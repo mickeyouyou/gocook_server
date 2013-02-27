@@ -3,3 +3,8 @@
 composer
 zendframework
 autoload.php
+monolog
+zf-commons
+psr
+doctrine
+bin
