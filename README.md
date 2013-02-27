@@ -22,13 +22,6 @@ This is gocook_server code.
 #####For MacOSX:
 Just Install binary mysql
 
-	
-###Database
-----------------------------
-1. import `data/schema.sql` to mysql
-
-2. copy `config/autoload/database.local.php.dist` and rename the file as `database.local.php`. Remeber to change the user and password.
-
 
 ###Virtual Host
 ------------
@@ -61,8 +54,8 @@ Just Install binary mysql
 			allow from all
 		</Directory>
 
-2. Change default encoding
-
+2. Change default encoding (Just For linux)
+	
 		sudo gedit /etc/apache2/conf.d/charset
 
 	remove `#`
@@ -91,6 +84,13 @@ Install (It will take some time depends on your network)
 	cd gocook_server
 	php composer.phar self-update
 	php composer.phar install
+
+
+###Config Project Database
+----------------------------
+1. import `data/schema.sql` to mysql
+
+2. copy `config/autoload/database.local.php.dist` and rename the file as `database.local.php`. Remeber to change the user and password.
 
 
 ###Finish
