@@ -59,7 +59,9 @@ class User extends EventProvider implements ServiceManagerAwareInterface
     public function register(array $data)
     {
         $class = $this->getOptions()->getUserEntityClass();
+        
         $user  = new $class;
+        
         $form  = $this->getRegisterForm();
         $form->setHydrator($this->getServiceManager()->get('zfcuser_register_form_hydrator'));
         $form->bind($user);
@@ -88,8 +90,12 @@ class User extends EventProvider implements ServiceManagerAwareInterface
                 $user->setState($this->getOptions()->getDefaultUserState());
             }
         }
+        
+        $user->setTestField(11111);
+                
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('user' => $user, 'form' => $form));
         $this->getUserMapper()->insert($user);
+                
         $this->getEventManager()->trigger(__FUNCTION__.'.post', $this, array('user' => $user, 'form' => $form));
         return $user;
     }

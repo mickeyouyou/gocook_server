@@ -72,8 +72,6 @@ class UserController extends AbstractActionController
             $redirect = false;
         }
         
-        var_dump("111");
-
         if (!$request->isPost()) {
             return array(
                 'loginForm' => $form,
@@ -164,9 +162,7 @@ class UserController extends AbstractActionController
         if (!$this->getOptions()->getEnableRegistration()) {
             return array('enableRegistration' => false);
         }
-        
-
-        
+         
         $request = $this->getRequest();
         $service = $this->getUserService();
         $form = $this->getRegisterForm();
@@ -192,6 +188,7 @@ class UserController extends AbstractActionController
         }
 
         $post = $prg;
+        
         $user = $service->register($post);
 
         $redirect = isset($prg['redirect']) ? $prg['redirect'] : null;

@@ -173,11 +173,23 @@ class User implements BaseUserInterface
         return $this;
     }
     
+     /**
+     * Set state.
+     *
+     * @param int $state
+     * @return UserInterface
+     */
     public function getTestField()
     {
         return $this->testField;
     }
     
+     /**
+     * Set testField.
+     *
+     * @param int $testField
+     * @return UserInterface
+     */
     public function setTestField($testField)
     {
         $this->testField = $testField;
