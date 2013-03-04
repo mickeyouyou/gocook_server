@@ -8,6 +8,7 @@ return array(
     'controllers' => array(
         'invokables' => array(
             'myuser' => 'MyUser\Controller\UserController',
+            'zfcuser' => 'MyUser\Controller\UserController',            
         ),
     ),
     'router' => array(

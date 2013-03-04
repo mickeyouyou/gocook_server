@@ -30,4 +30,23 @@ class Module
             ),
         );
     }
+    
+    public function getServiceConfig()
+    {
+        return array(
+            'factories' => array(
+                'zfcuser_user_mapper' => function ($sm) {
+                    $options = $sm->get('zfcuser_module_options');
+                    $mapper = new Mapper\User();
+                    $mapper->setDbAdapter($sm->get('zfcuser_zend_db_adapter'));
+                    $entityClass = $options->getUserEntityClass();
+                    $mapper->setEntityPrototype(new $entityClass);
+                    return $mapper;
+                }
+            ),
+            'invokables' => array(
+                'zfcuser_user_service' => 'MyUser\Service\User',
+            ),
+        );
+    }
 }
