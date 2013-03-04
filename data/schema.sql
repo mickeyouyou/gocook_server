@@ -22,6 +22,7 @@ CREATE TABLE `user` (
   `weibo_id` varchar(255) DEFAULT NULL,
   `weibo_access_token` varchar(255) DEFAULT NULL,
   `state` smallint(6) DEFAULT NULL,
+  `test_field` int(11) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`),
