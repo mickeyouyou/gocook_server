@@ -4,6 +4,8 @@ return array(
     'modules' => array(
         'ZfcBase',
         'ZfcUser',
+        'DoctrineModule',
+        'DoctrineORMModule',
         'MyUser',
         'Application',
         'Main',

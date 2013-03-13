@@ -91,7 +91,7 @@ class User extends EventProvider implements ServiceManagerAwareInterface
             }
         }
         
-        $user->setTestField(11111);
+        $user->setAge(11);
                 
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('user' => $user, 'form' => $form));
         $this->getUserMapper()->insert($user);

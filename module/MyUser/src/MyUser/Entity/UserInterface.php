@@ -97,7 +97,7 @@ interface UserInterface extends BaseInterface
     public function setState($state);
 
     
-    public function getTestField();
-    public function setTestField($testField);
+    public function getAge();
+    public function setAge($age);
     
 }

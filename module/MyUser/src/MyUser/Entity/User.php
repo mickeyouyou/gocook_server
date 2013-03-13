@@ -39,7 +39,7 @@ class User implements BaseUserInterface
     /**
      * @var test_field 
      */
-    protected $testField;
+    protected $age;
     
     /**
      * Get id.
@@ -179,20 +179,20 @@ class User implements BaseUserInterface
      * @param int $state
      * @return UserInterface
      */
-    public function getTestField()
+    public function getAge()
     {
-        return $this->testField;
+        return $this->age;
     }
     
      /**
-     * Set testField.
+     * Set Age.
      *
-     * @param int $testField
+     * @param int $age
      * @return UserInterface
      */
-    public function setTestField($testField)
+    public function setAge($age)
     {
-        $this->testField = $testField;
+        $this->age = $age;
         return $this;
     }
 }
