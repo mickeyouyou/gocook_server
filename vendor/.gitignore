@@ -7,4 +7,5 @@ monolog
 zf-commons
 psr
 doctrine
+symfony
 bin
