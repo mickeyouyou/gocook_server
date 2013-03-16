@@ -14,7 +14,9 @@ use Zend\Mvc\Controller\AbstractActionController,
     User\Form\LoginForm,
     User\Service\UserService,
     User\Form\RegisterForm,
-    User\Form\RegisterFilter;
+    User\Form\RegisterFilter,
+    User\Form\ChangePassForm,
+    User\Form\ChangePassFilter;    
 
 class UserController extends AbstractActionController 
 {
@@ -101,6 +103,37 @@ class UserController extends AbstractActionController
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');      
         $authService->clearIdentity();
         return $this->redirect()->toRoute('user');      
+    }
+    
+    public function changepassAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+          
+            $data = $request->getPost();
+            
+            $form = new ChangePassForm;
+            $form->setInputFilter(new ChangePassFilter);
+            $form->setData($data);
+            
+            if($form->isValid()) {
+                $userService = $this->getServiceLocator()->get('user_service');
+                if($userService->changepass($data)) {
+                    return new ViewModel(array(
+                      'form' => new ChangePassForm(),
+                      'result' => 'Change Success!'
+                    ));
+                }
+            }
+            
+            return new ViewModel(array(
+                'form' => new ChangePassForm(),
+                'result' => 'Change Error!'
+            ));  
+        }
+        return new ViewModel(array(
+            'form' => new ChangePassForm(),
+        ));          
     }
     
     

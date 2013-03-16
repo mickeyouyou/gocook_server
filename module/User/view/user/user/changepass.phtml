@@ -1,0 +1,14 @@
+<?php
+    $form = $this->form;
+    $form->prepare();
+    echo $this->form()->openTag($form);
+    echo $this->formRow($form->get('oripassword'));
+    echo $this->formRow($form->get('password'));
+    echo $this->formRow($form->get('repassword'));
+    echo $this->formInput($form->get('submit'));
+    echo $this->form()->closeTag($form);
+?>
+<?php 
+    echo $this->result;
+?>
+<div><a href="/user">Return</a></div>

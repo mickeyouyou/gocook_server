@@ -72,6 +72,8 @@ class UserService implements ServiceManagerAwareInterface
         if (trim($data['nickname'])!="")
           $user->__set('display_name', trim($data['nickname']));
         
+        //$user->__set();
+        
         $repository = $this->entityManager->getRepository('User\Entity\User');
         $email_result = $repository->findOneBy(array('email' => $data['email']));
         //$display_result = $repository->findOneBy(array('display_name' => $data['display_name']));
@@ -82,6 +84,24 @@ class UserService implements ServiceManagerAwareInterface
             return true;
         }
         
+        return false;
+    }
+    
+    public function changepass($data)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');     
+        $user = $authService->getIdentity();
+        $bcrypt = new Bcrypt;
+        $bcrypt->setCost(self::PASSWORDCOST);
+        if ($bcrypt->verify($data['oripassword'], $user->__get('password')))
+        {
+            $bcrypt = new Bcrypt;
+            $bcrypt->setCost(self::PASSWORDCOST);
+            $user->__set('password', $bcrypt->create($data['password']));
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+            return true;
+        }
         return false;
     }
     
