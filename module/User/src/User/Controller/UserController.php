@@ -29,12 +29,24 @@ class UserController extends AbstractActionController
 
     public function indexAction()
     {
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if(!$authService->hasIdentity()) {
+            return $this->redirect()->toRoute('user', array('action' => 'login'));      
+        }
+
+        return new ViewModel(array(
+            'username' => $authService->getIdentity()->__get('email')
+        ));
     }
     
 
     public function loginAction()
-    {
-      
+    {   
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');      
+        if($authService->hasIdentity()) {
+            return $this->redirect()->toRoute('user');      
+        }
+        
         $request = $this->getRequest();
         if ($request->isPost()) {
           
@@ -42,12 +54,12 @@ class UserController extends AbstractActionController
             
             $userService = $this->getServiceLocator()->get('user_service');
             if($userService->authenticate($data)) {
-                return $this->redirect()->toRoute('user/index');
+                return $this->redirect()->toRoute('user'); 
             }
 
             return new ViewModel(array(
-            'form' => new LoginForm(),
-            'errors' => "Error"
+                'form' => new LoginForm(),
+                'errors' => "Login Errors"
             ));
         }
         return new ViewModel(array(
@@ -86,7 +98,9 @@ class UserController extends AbstractActionController
     
     public function logoutAction()
     {
-      
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');      
+        $authService->clearIdentity();
+        return $this->redirect()->toRoute('user');      
     }
     
     

@@ -78,7 +78,7 @@ class RegisterForm extends Form
             'name' => 'submit',
             'attributes' => array(
                 'type' => 'submit',
-                'value' => 'Login',
+                'value' => 'Register',
                 'id' => 'submitbtn',
             ),
         ));

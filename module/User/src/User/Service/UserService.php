@@ -38,13 +38,16 @@ class UserService implements ServiceManagerAwareInterface
                 'objectManager'=>$this->getEntityManager(),
                 'identityClass'=>'User\Entity\User',
                 'identityProperty'=>$type,
-                'credentialProperty'=>'password'
+                'credentialProperty'=>'password',
+                'credential_callable' => function(\User\Entity\User $user, $password) {
+                    $bcrypt = new \Zend\Crypt\Password\Bcrypt();
+                    $bcrypt->setCost(UserService::PASSWORDCOST);
+                    return $bcrypt->verify($password, $user->__get('password'));
+                },
             ));
 
             $adapter->setIdentityValue($data['login']);
-            $bcrypt = new Bcrypt;
-            $bcrypt->setCost(self::PASSWORDCOST);
-            $password = $bcrypt->create($data['password']);
+            $password = $data['password'];
             $adapter->setCredentialValue($password);
             $authResult = $authService->authenticate();
             
@@ -64,14 +67,15 @@ class UserService implements ServiceManagerAwareInterface
 
         $bcrypt = new Bcrypt;
         $bcrypt->setCost(self::PASSWORDCOST);
-        $user->setPassword($bcrypt->create($data['password']));
-        $user->setEmail($data['email']);
-        $user->setUsername($data['nickname']);
-        
+        $user->__set('password', $bcrypt->create($data['password']));
+        $user->__set('email', $data['email']);
+        if (trim($data['nickname'])!="")
+          $user->__set('display_name', trim($data['nickname']));
         
         $repository = $this->entityManager->getRepository('User\Entity\User');
-        $user_result = $repository->findOneBy(array('email' => $data['email']));
-        if (!$user_result)
+        $email_result = $repository->findOneBy(array('email' => $data['email']));
+        //$display_result = $repository->findOneBy(array('display_name' => $data['display_name']));
+        if (!$email_result) // && !$display_result)
         {
             $this->entityManager->persist($user);
             $this->entityManager->flush();

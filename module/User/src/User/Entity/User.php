@@ -37,22 +37,10 @@ class User
      */
     protected $password;
     
-    
-    
-    public function setPassword($password)
-    {
-        $this->password = $password;
-    }
-    
-    public function setUsername($username)
-    {
-        $this->username = $username;
-    }    
-
-    public function setEmail($email)
-    {
-        $this->email = $email;
-    }
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected $display_name;
     
     /**
      * Magic getter to expose protected properties.
