@@ -1,9 +1,10 @@
 <?php
 
-namespace MyUser;
+namespace User;
 
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
+use Zend\Authentication\AuthenticationService;
 
 class Module
 {
@@ -35,20 +36,17 @@ class Module
     {
         return array(
             'factories' => array(
-                'zfcuser_user_mapper' => function ($sm) {
-                    $options = $sm->get('zfcuser_module_options');
-                    $mapper = new Mapper\User();
-                    $mapper->setDbAdapter($sm->get('zfcuser_zend_db_adapter'));
-                    $entityClass = $options->getUserEntityClass();
-                    $mapper->setEntityPrototype(new $entityClass);
-                    $mapper->setHydrator(new Mapper\UserHydrator());
-                    $mapper->setTableName($options->getTableName());
-                    return $mapper;                    
+                'Zend\Authentication\AuthenticationService' => function($serviceManager) {
+                    // If you are using DoctrineORMModule:
+                    return $serviceManager->get('doctrine.authenticationservice.orm_default');
+                },
+                'user_service' => function($sm) {
+                    $service = new \User\Service\UserService();
+                    $service->setServiceManager($sm);
+                    $service->setEntityManager($sm->get('doctrine.entitymanager.orm_default'));
+                    return $service;
                 }
-            ),
-            'invokables' => array(
-                'zfcuser_user_service' => 'MyUser\Service\User',
-            ),
+            )
         );
     }
 }

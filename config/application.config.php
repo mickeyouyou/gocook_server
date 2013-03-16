@@ -2,13 +2,12 @@
 return array(
 
     'modules' => array(
-        'ZfcBase',
-        'ZfcUser',
+        'ZendDeveloperTools',
         'DoctrineModule',
         'DoctrineORMModule',
-        'MyUser',
         'Application',
         'Main',
+        'User',
     ),
 
     'module_listener_options' => array(
