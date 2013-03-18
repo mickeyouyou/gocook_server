@@ -9,6 +9,7 @@ use Zend\ServiceManager\ServiceManager;
 use Doctrine\ORM\EntityManager;
 use Zend\Crypt\Password\Bcrypt;
 use User\Entity\User;
+use User\Entity\UserInfo;
 use User\Form\LoginForm;
 use User\Form\RegisterForm;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
@@ -71,9 +72,8 @@ class UserService implements ServiceManagerAwareInterface
         $user->__set('email', $data['email']);
         if (trim($data['nickname'])!="")
           $user->__set('display_name', trim($data['nickname']));
-        
-        //$user->__set();
-        
+        $user->__set('register_time', new \DateTime());
+                
         $repository = $this->entityManager->getRepository('User\Entity\User');
         $email_result = $repository->findOneBy(array('email' => $data['email']));
         //$display_result = $repository->findOneBy(array('display_name' => $data['display_name']));
@@ -81,6 +81,20 @@ class UserService implements ServiceManagerAwareInterface
         {
             $this->entityManager->persist($user);
             $this->entityManager->flush();
+            
+            $user_info = new UserInfo();
+            $user_info->__set('collect_count', 0);
+            $user_info->__set('dish_count', 0);
+            $user_info->__set('recipe_count', 0);
+            $user_info->__set('following_count', 0);
+            $user_info->__set('followed_count', 0);
+            
+            $user->__set('user_info', $user_info);
+            $user_info->__set('user', $user);
+            
+            $this->entityManager->persist($user_info);
+            $this->entityManager->flush();          
+     
             return true;
         }
         

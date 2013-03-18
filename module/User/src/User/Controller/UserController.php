@@ -11,6 +11,7 @@ use Zend\Mvc\Controller\AbstractActionController,
     DoctrineModule\Authentication\Adapter\DoctrineObjectRepository as DoctrineAdapter,
         
     User\Entity\User,  
+    User\Entity\UserInfo,  
     User\Form\LoginForm,
     User\Service\UserService,
     User\Form\RegisterForm,
