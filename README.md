@@ -91,7 +91,7 @@ Install (It will take some time depends on your network)
 1. import `data/schema.sql` to mysql
 
 2. copy `config/autoload/database.local.php.dist` and rename the file as `database.local.php`. Remeber to change the user and password.
-
+2. copy `config/autoload/zenddevelopertools.local.php.dist` and rename the file as `zenddevelopertools.local.php`.
 
 ###Finish
 Afterwards, you should be ready to go!
