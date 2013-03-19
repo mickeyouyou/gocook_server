@@ -38,7 +38,7 @@ CREATE TABLE `dish` (
   `content` text,
   `photo_id` int(11) DEFAULT NULL,
   `favor_count` int(11) DEFAULT NULL,
-  `state` char(1) DEFAULT NULL,
+  `state` smallint(1) DEFAULT NULL,
   PRIMARY KEY (`dish_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -66,7 +66,7 @@ CREATE TABLE `dish_comment` (
   `recipe_id` int(11) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
   `content` text,
-  `state` char(1) DEFAULT NULL,
+  `state` smallint(1) DEFAULT NULL,
   PRIMARY KEY (`comment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -89,7 +89,7 @@ DROP TABLE IF EXISTS `material`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `material` (
   `material_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` int(11) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
   `catgory` int(11) DEFAULT NULL,
   PRIMARY KEY (`material_id`),
   UNIQUE KEY `name` (`name`)
@@ -207,7 +207,7 @@ CREATE TABLE `recipe_comment` (
   `recipe_id` int(11) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
   `content` text,
-  `state` char(1) DEFAULT NULL,
+  `state` smallint(1) DEFAULT NULL,
   PRIMARY KEY (`comment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -232,7 +232,7 @@ CREATE TABLE `user` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(255) DEFAULT '',
   `display_name` varchar(50) DEFAULT NULL,
-  `portrait` int(11) DEFAULT NULL,
+  `portrait_id` int(11) DEFAULT NULL,
   `email` varchar(255) DEFAULT '',
   `password` varchar(128) NOT NULL,
   `qq_openid` varchar(255) DEFAULT NULL,
@@ -240,20 +240,23 @@ CREATE TABLE `user` (
   `weibo_id` bigint(11) DEFAULT NULL,
   `weibo_access_token` varchar(255) DEFAULT NULL,
   `state` smallint(6) DEFAULT NULL,
-  `gender` char(1) DEFAULT NULL,
+  `gender` smallint(1) DEFAULT NULL,
   `age` smallint(6) DEFAULT NULL,
   `career` varchar(100) DEFAULT NULL,
   `city` varchar(50) DEFAULT NULL,
+  `province` varchar(50) DEFAULT NULL,
   `tel` varchar(20) DEFAULT NULL,
-  `user_type` char(1) DEFAULT NULL,
+  `user_type` smallint(1) DEFAULT NULL,
   `register_time` datetime DEFAULT NULL,
   `intro` text,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `qq_openid` (`qq_openid`),
-  UNIQUE KEY `weibo_id` (`weibo_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+  UNIQUE KEY `weibo_id` (`weibo_id`),
+  KEY `user_id` (`user_id`),
+  KEY `portrait_id` (`portrait_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -262,7 +265,6 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,NULL,NULL,NULL,'a@a.com','$2y$14$ndvisBHZ.P5CHAYemXaK7.n/Bbs/Sgoc/mITLmzPrhOjEvS0dyJiC',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0000-00-00 00:00:00',NULL),(2,NULL,NULL,NULL,'aa@aa.com','$2y$14$LqwOWxyPYLSuGB2TcbOYXu/mZu/BylGgIfT83JhI5w7olXQVAcHoO',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0000-00-00 00:00:00',NULL),(3,NULL,NULL,NULL,'a@aa.com','$2y$14$AWPCFljdG3rSl.00dKM6qOCEfHyYvSaDtcsRJSSNnEIsgj0rZzr82',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0000-00-00 00:00:00',NULL),(4,NULL,NULL,NULL,'a@aaa.com','$2y$14$sERvvSj2JnmeZrZ5F6Pgi.s5yxE8kkVWkbHKxZ4uJAcoSs5FsFQZu',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0000-00-00 00:00:00',NULL),(5,NULL,NULL,NULL,'aaa@aaa.com','$2y$14$.5SkY18BmK2MomJqy2aMo.yd.SqADplGMsLog7uqAsMZz897tY1Km',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0000-00-00 00:00:00',NULL),(6,NULL,NULL,NULL,'aaa@aaaa.com','$2y$14$PSNq8X4k08yJvxfZpcArtOcKFqyoLt1hF1odG.KvjML75RF9ApVjy',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0000-00-00 00:00:00',NULL);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -274,7 +276,7 @@ DROP TABLE IF EXISTS `user_collection`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user_collection` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
   `recipe_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -325,10 +327,10 @@ DROP TABLE IF EXISTS `user_favor`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user_favor` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
   `dish_id` int(11) DEFAULT NULL,
-  `state` char(1) DEFAULT NULL COMMENT '当为0时表示未赞',
+  `state` smallint(1) DEFAULT NULL COMMENT '当为0时表示未赞',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -350,15 +352,15 @@ DROP TABLE IF EXISTS `user_info`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user_info` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL DEFAULT '0',
   `collect_count` int(11) DEFAULT NULL,
   `dish_count` int(11) DEFAULT NULL,
   `recipe_count` int(11) DEFAULT NULL,
   `following_count` int(11) DEFAULT NULL,
   `followed_count` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `user_id` (`user_id`)
+  PRIMARY KEY (`user_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `user_info_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -382,8 +384,10 @@ CREATE TABLE `user_relation` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
   `target_id` int(11) DEFAULT NULL,
-  `state` char(1) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `state` smallint(1) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `target_id` (`target_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -405,4 +409,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-03-13  1:20:02
+-- Dump completed on 2013-03-19 12:15:56
