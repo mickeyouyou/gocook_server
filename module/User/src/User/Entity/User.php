@@ -7,7 +7,7 @@ use User\Entity\UserInfo;
 use User\Entity\Recipe;
 use User\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-
+//必须全部删除才能让另一方删除的就是owner，owner中inversedBy
 /**
  * @ORM\Entity(repositoryClass="User\Repository\UserRepository")
  * @ORM\Table(name="user")
