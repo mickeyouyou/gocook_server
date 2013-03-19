@@ -39,7 +39,9 @@ CREATE TABLE `dish` (
   `photo_id` int(11) DEFAULT NULL,
   `favor_count` int(11) DEFAULT NULL,
   `state` smallint(1) DEFAULT NULL,
-  PRIMARY KEY (`dish_id`)
+  PRIMARY KEY (`dish_id`),
+  KEY `recipe_id` (`recipe_id`),
+  CONSTRAINT `dish_ibfk_1` FOREIGN KEY (`recipe_id`) REFERENCES `recipe` (`recipe_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -167,7 +169,7 @@ DROP TABLE IF EXISTS `recipe`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `recipe` (
-  `recipe_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `recipe_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
   `name` varchar(100) DEFAULT NULL,
@@ -181,7 +183,10 @@ CREATE TABLE `recipe` (
   `materials` text,
   `recipe_steps` text,
   `tips` text,
-  PRIMARY KEY (`recipe_id`)
+  PRIMARY KEY (`recipe_id`),
+  KEY `user_id` (`user_id`),
+  KEY `recipe_id` (`recipe_id`),
+  CONSTRAINT `recipe_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -279,7 +284,11 @@ CREATE TABLE `user_collection` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
   `recipe_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `recipe_id` (`recipe_id`),
+  CONSTRAINT `user_collection_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
+  CONSTRAINT `user_collection_ibfk_1` FOREIGN KEY (`recipe_id`) REFERENCES `recipe` (`recipe_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -409,4 +418,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-03-19 12:15:56
+-- Dump completed on 2013-03-19 16:26:17

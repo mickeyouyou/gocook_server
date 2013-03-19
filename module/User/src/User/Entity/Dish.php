@@ -66,6 +66,11 @@ class Dish
      */
     protected $state;    
     
+    /**
+     * @ManyToOne(targetEntity="Recipe", inversedBy="dishes")
+     * @JoinColumn(name="recipe_id", referencedColumnName="recipe_id")
+     **/
+   protected $recipe;
    
     /**
      * Magic getter to expose protected properties.

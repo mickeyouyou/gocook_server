@@ -8,6 +8,8 @@
 namespace User\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use User\Entity\User;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity
@@ -37,6 +39,23 @@ class Recipe
      */
     protected $recipe_id;
     
+    /*
+     * @ORM\ManyToMany(targetEntity="User", mappedBy="collect_recipes") 
+     */
+    protected $collect_users;
+    
+    /**
+     * @ManyToOne(targetEntity="User", inversedBy="recipes")
+     * @JoinColumn(name="user_id", referencedColumnName="user_id")
+     **/
+   protected $user;
+   
+    /**
+     * @ORM\OneToMany(targetEntity="Dish", mappedBy="recipe")
+     * @ORM\JoinColumn(name="recipe_id", referencedColumnName="recipe_id")
+     **/
+   protected $dishes;
+   
     
     /**
      * @ORM\Column(type="integer")
@@ -103,6 +122,12 @@ class Recipe
      */
     protected $tips;
     
+    
+    public function __construct()
+    {
+        $this->dishes = new ArrayCollection();
+      
+    }
     
     /**
      * Magic getter to expose protected properties.

@@ -4,7 +4,9 @@ namespace User\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use User\Entity\UserInfo;
+use User\Entity\Recipe;
 use User\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass="User\Repository\UserRepository")
@@ -28,8 +30,23 @@ class User
      * @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
      **/
     protected $user_info;
-
+    
     /**
+     * @ORM\ManyToMany(targetEntity="Recipe", inversedBy="collect_users")
+     * @ORM\JoinTable(name="user_collection",
+     * joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id")},
+     * inverseJoinColumns={@ORM\JoinColumn(name="recipe_id", referencedColumnName="recipe_id")}
+     **/
+    protected $collect_recipes;    
+    
+    /**
+     * @ORM\OneToMany(targetEntity="Recipe", mappedBy="user")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
+     **/
+   protected $recipes;
+
+
+   /**
      * @ORM\Column(type="string")
      */
     protected $username;
@@ -93,6 +110,11 @@ class User
      * @ORM\Column(type="text")
      */
     protected $intro;   
+
+    public function __construct() 
+    {
+        $this->recipes = new ArrayCollection();
+    }
     
     /**
      * Magic getter to expose protected properties.
