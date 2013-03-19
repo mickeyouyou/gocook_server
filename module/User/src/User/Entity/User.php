@@ -4,9 +4,10 @@ namespace User\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use User\Entity\UserInfo;
+use User\Repository\UserRepository;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="User\Repository\UserRepository")
  * @ORM\Table(name="user")
  * @property string $username
  * @property string $password
