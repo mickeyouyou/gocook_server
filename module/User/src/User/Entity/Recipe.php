@@ -45,8 +45,8 @@ class Recipe
     protected $collect_users;
     
     /**
-     * @ManyToOne(targetEntity="User", inversedBy="recipes")
-     * @JoinColumn(name="user_id", referencedColumnName="user_id")
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="recipes")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
      **/
    protected $user;
    

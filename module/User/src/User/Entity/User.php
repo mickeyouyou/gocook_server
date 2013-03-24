@@ -35,7 +35,7 @@ class User
      * @ORM\ManyToMany(targetEntity="Recipe", inversedBy="collect_users")
      * @ORM\JoinTable(name="user_collection",
      * joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id")},
-     * inverseJoinColumns={@ORM\JoinColumn(name="recipe_id", referencedColumnName="recipe_id")}
+     * inverseJoinColumns={@ORM\JoinColumn(name="recipe_id", referencedColumnName="recipe_id")})
      **/
     protected $collect_recipes;    
     

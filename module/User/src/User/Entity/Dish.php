@@ -67,8 +67,8 @@ class Dish
     protected $state;    
     
     /**
-     * @ManyToOne(targetEntity="Recipe", inversedBy="dishes")
-     * @JoinColumn(name="recipe_id", referencedColumnName="recipe_id")
+     * @ORM\ManyToOne(targetEntity="Recipe", inversedBy="dishes")
+     * @ORM\JoinColumn(name="recipe_id", referencedColumnName="recipe_id")
      **/
    protected $recipe;
    
