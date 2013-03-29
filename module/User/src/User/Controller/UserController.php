@@ -91,7 +91,7 @@ class UserController extends AbstractActionController
         {
             $username = $authService->getIdentity()->__get('email');
             return new JsonModel(array(
-                'result' => true,
+                'result' => 0,
                 'errorcode' => 0,
                 'username' => $username,
                 'icon' => ''
@@ -99,7 +99,7 @@ class UserController extends AbstractActionController
         }
         else {
             return new JsonModel(array(
-                'result' => false,
+                'result' => 1,
                 'errorcode' => 1,
                 'username' => "",
                 'icon' => ''
