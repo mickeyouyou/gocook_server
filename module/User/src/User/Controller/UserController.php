@@ -19,6 +19,9 @@ use Zend\Mvc\Controller\AbstractActionController,
     User\Form\ChangePassForm,
     User\Form\ChangePassFilter;    
 
+use Zend\View\Model\JsonModel;
+
+
 class UserController extends AbstractActionController 
 {
     
@@ -45,29 +48,63 @@ class UserController extends AbstractActionController
 
     public function loginAction()
     {   
-        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');      
-        if($authService->hasIdentity()) {
-            return $this->redirect()->toRoute('user');      
-        }
+        $loginSuccess = false;
         
         $request = $this->getRequest();
+      
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');      
+        if($authService->hasIdentity()) {
+            if ($this->isMobile($request))
+                $loginSuccess = true;
+            else
+                return $this->redirect()->toRoute('user');                      
+        }
+
         if ($request->isPost()) {
           
             $data = $request->getPost();
             
             $userService = $this->getServiceLocator()->get('user_service');
             if($userService->authenticate($data)) {
-                return $this->redirect()->toRoute('user'); 
+                if($this->isMobile($request))
+                    $loginSuccess = true;
+                else
+                    return $this->redirect()->toRoute('user');
             }
 
+            if(!$this->isMobile($request))
+            {
+                return new ViewModel(array(
+                    'form' => new LoginForm(),
+                    'errors' => "Login Errors"
+                ));
+            }
+        }
+        if(!$this->isMobile($request)){
             return new ViewModel(array(
-                'form' => new LoginForm(),
-                'errors' => "Login Errors"
+                'form' => new LoginForm()
             ));
         }
-        return new ViewModel(array(
-            'form' => new LoginForm()
-        ));
+        
+        
+        if ($loginSuccess)
+        {
+            $username = $authService->getIdentity()->__get('email');
+            return new JsonModel(array(
+                'result' => true,
+                'errorcode' => 0,
+                'username' => $username,
+                'icon' => ''
+            ));            
+        }
+        else {
+            return new JsonModel(array(
+                'result' => false,
+                'errorcode' => 1,
+                'username' => "",
+                'icon' => ''
+            ));              
+        }
     }
     
     public function registerAction() 
@@ -137,6 +174,20 @@ class UserController extends AbstractActionController
         ));          
     }
     
+    public function isMobile($request)
+    {
+        $isMobile = false;
+        $requestHeaders  = $request->getHeaders();
+        if($requestHeaders->has('x-client-identifier'))
+        {
+          $xIdentifier = $requestHeaders->get('x-client-identifier')->getFieldValue();
+          if($xIdentifier == 'Mobile')
+          {
+            $isMobile = true;
+          }
+        }
+        return $isMobile;
+    }
     
     public function setEntityManager(EntityManager $em)
     {

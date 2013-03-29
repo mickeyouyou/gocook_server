@@ -5,7 +5,6 @@
     echo $this->form()->openTag($form);
     echo $this->formRow($form->get('login'));
     echo $this->formRow($form->get('password'));
-    echo $this->formRow($form->get('csrf'));
     echo $this->formInput($form->get('submit'));
     echo $this->form()->closeTag($form);
 ?>

@@ -11,7 +11,9 @@ use Zend\Crypt\Password\Bcrypt;
 use User\Entity\User;
 use User\Entity\UserInfo;
 use User\Form\LoginForm;
+use User\Form\LoginFilter;
 use User\Form\RegisterForm;
+use User\Form\RegisterFilter;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 
 
@@ -23,8 +25,9 @@ class UserService implements ServiceManagerAwareInterface
     protected $entityManager;
     
     public function authenticate($data)
-    {
+    {        
         $form = new LoginForm;
+        $form->setInputFilter(new LoginFilter());
         $form->setData($data);
 
         if(!$form->isValid()) {

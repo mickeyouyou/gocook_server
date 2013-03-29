@@ -16,7 +16,7 @@ class LoginFilter extends InputFilter {
             ),
             'validators' => array(
                 array(
-                    'name' => 'text',
+                    'name' => 'StringLength',
                     'options' => array( 'min' => 6 ),
                 ),
             ),
