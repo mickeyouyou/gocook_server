@@ -138,30 +138,6 @@ LOCK TABLES `photo` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `portrait`
---
-
-DROP TABLE IF EXISTS `portrait`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `portrait` (
-  `portrait_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `filename` varchar(100) DEFAULT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`portrait_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `portrait`
---
-
-LOCK TABLES `portrait` WRITE;
-/*!40000 ALTER TABLE `portrait` DISABLE KEYS */;
-/*!40000 ALTER TABLE `portrait` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `recipe`
 --
 
@@ -237,7 +213,7 @@ CREATE TABLE `user` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(255) DEFAULT '',
   `display_name` varchar(50) DEFAULT NULL,
-  `portrait_id` int(11) DEFAULT NULL,
+  `portrait` varchar(50) DEFAULT NULL,
   `email` varchar(255) DEFAULT '',
   `password` varchar(128) NOT NULL,
   `qq_openid` varchar(255) DEFAULT NULL,
@@ -259,9 +235,8 @@ CREATE TABLE `user` (
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `qq_openid` (`qq_openid`),
   UNIQUE KEY `weibo_id` (`weibo_id`),
-  KEY `user_id` (`user_id`),
-  KEY `portrait_id` (`portrait_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -281,14 +256,13 @@ DROP TABLE IF EXISTS `user_collection`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user_collection` (
-  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) DEFAULT NULL,
-  `recipe_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  `user_id` int(11) NOT NULL DEFAULT '0',
+  `recipe_id` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`user_id`,`recipe_id`),
   KEY `user_id` (`user_id`),
   KEY `recipe_id` (`recipe_id`),
-  CONSTRAINT `user_collection_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-  CONSTRAINT `user_collection_ibfk_1` FOREIGN KEY (`recipe_id`) REFERENCES `recipe` (`recipe_id`)
+  CONSTRAINT `user_collection_ibfk_1` FOREIGN KEY (`recipe_id`) REFERENCES `recipe` (`recipe_id`),
+  CONSTRAINT `user_collection_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -373,14 +347,6 @@ CREATE TABLE `user_info` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `user_info`
---
-
-LOCK TABLES `user_info` WRITE;
-/*!40000 ALTER TABLE `user_info` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_info` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `user_relation`
@@ -418,4 +384,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-03-19 16:26:17
+-- Dump completed on 2013-04-01  5:16:00
