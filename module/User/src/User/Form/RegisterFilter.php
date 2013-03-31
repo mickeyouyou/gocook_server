@@ -20,6 +20,24 @@ class RegisterFilter extends InputFilter {
                 ),
             ),
         ));
+
+        $this->add(array(
+            'name' => 'nickname',
+            'required' => true,
+            'filters' => array(
+                array('name' => 'StringTrim'),
+            ),
+            'validators' => array(
+                array(
+                    'name' => 'StringLength',
+                    'options' => array(
+                        'encoding' => 'UTF-8',
+                        'min'      => 3,
+                        'max'      => 20,
+                    ),
+                ),
+            ),
+        ));
         
         $this->add(array(
             'name' => 'password',

@@ -63,6 +63,15 @@ class RegisterForm extends Form
                 'label' => 'NickName',
             ),
         ));
+        
+        $this->add(array(
+            'name' => 'avatar',
+            'attributes' => array(
+                'type' => 'file',
+            ),
+            'options' => array(
+            ),
+        ));        
 
         $this->add(array(
             'name' => 'submit',

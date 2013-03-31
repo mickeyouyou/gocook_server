@@ -41,7 +41,7 @@ class UserController extends AbstractActionController
         }
 
         return new ViewModel(array(
-            'username' => $authService->getIdentity()->__get('email')
+            'username' => $authService->getIdentity()->__get('display_name')
         ));
     }
     
@@ -89,7 +89,7 @@ class UserController extends AbstractActionController
         
         if ($loginSuccess)
         {
-            $username = $authService->getIdentity()->__get('email');
+            $username = $authService->getIdentity()->__get('display_name');
             return new JsonModel(array(
                 'result' => 0,
                 'errorcode' => 0,
@@ -109,6 +109,11 @@ class UserController extends AbstractActionController
     
     public function registerAction() 
     {
+        $result = 1;
+        $errorcode = 0;
+        
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');      
+
         $request = $this->getRequest();
         if ($request->isPost()) {
           
@@ -117,23 +122,66 @@ class UserController extends AbstractActionController
             $form = new RegisterForm;
             $form->setInputFilter(new RegisterFilter);
             $form->setData($data);
-
+            
             if($form->isValid()) {
                 $userService = $this->getServiceLocator()->get('user_service');
-                if($userService->register($data)) {
+                $reg_result = $userService->register($data);
+                if ($reg_result == 0)
+                {
+                    $result = $reg_result;
+                    $errorcode = 0;
+                }
+                else
+                {
+                    $result = 1;
+                    $errorcode = $reg_result;
+                }
+                if (!$this->isMobile($request))
                     return $this->redirect()->toRoute('user/login');
+            }
+            else 
+            {
+                if ($this->isMobile($request))
+                {
+                   $result = 1;
+                    $errorcode = 1;//TODO:判断是哪种错误码                    
+                }
+                else
+                {
+                    return new ViewModel(array(
+                        'form' => new RegisterForm(),
+                        'errors' => 'Register Error!'
+                    ));  
                 }
             }
-            
-            return new ViewModel(array(
-                'form' => new RegisterForm(),
-                'errors' => 'Register Error!'
-            ));            
+          
         }
         
-        return new ViewModel(array(
-            'form' => new RegisterForm()
-        ));
+        if (!$this->isMobile($request))
+        {
+            return new ViewModel(array(
+                'form' => new RegisterForm()
+            ));                 
+        }
+
+        if ($result == 0)
+        {
+            $username = $authService->getIdentity()->__get('display_name');
+            return new JsonModel(array(
+                'result' => 0,
+                'errorcode' => 0,
+                'username' => $username,
+                'icon' => ''
+            ));            
+        }
+        else {
+            return new JsonModel(array(
+                'result' => 1,
+                'errorcode' => $errorcode,
+                'username' => "",
+                'icon' => ''
+            ));              
+        }
     }
     
     public function logoutAction()
