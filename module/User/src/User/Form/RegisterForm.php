@@ -23,6 +23,7 @@ class RegisterForm extends Form
         $this->setAttribute('method', 'post')
              ->setHydrator(new ClassMethodsHydrator(false))
              ->setObject(new User());
+        $this->setAttribute('enctype','multipart/form-data');
 
         $this->add(array(
             'name' => 'email',

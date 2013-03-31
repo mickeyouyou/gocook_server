@@ -106,6 +106,30 @@ class UserService implements ServiceManagerAwareInterface
 
         return 0;//result
     }
+
+    //保存头像
+    public function saveAvatar($file)
+    {
+
+        $size = new Size(array('min'=>2000000)); //minimum bytes filesize         
+        $adapter = new \Zend\File\Transfer\Adapter\Http();
+        $adapter->setValidators(array($size), $file['name']);
+        if (!$adapter->isValid()){
+            return false;
+//            $dataError = $adapter->getMessages();
+//            $error = array();
+//            foreach($dataError as $key=>$row)
+//            {
+//                $error[] = $row;
+//            }
+        } else {
+            $adapter->setDestination(INDEX_ROOT_PATH.'/images/avatars');
+                    if ($adapter->receive($file['name'])) {
+                        return true;
+                    }
+                } 
+       
+    }
     
     public function changepass($data)
     {

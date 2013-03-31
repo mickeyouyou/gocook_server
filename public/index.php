@@ -5,6 +5,8 @@
  */
 chdir(dirname(__DIR__));
 
+define('INDEX_ROOT_PATH', dirname(__DIR__));
+
 // Setup autoloading
 require 'init_autoloader.php';
 

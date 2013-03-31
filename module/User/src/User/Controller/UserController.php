@@ -113,6 +113,7 @@ class UserController extends AbstractActionController
         $errorcode = 0;
         
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');      
+        $userService = $this->getServiceLocator()->get('user_service');
 
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -124,7 +125,6 @@ class UserController extends AbstractActionController
             $form->setData($data);
             
             if($form->isValid()) {
-                $userService = $this->getServiceLocator()->get('user_service');
                 $reg_result = $userService->register($data);
                 if ($reg_result == 0)
                 {
@@ -166,6 +166,12 @@ class UserController extends AbstractActionController
 
         if ($result == 0)
         {
+            $File = $this->params()->fromFiles('avatar');
+            if ($File)
+            {
+                $userService->saveAvatar($File);
+            }
+            
             $username = $authService->getIdentity()->__get('display_name');
             return new JsonModel(array(
                 'result' => 0,
@@ -188,7 +194,7 @@ class UserController extends AbstractActionController
     {
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');      
         $authService->clearIdentity();
-        return $this->redirect()->toRoute('user');      
+        return $this->redirect()->toRoute('user'); 
     }
     
     public function changepassAction()
