@@ -108,10 +108,9 @@ class UserService implements ServiceManagerAwareInterface
     }
 
     //保存头像
-    public function saveAvatar($file)
+    public function saveAvatar($file, $uid)
     {
-
-        $size = new Size(array('min'=>2000000)); //minimum bytes filesize         
+        $size = new \Zend\Validator\File\Size(array('min'=>20000)); //minimum bytes filesize         
         $adapter = new \Zend\File\Transfer\Adapter\Http();
         $adapter->setValidators(array($size), $file['name']);
         if (!$adapter->isValid()){
@@ -123,12 +122,29 @@ class UserService implements ServiceManagerAwareInterface
 //                $error[] = $row;
 //            }
         } else {
-            $adapter->setDestination(INDEX_ROOT_PATH.'/images/avatars');
-                    if ($adapter->receive($file['name'])) {
-                        return true;
-                    }
-                } 
-       
+                
+            $savedfilename = $uid.date("_YmdHim").'.png';
+            $savedFullPath = INDEX_ROOT_PATH."/public/images/avatars/".$savedfilename;
+            @unlink($savedFullPath);
+            $cpresult = copy($_FILES['avatar']['tmp_name'], $savedFullPath);
+            @unlink($_FILES['avatar']['tmp_name']);
+
+            if (!$cpresult)
+                return false;
+            
+            $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');     
+            $user = $authService->getIdentity();
+            $user->__set('portrait', $savedfilename);
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();    
+            
+            return true;
+            
+//            $adapter->setDestination(INDEX_ROOT_PATH."/public/images/avatars");
+//            if ($adapter->receive($file['name'])) {
+//                return true;
+//            }
+        }       
     }
     
     public function changepass($data)

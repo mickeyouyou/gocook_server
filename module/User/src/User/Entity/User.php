@@ -57,9 +57,9 @@ class User
     protected $display_name;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      */
-    protected $portrait_id;    
+    protected $portrait;    
     
     /**
      * @ORM\Column(type="string")

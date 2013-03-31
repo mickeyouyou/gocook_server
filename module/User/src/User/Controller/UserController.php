@@ -168,16 +168,20 @@ class UserController extends AbstractActionController
         {
             $File = $this->params()->fromFiles('avatar');
             if ($File)
-            {
-                $userService->saveAvatar($File);
-            }
+                $userService->saveAvatar($File, $authService->getIdentity()->__get('user_id'));
             
             $username = $authService->getIdentity()->__get('display_name');
+            $avatar = $authService->getIdentity()->__get('portrait');
+            if (!$avatar || $avatar=='')
+                $avatar = '';
+            else
+                $avatar = 'images/avatars/'.$avatar;
+            
             return new JsonModel(array(
                 'result' => 0,
                 'errorcode' => 0,
                 'username' => $username,
-                'icon' => ''
+                'icon' => $avatar
             ));            
         }
         else {
