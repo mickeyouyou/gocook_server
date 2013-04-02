@@ -90,11 +90,17 @@ class UserController extends AbstractActionController
         if ($loginSuccess)
         {
             $username = $authService->getIdentity()->__get('display_name');
+            $avatar = $authService->getIdentity()->__get('portrait');
+            if (!$avatar || $avatar=='')
+                $avatar = '';
+            else
+                $avatar = 'images/avatars/'.$avatar;
+            
             return new JsonModel(array(
                 'result' => 0,
                 'errorcode' => 0,
                 'username' => $username,
-                'icon' => ''
+                'icon' => $avatar
             ));            
         }
         else {
