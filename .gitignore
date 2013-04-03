@@ -5,3 +5,4 @@ demos/
 extras/documentation
 .DS_Store
 composer.lock
+.idea/
