@@ -3,26 +3,26 @@
 namespace User\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController,
-    Zend\View\Model\ViewModel,   
+    Zend\View\Model\ViewModel,
     Zend\Authentication\AuthenticationService,
     Zend\Authentication\Adapter\AdapterInterface,
-        
+
     Doctrine\ORM\EntityManager,
     DoctrineModule\Authentication\Adapter\DoctrineObjectRepository as DoctrineAdapter,
-        
-    User\Entity\User,  
-    User\Entity\UserInfo,  
+
+    User\Entity\User,
+    User\Entity\UserInfo,
     User\Form\LoginForm,
     User\Service\UserService,
     User\Form\RegisterForm,
     User\Form\RegisterFilter,
     User\Form\ChangePassForm,
-    User\Form\ChangePassFilter;    
+    User\Form\ChangePassFilter;
 
 use Zend\View\Model\JsonModel;
 
 
-class UserController extends AbstractActionController 
+class UserController extends AbstractActionController
 {
     
     /**
@@ -44,7 +44,7 @@ class UserController extends AbstractActionController
             'username' => $authService->getIdentity()->__get('display_name')
         ));
     }
-    
+
 
     public function loginAction()
     {   
@@ -260,15 +260,15 @@ class UserController extends AbstractActionController
  
     public function getEntityManager()
     {
-        if (null === $this->em)
+        if (null == $this->em)
             $this->em = $this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
         return $this->em;        
     } 
     
     public function getRepository()
     {
-        if (null === $this->userRepository) 
-            $this->userEntity = $this->getEntityManager()->getRepository('User\Entity\User');
+        if (null == $this->userRepository)
+            $this->userRepository = $this->getEntityManager()->getRepository('User\Entity\User');
         return $this->userRepository;
     }
 }
