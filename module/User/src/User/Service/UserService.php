@@ -110,7 +110,7 @@ class UserService implements ServiceManagerAwareInterface
     //保存头像
     public function saveAvatar($file, $uid)
     {
-        $size = new \Zend\Validator\File\Size(array('min'=>20000)); //minimum bytes filesize         
+        $size = new \Zend\Validator\File\Size(array('min'=>1000)); //minimum bytes filesize
         $adapter = new \Zend\File\Transfer\Adapter\Http();
         $adapter->setValidators(array($size), $file['name']);
         if (!$adapter->isValid()){
@@ -122,7 +122,6 @@ class UserService implements ServiceManagerAwareInterface
 //                $error[] = $row;
 //            }
         } else {
-                
             $savedfilename = $uid.date("_YmdHim").'.png';
             $savedFullPath = INDEX_ROOT_PATH."/public/images/avatars/".$savedfilename;
             @unlink($savedFullPath);
@@ -131,7 +130,7 @@ class UserService implements ServiceManagerAwareInterface
 
             if (!$cpresult)
                 return false;
-            
+
             $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');     
             $user = $authService->getIdentity();
             $user->__set('portrait', $savedfilename);

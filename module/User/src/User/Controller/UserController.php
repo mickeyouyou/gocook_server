@@ -278,7 +278,7 @@ class UserController extends AbstractActionController
     {
         $result = 1;
         $errorcode = 0;
-        
+
         $request = $this->getRequest();
         //如果是post，那么就根据提交的修改个人信息
         if ($request->isPost()) {
