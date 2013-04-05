@@ -190,7 +190,8 @@ class UserController extends AbstractActionController
                 'icon' => $avatar
             ));            
         }
-        else {
+        else
+        {
             return new JsonModel(array(
                 'result' => 1,
                 'errorcode' => $errorcode,
@@ -202,13 +203,29 @@ class UserController extends AbstractActionController
     
     public function logoutAction()
     {
+        $request = $this->getRequest();
+
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');      
         $authService->clearIdentity();
-        return $this->redirect()->toRoute('user'); 
+        if (!$this->isMobile($request))
+        {
+            return $this->redirect()->toRoute('user');
+        }
+        else
+        {
+            return new JsonModel(array(
+                'result' => 1,
+                'errorcode' => 0
+            ));
+        }
+
     }
     
     public function changepassAction()
     {
+        $result = 1;
+        $errorcode = 0;
+
         $request = $this->getRequest();
         if ($request->isPost()) {
           
@@ -219,25 +236,60 @@ class UserController extends AbstractActionController
             $form->setData($data);
             
             if($form->isValid()) {
-                $userService = $this->getServiceLocator()->get('user_service');
-                if($userService->changepass($data)) {
-                    return new ViewModel(array(
-                      'form' => new ChangePassForm(),
-                      'result' => 'Change Success!'
-                    ));
+                if (!$this->isMobile($request))
+                {
+                    $userService = $this->getServiceLocator()->get('user_service');
+                    if($userService->changepass($data)) {
+                        return new ViewModel(array(
+                            'form' => new ChangePassForm(),
+                            'result' => 'Change Success!'
+                        ));
+                    }
+                }
+                else
+                {
+                    $result = 0;
                 }
             }
-            
+
+            if (!$this->isMobile($request))
+            {
+                return new ViewModel(array(
+                    'form' => new ChangePassForm(),
+                    'result' => 'Change Error!'
+                ));
+            }
+        }
+
+        if (!$this->isMobile($request))
+        {
             return new ViewModel(array(
                 'form' => new ChangePassForm(),
-                'result' => 'Change Error!'
-            ));  
+            ));
         }
-        return new ViewModel(array(
-            'form' => new ChangePassForm(),
-        ));          
+
+        return new JsonModel(array(
+            'result' => $result,
+            'errorcode' => $errorcode
+        ));
     }
-    
+
+    public function basicinfoAction()
+    {
+        $result = 1;
+        $errorcode = 0;
+        
+        $request = $this->getRequest();
+        //如果是post，那么就根据提交的修改个人信息
+        if ($request->isPost()) {
+
+
+        }
+
+    }
+
+
+    /*************Others****************/
     public function isMobile($request)
     {
         $isMobile = false;
