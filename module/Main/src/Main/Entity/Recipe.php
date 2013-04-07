@@ -5,7 +5,7 @@
 * Created By Panda on 18/03/13
 */
 
-namespace User\Entity;
+namespace Main\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use User\Entity\User;
@@ -40,12 +40,12 @@ class Recipe
     protected $recipe_id;
     
     /*
-     * @ORM\ManyToMany(targetEntity="User", mappedBy="collect_recipes") 
+     * @ORM\ManyToMany(targetEntity="User\Entity\User", mappedBy="collect_recipes")
      */
     protected $collect_users;
     
     /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="recipes")
+     * @ORM\ManyToOne(targetEntity="User\Entity\User", inversedBy="recipes")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
      **/
    protected $user;

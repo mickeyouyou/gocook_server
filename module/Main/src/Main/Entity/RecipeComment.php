@@ -1,25 +1,25 @@
 <?php
 /**
-* UserComment
+* Dish
 * 
 * Created By Panda on 18/03/13
 */
 
-namespace User\Entity;
+namespace Main\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="user_comment")
+ * @ORM\Table(name="recipe_comment")
  * @property bigint $comment_id
  * @property integer $user_id
- * @property integer $owner_id
+ * @property integer $recipe_id
  * @property datetime $create_time
  * @property text $content
  * @property smallint $state
  */
-class UserComment
+class RecipeComment
 {
 
     /**
@@ -37,7 +37,7 @@ class UserComment
     /**
      * @ORM\Column(type="integer")
      */
-    protected $owner_id;    
+    protected $recipe_id;    
     
     /**
      * @ORM\Column(type="datetime")

@@ -1,22 +1,25 @@
 <?php
 /**
-* UserCollection
+* UserComment
 * 
-* Created By Panda on 19/03/13
+* Created By Panda on 18/03/13
 */
 
-namespace User\Entity;
+namespace Main\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="user_collection")
- * @property bigint $id
- * #property string $user_id
- * @property integer $recipe_id
+ * @ORM\Table(name="user_comment")
+ * @property bigint $comment_id
+ * @property integer $user_id
+ * @property integer $owner_id
+ * @property datetime $create_time
+ * @property text $content
+ * @property smallint $state
  */
-class UserCollection
+class UserComment
 {
 
     /**
@@ -24,19 +27,34 @@ class UserCollection
      * @ORM\Column(type="bigint");
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    protected $comment_id;
 
     /**
      * @ORM\Column(type="integer")
      */
     protected $user_id;
-    
+
     /**
      * @ORM\Column(type="integer")
      */
-    protected $recipe_id;
+    protected $owner_id;    
     
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    protected $create_time;
     
+    /**
+     * @ORM\Column(type="text")
+     */
+    protected $content; 
+    
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    protected $state;    
+    
+   
     /**
      * Magic getter to expose protected properties.
      *

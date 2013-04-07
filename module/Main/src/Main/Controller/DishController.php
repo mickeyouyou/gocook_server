@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Main IndexController
+ * Recipe IndexController
  * @copyright Copyright (c) 2005-2012 BadPanda Inc.
  */
 
@@ -13,28 +13,16 @@ use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 
-class IndexController extends AbstractActionController {
+class DishController extends AbstractActionController {
 
-    protected function attachDefaultListeners()
-    {
-        parent::attachDefaultListeners();
-        $events = $this->getEventManager();
-        $events->attach(MvcEvent::EVENT_DISPATCH, array($this, 'postDispatch'), -100);
-    }
-
-    public function postDispatch()
-    {
-
-    }
-  
     public function indexAction() {
         $result = new JsonModel(array(
-	        'some_parameter' => 'some value',
+            'some' => 'some value',
             'success'=>true,
         ));
- 
+
         return $result;
-  }
+    }
 
     public function getmainAction() {
         $tophot_img = '';

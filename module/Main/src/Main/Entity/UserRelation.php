@@ -1,41 +1,37 @@
 <?php
-/**
-* Material
-* 
-* Created By Panda on 19/03/13
-*/
 
-namespace User\Entity;
+namespace Main\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+
 /**
  * @ORM\Entity
- * @ORM\Table(name="material")
- * @property integer $material_id
- * #property string $name
- * @property integer $catgory
+ * @ORM\Table(name="user_relation")
+ * @property int $id
+ * @property int $user_id
+ * @property int $target_id
+ * @property int $state
  */
-class Material
+class UserRelation
 {
 
     /**
      * @ORM\Id
-     * @ORM\Column(type="integer");
+     * @ORM\Column(type="bigint");
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $material_id;
-
-    /**
-     * @ORM\Column(type="string")
-     */
-    protected $name;
+    protected $id;
     
     /**
      * @ORM\Column(type="integer")
      */
-    protected $catgory;
+    protected $user_id;
     
+    /**
+     * @ORM\Column(type="integer")
+     */
+    protected $target_id;
     
     /**
      * Magic getter to expose protected properties.

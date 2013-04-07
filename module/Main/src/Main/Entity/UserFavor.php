@@ -5,7 +5,7 @@
 * Created By Panda on 19/03/13
 */
 
-namespace User\Entity;
+namespace Main\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 

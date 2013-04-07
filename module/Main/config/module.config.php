@@ -112,7 +112,10 @@ return array(
     'controllers' => array(
         'invokables' => array(
             'Main\Controller\Index' => 'Main\Controller\IndexController',
-            'Main\Controller\Activity' => 'Main\Controller\ActivityController'
+            'Main\Controller\Activity' => 'Main\Controller\ActivityController',
+            'Main\Controller\Recipe' => 'Main\Controller\RecipeController',
+            'Main\Controller\Cook' => 'Main\Controller\CookController',
+            'Main\Controller\Dish' => 'Main\Controller\DishController'
         ),
     ),
     'view_manager' => array(
@@ -132,6 +135,20 @@ return array(
         ),
         'strategies' => array(
             'ViewJsonStrategy',
+        ),
+    ),
+    'doctrine' => array(
+        'driver' => array(
+            'Main' . '_driver' => array(
+                'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
+                'cache' => 'array',
+                'paths' => array(__DIR__ . '/../src/' . 'Main' . '/Entity')
+            ),
+            'orm_default' => array(
+                'drivers' => array(
+                    'Main' . '\Entity' => 'Main' . '_driver'
+                )
+            )
         ),
     ),
 );

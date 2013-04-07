@@ -4,7 +4,7 @@ namespace User\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use User\Entity\UserInfo;
-use User\Entity\Recipe;
+use Main\Entity\Recipe;
 use User\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 //必须全部删除才能让另一方删除的就是owner，owner中inversedBy
@@ -32,7 +32,7 @@ class User
     protected $user_info;
     
     /**
-     * @ORM\ManyToMany(targetEntity="Recipe", inversedBy="collect_users")
+     * @ORM\ManyToMany(targetEntity="\Main\Entity\Recipe", inversedBy="collect_users")
      * @ORM\JoinTable(name="user_collection",
      * joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id")},
      * inverseJoinColumns={@ORM\JoinColumn(name="recipe_id", referencedColumnName="recipe_id")})
@@ -40,7 +40,7 @@ class User
     protected $collect_recipes;    
     
     /**
-     * @ORM\OneToMany(targetEntity="Recipe", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="\Main\Entity\Recipe", mappedBy="user")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
      **/
    protected $recipes;
