@@ -12,7 +12,7 @@ use User\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Main\Repository\RecipeRepository")
  * @ORM\Table(name="recipe")
  * @property integer $recipe_id
  * @property integer $user_id
@@ -103,9 +103,9 @@ class Recipe
     protected $catgory;        
 
     /**
-     * @ORM\Column(type="bigint")
+     * @ORM\Column(type="string")
      */
-    protected $cover_img_id;    
+    protected $cover_img;
     
     /**
      * @ORM\Column(type="text")

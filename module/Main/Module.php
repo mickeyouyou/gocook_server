@@ -51,5 +51,19 @@ class Module
             ),
         );
     }
+
+    public function getServiceConfig()
+    {
+        return array(
+            'factories' => array(
+                'recipe_service' => function($sm) {
+                    $service = new \Main\Service\RecipeService();
+                    $service->setServiceManager($sm);
+                    $service->setEntityManager($sm->get('doctrine.entitymanager.orm_default'));
+                    return $service;
+                }
+            )
+        );
+    }
     
 }

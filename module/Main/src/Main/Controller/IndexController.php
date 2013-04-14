@@ -36,10 +36,17 @@ class IndexController extends AbstractActionController {
         return $result;
   }
 
-    public function getmainAction() {
+    public function iosMainAction() {
         $tophot_img = '';
         $topnew_img = '';
 
+
+        $result = new JsonModel(array(
+            'some_parameter' => 'some value',
+            'success'=>true,
+        ));
+
+        return $result;
 
     }
 
