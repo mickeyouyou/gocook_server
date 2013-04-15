@@ -10,6 +10,7 @@ namespace Main\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Mvc\MvcEvent;
+use Main\Repository\RecipeRepository;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 
@@ -34,12 +35,15 @@ class IndexController extends AbstractActionController {
         ));
  
         return $result;
-  }
+    }
 
     public function iosMainAction() {
-        $tophot_img = '';
         $topnew_img = '';
 
+        $recipeService = $this->getServiceLocator()->get('recipe_service');
+        $topRecipe = $recipeService->getTopCollectedRecipe();
+        $tophot_img = $topRecipe->cover_img;
+        var_dump($tophot_img);
 
         $result = new JsonModel(array(
             'some_parameter' => 'some value',

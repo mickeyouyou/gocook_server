@@ -95,7 +95,7 @@ class Recipe
     /**
      * @ORM\Column(type="integer")
      */
-    protected $browser_count;    
+    protected $browse_count;
     
     /**
      * @ORM\Column(type="string")

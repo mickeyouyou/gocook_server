@@ -25,6 +25,7 @@ return array(
                     'user'     => 'root',
                     'password' => '1',
                     'dbname'   => 'GoCook',
+                    'charset'  => 'UTF8',
                 )
             )
         )

@@ -17,7 +17,12 @@ class RecipeService implements ServiceManagerAwareInterface
     protected $serviceManager;
     protected $entityManager;
     
-
+    public function getTopCollectedRecipe()
+    {
+        $recipes = $this->entityManager->getRepository('Main\Entity\Recipe')->getRecipesByCollectedCount();
+        $top_recipe = $recipes[0];
+        return $top_recipe;
+    }
     
     
     /*************Manager****************/
