@@ -16,14 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `GoCook`
---
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `GoCook` /*!40100 DEFAULT CHARACTER SET utf8 */;
-
-USE `GoCook`;
-
---
 -- Table structure for table `dish`
 --
 
@@ -46,15 +38,6 @@ CREATE TABLE `dish` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `dish`
---
-
-LOCK TABLES `dish` WRITE;
-/*!40000 ALTER TABLE `dish` DISABLE KEYS */;
-/*!40000 ALTER TABLE `dish` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `dish_comment`
 --
 
@@ -74,15 +57,6 @@ CREATE TABLE `dish_comment` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `dish_comment`
---
-
-LOCK TABLES `dish_comment` WRITE;
-/*!40000 ALTER TABLE `dish_comment` DISABLE KEYS */;
-/*!40000 ALTER TABLE `dish_comment` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `material`
 --
 
@@ -97,15 +71,6 @@ CREATE TABLE `material` (
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `material`
---
-
-LOCK TABLES `material` WRITE;
-/*!40000 ALTER TABLE `material` DISABLE KEYS */;
-/*!40000 ALTER TABLE `material` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `photo`
@@ -129,15 +94,6 @@ CREATE TABLE `photo` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `photo`
---
-
-LOCK TABLES `photo` WRITE;
-/*!40000 ALTER TABLE `photo` DISABLE KEYS */;
-/*!40000 ALTER TABLE `photo` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `recipe`
 --
 
@@ -155,7 +111,7 @@ CREATE TABLE `recipe` (
   `comment_count` int(11) DEFAULT NULL,
   `browse_count` int(11) DEFAULT NULL,
   `catgory` varchar(100) DEFAULT NULL,
-  `cover_img_id` bigint(11) DEFAULT NULL,
+  `cover_img` varchar(100) DEFAULT NULL,
   `materials` text,
   `recipe_steps` text,
   `tips` text,
@@ -163,17 +119,8 @@ CREATE TABLE `recipe` (
   KEY `user_id` (`user_id`),
   KEY `recipe_id` (`recipe_id`),
   CONSTRAINT `recipe_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `recipe`
---
-
-LOCK TABLES `recipe` WRITE;
-/*!40000 ALTER TABLE `recipe` DISABLE KEYS */;
-/*!40000 ALTER TABLE `recipe` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `recipe_comment`
@@ -192,15 +139,6 @@ CREATE TABLE `recipe_comment` (
   PRIMARY KEY (`comment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `recipe_comment`
---
-
-LOCK TABLES `recipe_comment` WRITE;
-/*!40000 ALTER TABLE `recipe_comment` DISABLE KEYS */;
-/*!40000 ALTER TABLE `recipe_comment` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `user`
@@ -236,17 +174,8 @@ CREATE TABLE `user` (
   UNIQUE KEY `qq_openid` (`qq_openid`),
   UNIQUE KEY `weibo_id` (`weibo_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user`
---
-
-LOCK TABLES `user` WRITE;
-/*!40000 ALTER TABLE `user` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `user_collection`
@@ -267,15 +196,6 @@ CREATE TABLE `user_collection` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_collection`
---
-
-LOCK TABLES `user_collection` WRITE;
-/*!40000 ALTER TABLE `user_collection` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_collection` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `user_comment`
 --
 
@@ -294,15 +214,6 @@ CREATE TABLE `user_comment` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_comment`
---
-
-LOCK TABLES `user_comment` WRITE;
-/*!40000 ALTER TABLE `user_comment` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_comment` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `user_favor`
 --
 
@@ -317,15 +228,6 @@ CREATE TABLE `user_favor` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user_favor`
---
-
-LOCK TABLES `user_favor` WRITE;
-/*!40000 ALTER TABLE `user_favor` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_favor` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `user_info`
@@ -347,7 +249,6 @@ CREATE TABLE `user_info` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-
 --
 -- Table structure for table `user_relation`
 --
@@ -365,15 +266,6 @@ CREATE TABLE `user_relation` (
   KEY `target_id` (`target_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user_relation`
---
-
-LOCK TABLES `user_relation` WRITE;
-/*!40000 ALTER TABLE `user_relation` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_relation` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -384,4 +276,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-04-01  5:16:00
+-- Dump completed on 2013-04-16  1:20:27
