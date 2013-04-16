@@ -38,16 +38,28 @@ class IndexController extends AbstractActionController {
     }
 
     public function iosMainAction() {
-        $topnew_img = '';
+        $topnew_img = 'images/recipe/140/265058.1.jpg';
 
         $recipeService = $this->getServiceLocator()->get('recipe_service');
         $topRecipe = $recipeService->getTopCollectedRecipe();
-        $tophot_img = $topRecipe->cover_img;
-        var_dump($tophot_img);
+        $tophot_img = 'images/recipe/140/'.$topRecipe->cover_img;
 
+        $recommend_items = array();
+        $recommend_keywords = array('家常菜','猪肉','快手菜','汤羹');
+        foreach ($recommend_keywords as $keyword){
+            $recipes = $recipeService->getRecipesByKeywordOfCatgory($keyword, 4, 0);
+            $recommend_item = array();
+            $recommend_item['name'] = $keyword;
+            $recommend_item['images'] = array();
+            foreach ($recipes as $recipe){
+                array_push($recommend_item['images'], 'images/recipe/140/'.$recipe->__get('cover_img'));
+            }
+            array_push($recommend_items, $recommend_item);
+        }
         $result = new JsonModel(array(
-            'some_parameter' => 'some value',
-            'success'=>true,
+            'topnew_img' => $topnew_img,
+            'tophot_img' => $tophot_img,
+            'recommend_items' => $recommend_items,
         ));
 
         return $result;
