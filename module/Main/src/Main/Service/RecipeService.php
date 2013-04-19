@@ -18,12 +18,26 @@ class RecipeService implements ServiceManagerAwareInterface
     protected $entityManager;
     
 
-    // 获取收藏次数最多的菜谱
+    // 获取收藏次数最多的一个菜谱
     public function getTopCollectedRecipe()
     {
         $recipes = $this->entityManager->getRepository('Main\Entity\Recipe')->getRecipesByCollectedCount(1,0);
         $top_recipe = $recipes[0];
         return $top_recipe;
+    }
+
+    // 获取收藏次数最多的菜谱
+    public function getTopCollectedRecipes($limit, $offset=0)
+    {
+        $recipes = $this->entityManager->getRepository('Main\Entity\Recipe')->getRecipesByCollectedCount($limit,$offset);
+        return $recipes;
+    }
+
+    // 获取最新的菜谱
+    public function getTopNewRecipes($limit, $offset=0)
+    {
+        $recipes = $this->entityManager->getRepository('Main\Entity\Recipe')->getRecipesByCreateDate($limit,$offset);
+        return $recipes;
     }
 
     // 根据keyword查找catgory
