@@ -57,6 +57,7 @@ class IndexController extends AbstractActionController {
             array_push($recommend_items, $recommend_item);
         }
         $result = new JsonModel(array(
+            'result' => 0,
             'topnew_img' => $topnew_img,
             'tophot_img' => $tophot_img,
             'recommend_items' => $recommend_items,
@@ -64,6 +65,46 @@ class IndexController extends AbstractActionController {
 
         return $result;
 
+    }
+
+    public function searchAction()
+    {
+        $request = $this->getRequest();
+        $recipeService = $this->getServiceLocator()->get('recipe_service');
+        if ($request->isGet() && $keyword=$this->params()->fromQuery('keyword')) {
+            if($keyword!='')
+            {
+                $page = 1;
+                if ($this->params()->fromQuery('page')&&$keyword=$this->params()->fromQuery('keyword')!='')
+                {
+                    $page = intval($this->params()->fromQuery('page'));
+
+                }
+
+                $recipes = $recipeService->getReicpesByAutoSearch($keyword, 10, ($page - 1)*10);
+
+                $result_recipes = array();
+                foreach ($recipes as $recipe){
+                    $result_recipe = array(
+                        'recipe_id' => $recipe->__get('recipe_id'),
+                        'name' => $recipe->__get('name'),
+                        'image' => 'images/recipe/140/'.$recipe->__get('cover_img'),
+                        'dish_count' => $recipe->__get('dish_count')
+                    );
+
+                    array_push($result_recipes, $result_recipe);
+                }
+
+                return new JsonModel(array(
+                    'result' => 0,
+                    'result_recipes' => $result_recipes,
+                ));
+
+            }
+        }
+        return new JsonModel(array(
+            'result' => 1,
+        ));
     }
 
 

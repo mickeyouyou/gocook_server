@@ -33,7 +33,13 @@ class RecipeService implements ServiceManagerAwareInterface
         return $recipes;
     }
 
-    
+    // 根据keyword查找catgory, name, materials
+    public function getReicpesByAutoSearch($keyword, $limit, $offset=0)
+    {
+        $recipes = $this->entityManager->getRepository('Main\Entity\Recipe')->findRecipeByAutoSearch($keyword, $limit, $offset);
+        return $recipes;
+    }
+
     /*************Manager****************/
     public function setServiceManager(ServiceManager $serviceManager)
     {
