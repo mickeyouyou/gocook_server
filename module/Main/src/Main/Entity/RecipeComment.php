@@ -8,6 +8,8 @@
 namespace Main\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use User\Entity\User;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity
@@ -37,8 +39,20 @@ class RecipeComment
     /**
      * @ORM\Column(type="integer")
      */
-    protected $recipe_id;    
-    
+    protected $recipe_id;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Main\Entity\Recipe", inversedBy="recipe_comments")
+     * @ORM\JoinColumn(name="recipe_id", referencedColumnName="recipe_id")
+     **/
+    protected $recipe;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User\Entity\User", inversedBy="recipe_comments")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
+     **/
+    protected $user;
+
     /**
      * @ORM\Column(type="datetime")
      */

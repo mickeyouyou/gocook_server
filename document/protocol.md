@@ -39,7 +39,7 @@ ios主页协议。分别返回收总藏数最多的菜谱的图片，最新上�
 ######最新菜谱
 
 	protocol: recipe/topnew?page='page'
-	return: {"result":0, "result_recipes":[{"recipe_id":1, "name":"recipeName", "image":"image-url", "dish_co...nt":123}…]}
+	return: {"result":0, "result_recipes":[{"recipe_id":1, "name":"recipeName", "image":"image-url", "dish_count":123}…]}
 	
 最新菜谱协议。返回内容和搜索一样，每次也是返回10个。
 

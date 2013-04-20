@@ -34,11 +34,17 @@ class Recipe
 
     /**
      * @ORM\Id
-     * @ORM\Column(type="integer");
+     * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $recipe_id;
-    
+
+    /**
+     * @ORM\OneToMany(targetEntity="\Main\Entity\RecipeComment", mappedBy="recipe")
+     * @ORM\JoinColumn(name="recipe_id", referencedColumnName="recipe_id")
+     **/
+    protected $recipe_comments;
+
     /*
      * @ORM\ManyToMany(targetEntity="User\Entity\User", mappedBy="collect_recipes")
      */
@@ -125,7 +131,8 @@ class Recipe
     public function __construct()
     {
         $this->dishes = new ArrayCollection();
-      
+        $this->recipe_comments = new ArrayCollection();
+        $this->collect_users = new ArrayCollection();
     }
     
     /**

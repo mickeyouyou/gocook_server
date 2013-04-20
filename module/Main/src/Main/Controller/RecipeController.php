@@ -135,6 +135,16 @@ class RecipeController extends AbstractActionController {
         ));
     }
 
+//    public function testAction()
+//    {
+//        $repository = $this->getEntityManager()->getRepository('Main\Entity\RecipeComment');
+//        $recipe = $repository->findOneBy(array('comment_id' => 1));
+//        var_dump($recipe->user->user_id);
+//        return new JsonModel(array(
+//            'result' => 1,
+//        ));
+//    }
+
 
     /*************Others****************/
     public function isMobile($request)

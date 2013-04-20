@@ -20,7 +20,7 @@ class User
 
     /**
      * @ORM\Id
-     * @ORM\Column(type="integer");
+     * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $user_id;
@@ -45,6 +45,11 @@ class User
      **/
    protected $recipes;
 
+    /**
+     * @ORM\OneToMany(targetEntity="\Main\Entity\RecipeComment", mappedBy="user")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
+     **/
+    protected $recipe_comments;
 
    /**
      * @ORM\Column(type="string")
@@ -114,6 +119,8 @@ class User
     public function __construct() 
     {
         $this->recipes = new ArrayCollection();
+        $this->collect_recipes = new ArrayCollection();
+        $this->recipe_comments = new ArrayCollection();
     }
     
     /**
