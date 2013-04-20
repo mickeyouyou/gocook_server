@@ -135,15 +135,54 @@ class RecipeController extends AbstractActionController {
         ));
     }
 
-//    public function testAction()
-//    {
-//        $repository = $this->getEntityManager()->getRepository('Main\Entity\RecipeComment');
-//        $recipe = $repository->findOneBy(array('comment_id' => 1));
-//        var_dump($recipe->user->user_id);
-//        return new JsonModel(array(
-//            'result' => 1,
-//        ));
-//    }
+    public function commentsAction()
+    {
+        $request = $this->getRequest();
+        if ($this->isMobile($request))
+        {
+            //返回所有的评论
+            if ($this->params()->fromQuery('recipe_id')&&$keyword=$this->params()->fromQuery('recipe_id')!='')
+            {
+                $recipe_id = intval($this->params()->fromQuery('recipe_id'));
+
+                $repository = $this->getEntityManager()->getRepository('Main\Entity\RecipeComment');
+                $recipe_comments = $repository->findBy(array('recipe_id' => $recipe_id));
+                if ($recipe_comments)
+                {
+                    $result_recipe_comments = array();
+                    foreach ($recipe_comments as $recipe_comment){
+
+                        $avatar = $recipe_comment->user->__get('portrait');
+                        if (!$avatar || $avatar=='')
+                            $avatar = '';
+                        else
+                            $avatar = 'images/avatars/'.$avatar;
+
+                        $result_recipe_comment = array(
+                            'user_id' => intval($recipe_comment->user->user_id),
+                            'name' => $recipe_comment->user->display_name,
+                            'portrait' => $avatar,
+                            'content' => $recipe_comment->content,
+                            'create_time' => $recipe_comment->create_time==null?'':$recipe_comment->create_time,
+                        );
+
+                        array_push($result_recipe_comments, $result_recipe_comment);
+                    }
+
+                    return new JsonModel(array(
+                        'result' => 0,
+                        'result_recipe_comments' => $result_recipe_comments,
+                    ));
+                }
+            }
+        }
+
+        return new JsonModel(array(
+            'result' => 1,
+        ));
+    }
+
+    
 
 
     /*************Others****************/
@@ -159,7 +198,7 @@ class RecipeController extends AbstractActionController {
                 $isMobile = true;
             }
         }
-        return $isMobile;
+        return true;
     }
 
     public function setEntityManager(EntityManager $em)
