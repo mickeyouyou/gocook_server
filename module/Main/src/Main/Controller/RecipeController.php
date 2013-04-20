@@ -182,8 +182,37 @@ class RecipeController extends AbstractActionController {
         ));
     }
 
-    
+    public function postAction()
+    {
+        $request = $this->getRequest();
+        if ($this->isMobile($request))
+        {
+            if ($request->isPost())
+            {
 
+            }
+        }
+
+        return new JsonModel(array(
+            'result' => 1,
+        ));
+    }
+
+    public function commentAction()
+    {
+        $request = $this->getRequest();
+        if ($this->isMobile($request))
+        {
+            if ($request->isPost())
+            {
+
+            }
+        }
+
+        return new JsonModel(array(
+            'result' => 1,
+        ));
+    }
 
     /*************Others****************/
     public function isMobile($request)
@@ -198,7 +227,7 @@ class RecipeController extends AbstractActionController {
                 $isMobile = true;
             }
         }
-        return true;
+        return $isMobile;
     }
 
     public function setEntityManager(EntityManager $em)
