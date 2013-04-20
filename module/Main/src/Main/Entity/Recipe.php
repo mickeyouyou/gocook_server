@@ -43,7 +43,12 @@ class Recipe
      * @ORM\ManyToMany(targetEntity="User\Entity\User", mappedBy="collect_recipes")
      */
     protected $collect_users;
-    
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    protected $user_id;
+
     /**
      * @ORM\ManyToOne(targetEntity="User\Entity\User", inversedBy="recipes")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
@@ -55,12 +60,6 @@ class Recipe
      * @ORM\JoinColumn(name="recipe_id", referencedColumnName="recipe_id")
      **/
    protected $dishes;
-   
-    
-    /**
-     * @ORM\Column(type="integer")
-     */
-    protected $user_id;
     
     /**
      * @ORM\Column(type="datetime")
