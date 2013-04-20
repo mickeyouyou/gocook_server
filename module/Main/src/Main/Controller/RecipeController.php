@@ -30,12 +30,11 @@ class RecipeController extends AbstractActionController {
             $recipe = $repository->findOneBy(array('recipe_id' => $recipe_id));
             if ($recipe)
             {
-                var_dump($recipe->user->user_id);
                 return new JsonModel(array(
                     'result' => 0,
                     'result_recipe' => array(
                         'recipe_id' => $recipe->recipe_id,
-                        'author_id' => intval($recipe->user_id),//不知道为啥user_id竟然是string，大概是doctrine的bug
+                        'author_id' => $recipe->user->user_id,//不知道为啥user_id竟然是string，大概是doctrine的bug
                         'author_name' => $recipe->user->display_name,
                     ),
                 ));
