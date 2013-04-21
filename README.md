@@ -82,7 +82,6 @@ Install (It will take some time depends on your network)
 	cd my/project/dir
 	git clone git@github.com:maybe/gocook_server.git
 	cd gocook_server
-	php composer.phar self-update
 	php composer.phar install
 
 
