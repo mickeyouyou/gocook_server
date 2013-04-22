@@ -126,7 +126,7 @@ class UserController extends AbstractActionController
           
             $data = $request->getPost();
 
-            var_dump($data);
+            // var_dump($data);
             
             $form = new RegisterForm;
             $form->setInputFilter(new RegisterFilter);
