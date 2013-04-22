@@ -35,7 +35,7 @@ class RecipeController extends AbstractActionController {
                 if ($recipe)
                 {
                     $steps_array = Json::decode($recipe->recipe_steps, Json::TYPE_ARRAY);
-                    var_dump($steps_array);
+                    // var_dump($steps_array);
                     return new JsonModel(array(
                         'result' => 0,
                         'result_recipe' => array(
