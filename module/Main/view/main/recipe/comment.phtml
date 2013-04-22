@@ -1,0 +1,14 @@
+<?php
+    $form = $this->form;
+    $form->prepare();
+    /* @var $form User\Form\LoginForm */
+    echo $this->form()->openTag($form);
+    echo $this->formRow($form->get('recipe_id'));
+    echo $this->formRow($form->get('content'));
+    echo $this->formInput($form->get('submit'));
+    echo $this->form()->closeTag($form);
+?>
+<?php 
+    echo $this->errors;
+?>
+<div><a href="/recipe/comment">Comment</a></div>
