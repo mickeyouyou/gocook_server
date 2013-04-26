@@ -66,7 +66,14 @@ class Module
                     $service->setServiceManager($sm);
                     $service->setEntityManager($sm->get('doctrine.entitymanager.orm_default'));
                     return $service;
+                },
+                'dish_service' => function($sm) {
+                    $service = new \Main\Service\DishService();
+                    $service->setServiceManager($sm);
+                    $service->setEntityManager($sm->get('doctrine.entitymanager.orm_default'));
+                    return $service;
                 }
+
             )
         );
     }

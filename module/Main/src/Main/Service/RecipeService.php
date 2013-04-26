@@ -65,6 +65,8 @@ class RecipeService implements ServiceManagerAwareInterface
         $recipe = $recipe_repository->findBy(array('recipe_id' => $recipe_id));
         if ($recipe)
         {
+            $recipe->__set('comment_count', $recipe->__get('comment_count')+1);
+
             $recipe_comment = new RecipeComment();
             $recipe_comment->__set('create_time', new \DateTime());
             $recipe_comment->__set('user_id', $user_id);
