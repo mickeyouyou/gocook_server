@@ -2,6 +2,7 @@
 
 namespace Main\Service;
 
+use Main\Entity\RecipeComment;
 use Zend\Authentication\AuthenticationService;
 use Zend\Form\Form;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
@@ -52,6 +53,28 @@ class RecipeService implements ServiceManagerAwareInterface
     {
         $recipes = $this->entityManager->getRepository('Main\Entity\Recipe')->findRecipeByAutoSearch($keyword, $limit, $offset);
         return $recipes;
+    }
+
+    // 发表recipe评论（留言）
+    public function commitOnRecipe($data)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_id = $authService->getIdentity()->__get('user_id');
+        $recipe_id = intval($data['recipe_id']);
+        $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
+        $recipe = $recipe_repository->findBy(array('recipe_id' => $recipe_id));
+        if ($recipe)
+        {
+            $recipe_comment = new RecipeComment();
+            $recipe_comment->__set('create_time', new \DateTime());
+            $recipe_comment->__set('user_id', $user_id);
+            $recipe_comment->__set('recipe_id', $recipe_id);
+            $recipe_comment->__set('content', $data['content']);
+            $this->entityManager->persist($recipe_comment);
+            $this->entityManager->flush();
+            return true;
+        }
+        return false;
     }
 
     /*************Manager****************/

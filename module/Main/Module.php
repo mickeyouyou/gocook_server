@@ -8,6 +8,8 @@ namespace Main;
 
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
+use Zend\Authentication\AuthenticationService;
+
 
 class Module
 {
@@ -56,6 +58,9 @@ class Module
     {
         return array(
             'factories' => array(
+                'Zend\Authentication\AuthenticationService' => function($serviceManager) {
+                    return $serviceManager->get('doctrine.authenticationservice.orm_default');
+                },
                 'recipe_service' => function($sm) {
                     $service = new \Main\Service\RecipeService();
                     $service->setServiceManager($sm);

@@ -9,7 +9,7 @@ namespace Main\Form;
 
 use Zend\InputFilter\InputFilter;
 
-class RecipeCommenFilter extends InputFilter {
+class RecipeCommentFilter extends InputFilter {
 
     public function __construct() {
 

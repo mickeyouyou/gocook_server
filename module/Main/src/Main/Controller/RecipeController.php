@@ -14,6 +14,11 @@ use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use Zend\Json\Json;
 
+use Main\Form\RecipeCommentForm,
+    Main\Form\RecipeCommentFilter,
+    Main\Form\RecipePostForm,
+    Main\Form\RecipePostFilter;
+
 class RecipeController extends AbstractActionController {
 
     /**
@@ -201,11 +206,27 @@ class RecipeController extends AbstractActionController {
     public function commentAction()
     {
         $request = $this->getRequest();
-        if ($this->isMobile($request))
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if ($authService->hasIdentity()&&$this->isMobile($request))
         {
             if ($request->isPost())
             {
+                $data = $request->getPost();
 
+                $form = new RecipeCommentForm;
+                $form->setInputFilter(new RecipeCommentFilter);
+                $form->setData($data);
+
+                if($form->isValid()) {
+                    $recipeService = $this->getServiceLocator()->get('recipe_service');
+                    if ($recipeService->commitOnRecipe($form->getData()))
+                    {
+                        return new JsonModel(array(
+                            'result' => 0,
+                        ));
+                    }
+
+                }
             }
         }
 
