@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Recipe IndexController
+ * Dish IndexController
  * @copyright Copyright (c) 2005-2012 BadPanda Inc.
  */
 
@@ -14,6 +14,8 @@ use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use Main\Form\DishCommentForm;
 use Main\Form\DishCommentFilter;
+use Main\Form\DishPostForm;
+use Main\Form\DishPostFilter;
 
 class DishController extends AbstractActionController {
 
@@ -29,33 +31,21 @@ class DishController extends AbstractActionController {
 
         if ($this->isMobile($request))
         {
-            $repository = $this->getEntityManager()->getRepository('Main\Entity\Dish');
             if ($request->isGet() && $this->params()->fromQuery('id')!='') {
 
+                $page = 1;
+                if ($this->params()->fromQuery('page')&&$keyword=$this->params()->fromQuery('page')!='')
+                {
+                    $page = intval($this->params()->fromQuery('page'));
+                }
+
                 $recipe_id = intval($this->params()->fromQuery('id'));
-                $dishes = $repository->findBy(array('recipe_id' => $recipe_id));
+
+                $dishService = $this->getServiceLocator()->get('dish_service');
+                $dishes = $dishService->getDishesByFavorCount($recipe_id, 10, ($page-1)*10);
                 if ($dishes)
                 {
-                    $result_dishes = array();
-                    foreach ($dishes as $dish){
-
-                        $repository = $this->getEntityManager()->getRepository('User\Entity\User');
-                        $dish_user = $repository->findBy(array('user_id' => $dish->__get('user_id')));
-
-                        $result_dish = array(
-                            'dish_id' => $dish->__get('dish_id'),
-                            'recipe_id' => $dish->__get('recipe_id'),
-                            'user_id' => $dish->__get('user_id'),
-                            'user_name' => $dish_user->__get('display_name'),
-                            'create_time' => $dish->create_time==null?'':$dish->create_time,
-                            'content' => $dish->__get('content'),
-                            'photo_img' => 'images/dish/140/'.$dish->__get('photo_img'),
-                            'favor_count' => $dish->__get('favor_count')
-                        );
-
-                        array_push($result_dishes, $result_dish);
-                    }
-
+                    $result_dishes = $dishService->packetDishes($$dishes);
                     return new JsonModel(array(
                         'result' => 0,
                         'result_dishes' => $result_dishes,
@@ -85,8 +75,41 @@ class DishController extends AbstractActionController {
                 $form->setData($data);
 
                 if($form->isValid()) {
-                    $recipeService = $this->getServiceLocator()->get('dish_service');
-                    if ($recipeService->commitOnDish($form->getData()))
+                    $dishService = $this->getServiceLocator()->get('dish_service');
+                    if ($dishService->commitOnDish($form->getData()))
+                    {
+                        return new JsonModel(array(
+                            'result' => 0,
+                        ));
+                    }
+
+                }
+            }
+        }
+
+        return new JsonModel(array(
+            'result' => 1,
+        ));
+    }
+
+
+    public function postAction()
+    {
+        $request = $this->getRequest();
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if ($authService->hasIdentity()&&$this->isMobile($request))
+        {
+            if ($request->isPost())
+            {
+                $data = $request->getPost();
+
+                $form = new DishPostForm;
+                $form->setInputFilter(new DishPostFilter);
+                $form->setData($data);
+
+                if($form->isValid()) {
+                    $dishService = $this->getServiceLocator()->get('dish_service');
+                    if ($dishService->postOneDish($form->getData()))
                     {
                         return new JsonModel(array(
                             'result' => 0,

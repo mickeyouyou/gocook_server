@@ -140,6 +140,7 @@ class RecipeController extends AbstractActionController {
         ));
     }
 
+    // 返回所有评论
     public function commentsAction()
     {
         $request = $this->getRequest();
@@ -187,7 +188,7 @@ class RecipeController extends AbstractActionController {
         ));
     }
 
-    //发表菜谱需要好好做一下
+    //TODO:发表菜谱需要好好做一下
     public function postAction()
     {
         $request = $this->getRequest();
