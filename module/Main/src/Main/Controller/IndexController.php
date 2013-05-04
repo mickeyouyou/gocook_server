@@ -105,6 +105,7 @@ class IndexController extends AbstractActionController {
                         'recipe_id' => $recipe->__get('recipe_id'),
                         'name' => $recipe->__get('name'),
                         'image' => 'images/recipe/140/'.$recipe->__get('cover_img'),
+                        'materials' => $recipe->materials,
                         'dish_count' => $recipe->__get('dish_count')
                     );
 
