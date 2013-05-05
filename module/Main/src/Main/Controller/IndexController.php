@@ -139,7 +139,7 @@ class IndexController extends AbstractActionController {
                 $isMobile = true;
             }
         }
-        return true;
+        return $isMobile;
     }
 
     public function setEntityManager(EntityManager $em)
