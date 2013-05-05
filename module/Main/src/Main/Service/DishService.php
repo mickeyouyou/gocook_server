@@ -9,6 +9,8 @@ use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\ServiceManager\ServiceManager;
 use Doctrine\ORM\EntityManager;
 use Main\Entity\Dish;
+use User\Entity\User;
+use Main\Repository\DishRepository;
 use Main\Entity\Recipe;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 
@@ -42,7 +44,7 @@ class DishService implements ServiceManagerAwareInterface
             foreach ($dishes as $dish){
 
                 $repository = $this->getEntityManager()->getRepository('User\Entity\User');
-                $dish_user = $repository->findBy(array('user_id' => $dish->__get('user_id')));
+                $dish_user = $repository->findOneBy(array('user_id' => $dish->__get('user_id')));
 
                 $result_dish = array(
                     'dish_id' => $dish->__get('dish_id'),

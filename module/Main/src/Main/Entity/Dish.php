@@ -10,7 +10,7 @@ namespace Main\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Main\Repository\DishRepository")
  * @ORM\Table(name="dish")
  * @property integer $dish_id
  * #property integer $recipe_id
@@ -52,9 +52,9 @@ class Dish
     protected $content;    
     
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      */
-    protected $photo_id;
+    protected $photo_img;
     
     /**
      * @ORM\Column(type="integer")

@@ -86,6 +86,7 @@ class RecipeController extends AbstractActionController {
                 $result_recipe = array(
                     'recipe_id' => $recipe->__get('recipe_id'),
                     'name' => $recipe->__get('name'),
+                    'materials' => $recipe->materials,
                     'image' => 'images/recipe/140/'.$recipe->__get('cover_img'),
                     'dish_count' => $recipe->__get('dish_count')
                 );
@@ -123,6 +124,7 @@ class RecipeController extends AbstractActionController {
                 $result_recipe = array(
                     'recipe_id' => $recipe->__get('recipe_id'),
                     'name' => $recipe->__get('name'),
+                    'materials' => $recipe->materials,
                     'image' => 'images/recipe/140/'.$recipe->__get('cover_img'),
                     'dish_count' => $recipe->__get('dish_count')
                 );

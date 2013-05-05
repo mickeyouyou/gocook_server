@@ -45,7 +45,7 @@ class DishController extends AbstractActionController {
                 $dishes = $dishService->getDishesByFavorCount($recipe_id, 10, ($page-1)*10);
                 if ($dishes)
                 {
-                    $result_dishes = $dishService->packetDishes($$dishes);
+                    $result_dishes = $dishService->packetDishes($dishes);
                     return new JsonModel(array(
                         'result' => 0,
                         'result_dishes' => $result_dishes,
@@ -138,7 +138,7 @@ class DishController extends AbstractActionController {
                 $isMobile = true;
             }
         }
-        return $isMobile;
+        return true;
     }
 
     public function setEntityManager(EntityManager $em)
