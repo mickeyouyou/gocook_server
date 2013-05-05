@@ -1,0 +1,1 @@
+alter table dish change photo_id photo_img varchar(50)
