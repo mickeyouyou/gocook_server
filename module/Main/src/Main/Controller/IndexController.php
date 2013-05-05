@@ -91,8 +91,9 @@ class IndexController extends AbstractActionController {
             if ($request->isGet() && $this->params()->fromQuery('keyword') && $this->params()->fromQuery('keyword')!='') {
 
                 $keyword = $this->params()->fromQuery('keyword');
+
                 $page = 1;
-                if ($this->params()->fromQuery('page')&&$keyword=$this->params()->fromQuery('page')!='')
+                if ($this->params()->fromQuery('page')&&$this->params()->fromQuery('page')!='')
                 {
                     $page = intval($this->params()->fromQuery('page'));
                 }
@@ -138,7 +139,7 @@ class IndexController extends AbstractActionController {
                 $isMobile = true;
             }
         }
-        return $isMobile;
+        return true;
     }
 
     public function setEntityManager(EntityManager $em)
