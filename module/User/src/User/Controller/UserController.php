@@ -1,8 +1,7 @@
 <?php
 
 namespace User\Controller;
-
-use Zend\Mvc\Controller\AbstractActionController,
+use Application\Controller\BaseAbstractActionController,
     Zend\View\Model\ViewModel,
     Zend\Authentication\AuthenticationService,
     Zend\Authentication\Adapter\AdapterInterface,
@@ -22,7 +21,7 @@ use Zend\Mvc\Controller\AbstractActionController,
 use Zend\View\Model\JsonModel;
 
 
-class UserController extends AbstractActionController
+class UserController extends BaseAbstractActionController
 {
     
     /**
@@ -60,10 +59,13 @@ class UserController extends AbstractActionController
                 return $this->redirect()->toRoute('user');                      
         }
 
-        if ($request->isPost()) {
+
+        /* just for debug*/
+        if (1) {//($request->isPost()) {
           
-            $data = $request->getPost();
-            
+            //$data = $request->getPost();
+            $data = array('login'=>'test1@a.com', 'password' => '111111');
+
             $userService = $this->getServiceLocator()->get('user_service');
             if($userService->authenticate($data)) {
                 if($this->isMobile($request))
@@ -290,23 +292,7 @@ class UserController extends AbstractActionController
 
     }
 
-
     /*************Others****************/
-    public function isMobile($request)
-    {
-        $isMobile = false;
-        $requestHeaders  = $request->getHeaders();
-        if($requestHeaders->has('x-client-identifier'))
-        {
-          $xIdentifier = $requestHeaders->get('x-client-identifier')->getFieldValue();
-          if($xIdentifier == 'Mobile')
-          {
-            $isMobile = true;
-          }
-        }
-        return $isMobile;
-    }
-    
     public function setEntityManager(EntityManager $em)
     {
         $this->em = $em;

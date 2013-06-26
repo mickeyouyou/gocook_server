@@ -112,7 +112,6 @@ return array(
     'controllers' => array(
         'invokables' => array(
             'Main\Controller\Index' => 'Main\Controller\IndexController',
-            'Main\Controller\Activity' => 'Main\Controller\ActivityController',
             'Main\Controller\Recipe' => 'Main\Controller\RecipeController',
             'Main\Controller\Cook' => 'Main\Controller\CookController',
             'Main\Controller\Dish' => 'Main\Controller\DishController'

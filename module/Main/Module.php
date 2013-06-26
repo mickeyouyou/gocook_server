@@ -72,6 +72,12 @@ class Module
                     $service->setServiceManager($sm);
                     $service->setEntityManager($sm->get('doctrine.entitymanager.orm_default'));
                     return $service;
+                },
+                'cook_service' => function($sm) {
+                    $service = new \Main\Service\CookService();
+                    $service->setServiceManager($sm);
+                    $service->setEntityManager($sm->get('doctrine.entitymanager.orm_default'));
+                    return $service;
                 }
 
             )

@@ -7,7 +7,7 @@
 
 namespace Main\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
+use Application\Controller\BaseAbstractActionController;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
@@ -17,7 +17,7 @@ use Main\Form\DishCommentFilter;
 use Main\Form\DishPostForm;
 use Main\Form\DishPostFilter;
 
-class DishController extends AbstractActionController {
+class DishController extends BaseAbstractActionController {
 
     /**
      * @var Doctrine\ORM\EntityManager
@@ -126,21 +126,6 @@ class DishController extends AbstractActionController {
     }
 
     /*************Others****************/
-    public function isMobile($request)
-    {
-        $isMobile = false;
-        $requestHeaders  = $request->getHeaders();
-        if($requestHeaders->has('x-client-identifier'))
-        {
-            $xIdentifier = $requestHeaders->get('x-client-identifier')->getFieldValue();
-            if($xIdentifier == 'Mobile')
-            {
-                $isMobile = true;
-            }
-        }
-        return $isMobile;
-    }
-
     public function setEntityManager(EntityManager $em)
     {
         $this->em = $em;

@@ -73,7 +73,7 @@ class DishService implements ServiceManagerAwareInterface
         $user_id = $authService->getIdentity()->__get('user_id');
         $dish_id = intval($data['dish_id']);
         $dish_repository = $this->entityManager->getRepository('Main\Entity\Dish');
-        $dish = $dish_repository->findBy(array('dish_id' => $dish_id));
+        $dish = $dish_repository->findOneBy(array('dish_id' => $dish_id));
         if ($dish)
         {
             $recipe_comment = new DishComment();
@@ -97,7 +97,7 @@ class DishService implements ServiceManagerAwareInterface
         $user_id = $authService->getIdentity()->__get('user_id');
         $recipe_id = intval($data['recipe_id']);
         $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
-        $recipe = $recipe_repository->findBy(array('recipe_id' => $recipe_id));
+        $recipe = $recipe_repository->findOneBy(array('recipe_id' => $recipe_id));
         if ($recipe)
         {
             $recipe = new Dish();

@@ -12,26 +12,19 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity
  * @ORM\Table(name="user_collection")
- * @property bigint $id
  * #property string $user_id
  * @property integer $recipe_id
  */
 class UserCollection
 {
-
     /**
      * @ORM\Id
-     * @ORM\Column(type="bigint");
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
-
-    /**
      * @ORM\Column(type="integer")
      */
     protected $user_id;
     
     /**
+     * @ORM\Id
      * @ORM\Column(type="integer")
      */
     protected $recipe_id;

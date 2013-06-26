@@ -7,14 +7,14 @@
 
 namespace Main\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
+use Application\Controller\BaseAbstractActionController;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Mvc\MvcEvent;
 use Main\Repository\RecipeRepository;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 
-class IndexController extends AbstractActionController {
+class IndexController extends BaseAbstractActionController {
 
     /**
      * @var Doctrine\ORM\EntityManager
@@ -127,21 +127,6 @@ class IndexController extends AbstractActionController {
     }
 
     /*************Others****************/
-    public function isMobile($request)
-    {
-        $isMobile = false;
-        $requestHeaders  = $request->getHeaders();
-        if($requestHeaders->has('x-client-identifier'))
-        {
-            $xIdentifier = $requestHeaders->get('x-client-identifier')->getFieldValue();
-            if($xIdentifier == 'Mobile')
-            {
-                $isMobile = true;
-            }
-        }
-        return $isMobile;
-    }
-
     public function setEntityManager(EntityManager $em)
     {
         $this->em = $em;

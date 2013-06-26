@@ -45,11 +45,6 @@ class Recipe
      **/
     protected $recipe_comments;
 
-    /*
-     * @ORM\ManyToMany(targetEntity="User\Entity\User", mappedBy="collect_recipes")
-     */
-    protected $collect_users;
-
     /**
      * @ORM\Column(type="integer")
      */

@@ -7,7 +7,7 @@
 
 namespace Main\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
+use Application\Controller\BaseAbstractActionController;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
@@ -19,7 +19,7 @@ use Main\Form\RecipeCommentForm,
     Main\Form\RecipePostForm,
     Main\Form\RecipePostFilter;
 
-class RecipeController extends AbstractActionController {
+class RecipeController extends BaseAbstractActionController {
 
     /**
      * @var Doctrine\ORM\EntityManager
@@ -74,7 +74,7 @@ class RecipeController extends AbstractActionController {
         {
             $recipeService = $this->getServiceLocator()->get('recipe_service');
             $page = 1;
-            if ($this->params()->fromQuery('page')&&$keyword=$this->params()->fromQuery('page')!='')
+            if ($this->params()->fromQuery('page')&&$this->params()->fromQuery('page')!='')
             {
                 $page = intval($this->params()->fromQuery('page'));
             }
@@ -112,7 +112,7 @@ class RecipeController extends AbstractActionController {
         {
             $recipeService = $this->getServiceLocator()->get('recipe_service');
             $page = 1;
-            if ($this->params()->fromQuery('page')&&$keyword=$this->params()->fromQuery('page')!='')
+            if ($this->params()->fromQuery('page')&&$this->params()->fromQuery('page')!='')
             {
                 $page = intval($this->params()->fromQuery('page'));
             }
@@ -149,7 +149,7 @@ class RecipeController extends AbstractActionController {
         if ($this->isMobile($request))
         {
             //返回所有的评论
-            if ($this->params()->fromQuery('recipe_id')&&$keyword=$this->params()->fromQuery('recipe_id')!='')
+            if ($this->params()->fromQuery('recipe_id')&&$this->params()->fromQuery('recipe_id')!='')
             {
                 $recipe_id = intval($this->params()->fromQuery('recipe_id'));
 
@@ -207,6 +207,11 @@ class RecipeController extends AbstractActionController {
         ));
     }
 
+    public function modifyAction()
+    {
+
+    }
+
     public function commentAction()
     {
         $request = $this->getRequest();
@@ -240,21 +245,6 @@ class RecipeController extends AbstractActionController {
     }
 
     /*************Others****************/
-    public function isMobile($request)
-    {
-        $isMobile = false;
-        $requestHeaders  = $request->getHeaders();
-        if($requestHeaders->has('x-client-identifier'))
-        {
-            $xIdentifier = $requestHeaders->get('x-client-identifier')->getFieldValue();
-            if($xIdentifier == 'Mobile')
-            {
-                $isMobile = true;
-            }
-        }
-        return $isMobile;
-    }
-
     public function setEntityManager(EntityManager $em)
     {
         $this->em = $em;

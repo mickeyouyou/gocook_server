@@ -62,7 +62,7 @@ class RecipeService implements ServiceManagerAwareInterface
         $user_id = $authService->getIdentity()->__get('user_id');
         $recipe_id = intval($data['recipe_id']);
         $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
-        $recipe = $recipe_repository->findBy(array('recipe_id' => $recipe_id));
+        $recipe = $recipe_repository->findOneBy(array('recipe_id' => $recipe_id));
         if ($recipe)
         {
             $recipe->__set('comment_count', $recipe->__get('comment_count')+1);

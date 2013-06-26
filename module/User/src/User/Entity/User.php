@@ -32,14 +32,6 @@ class User
     protected $user_info;
     
     /**
-     * @ORM\ManyToMany(targetEntity="\Main\Entity\Recipe", inversedBy="collect_users")
-     * @ORM\JoinTable(name="user_collection",
-     * joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id")},
-     * inverseJoinColumns={@ORM\JoinColumn(name="recipe_id", referencedColumnName="recipe_id")})
-     **/
-    protected $collect_recipes;    
-    
-    /**
      * @ORM\OneToMany(targetEntity="\Main\Entity\Recipe", mappedBy="user")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
      **/
@@ -119,7 +111,6 @@ class User
     public function __construct() 
     {
         $this->recipes = new ArrayCollection();
-        $this->collect_recipes = new ArrayCollection();
         $this->recipe_comments = new ArrayCollection();
     }
     
