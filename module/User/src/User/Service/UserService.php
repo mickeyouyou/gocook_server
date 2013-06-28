@@ -163,7 +163,77 @@ class UserService implements ServiceManagerAwareInterface
         }
         return false;
     }
-    
+
+    public function changeuserinfo($data)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user = $authService->getIdentity();
+
+        $repository = $this->entityManager->getRepository('User\Entity\User');
+
+        $is_data_changed = false;
+
+        if (isset($data['nickname']))
+        {
+
+
+            $is_data_changed = true;
+        }
+
+        if (isset($data['gender']))
+        {
+
+            $is_data_changed = true;
+        }
+
+        if (isset($data['age']))
+        {
+
+            $is_data_changed = true;
+        }
+
+        if (isset($data['career']))
+        {
+
+            $is_data_changed = true;
+        }
+
+        if (isset($data['tel']))
+        {
+
+            $is_data_changed = true;
+        }
+
+        if (isset($data['city']))
+        {
+
+            $is_data_changed = true;
+        }
+
+        if (isset($data['province']))
+        {
+
+            $is_data_changed = true;
+        }
+
+        if (isset($data['intro']))
+        {
+
+            $is_data_changed = true;
+        }
+
+        if ($is_data_changed)
+        {
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+            return true;
+        }
+
+
+        return false;
+
+    }
+
     
     /*************Manager****************/
     public function setServiceManager(ServiceManager $serviceManager)

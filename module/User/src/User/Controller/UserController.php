@@ -16,6 +16,8 @@ use Application\Controller\BaseAbstractActionController,
     User\Form\RegisterForm,
     User\Form\RegisterFilter,
     User\Form\ChangePassForm,
+    User\Form\ChangeUserInfoForm,
+    User\Form\ChangeUserInfoFilter,
     User\Form\ChangePassFilter;
 
 use Zend\View\Model\JsonModel;
@@ -23,20 +25,20 @@ use Zend\View\Model\JsonModel;
 
 class UserController extends BaseAbstractActionController
 {
-    
+
     /**
      * @var Doctrine\ORM\EntityManager
      */
     protected $em;
-    
-    protected $userRepository;
-    
 
+    protected $userRepository;
+
+    // just for test
     public function indexAction()
     {
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         if(!$authService->hasIdentity()) {
-            return $this->redirect()->toRoute('user', array('action' => 'login'));      
+            return $this->redirect()->toRoute('user', array('action' => 'login'));
         }
 
         return new ViewModel(array(
@@ -44,27 +46,27 @@ class UserController extends BaseAbstractActionController
         ));
     }
 
-
+    // 登录
     public function loginAction()
-    {   
+    {
         $loginSuccess = false;
-        
+
         $request = $this->getRequest();
-      
-        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');      
+
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         if($authService->hasIdentity()) {
             if ($this->isMobile($request))
                 $loginSuccess = true;
             else
-                return $this->redirect()->toRoute('user');                      
+                return $this->redirect()->toRoute('user');
         }
 
 
-        /* just for debug*/
+        // /* just for debug*/
         if ($request->isPost()) {
-          
+
             $data = $request->getPost();
-            // $data = array('login'=>'test1@a.com', 'password' => '111111');
+            //$data = array('login'=>'test1@a.com', 'password' => '111111');
 
             $userService = $this->getServiceLocator()->get('user_service');
             if($userService->authenticate($data)) {
@@ -87,8 +89,8 @@ class UserController extends BaseAbstractActionController
                 'form' => new LoginForm()
             ));
         }
-        
-        
+
+
         if ($loginSuccess)
         {
             $username = $authService->getIdentity()->__get('display_name');
@@ -97,13 +99,13 @@ class UserController extends BaseAbstractActionController
                 $avatar = '';
             else
                 $avatar = 'images/avatars/'.$avatar;
-            
+
             return new JsonModel(array(
                 'result' => 0,
                 'errorcode' => 0,
                 'username' => $username,
                 'icon' => $avatar
-            ));            
+            ));
         }
         else {
             return new JsonModel(array(
@@ -111,29 +113,30 @@ class UserController extends BaseAbstractActionController
                 'errorcode' => 1,
                 'username' => "",
                 'icon' => ''
-            ));              
+            ));
         }
     }
-    
-    public function registerAction() 
+
+    // 注册
+    public function registerAction()
     {
         $result = 1;
         $errorcode = 0;
-        
-        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');      
+
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         $userService = $this->getServiceLocator()->get('user_service');
 
         $request = $this->getRequest();
         if ($request->isPost()) {
-          
+
             $data = $request->getPost();
 
             // var_dump($data);
-            
+
             $form = new RegisterForm;
             $form->setInputFilter(new RegisterFilter);
             $form->setData($data);
-            
+
             if($form->isValid()) {
                 $reg_result = $userService->register($data);
                 if ($reg_result == 0)
@@ -149,29 +152,29 @@ class UserController extends BaseAbstractActionController
                 if (!$this->isMobile($request))
                     return $this->redirect()->toRoute('user/login');
             }
-            else 
+            else
             {
                 if ($this->isMobile($request))
                 {
                    $result = 1;
-                    $errorcode = 1;//TODO:判断是哪种错误码                    
+                    $errorcode = 1;//TODO:判断是哪种错误码
                 }
                 else
                 {
                     return new ViewModel(array(
                         'form' => new RegisterForm(),
                         'errors' => 'Register Error!'
-                    ));  
+                    ));
                 }
             }
-          
+
         }
-        
+
         if (!$this->isMobile($request))
         {
             return new ViewModel(array(
                 'form' => new RegisterForm()
-            ));                 
+            ));
         }
 
         if ($result == 0)
@@ -179,20 +182,20 @@ class UserController extends BaseAbstractActionController
             $File = $this->params()->fromFiles('avatar');
             if ($File)
                 $userService->saveAvatar($File, $authService->getIdentity()->__get('user_id'));
-            
+
             $username = $authService->getIdentity()->__get('display_name');
             $avatar = $authService->getIdentity()->__get('portrait');
             if (!$avatar || $avatar=='')
                 $avatar = '';
             else
                 $avatar = 'images/avatars/'.$avatar;
-            
+
             return new JsonModel(array(
                 'result' => 0,
                 'errorcode' => 0,
                 'username' => $username,
                 'icon' => $avatar
-            ));            
+            ));
         }
         else
         {
@@ -201,15 +204,16 @@ class UserController extends BaseAbstractActionController
                 'errorcode' => $errorcode,
                 'username' => "",
                 'icon' => ''
-            ));              
+            ));
         }
     }
-    
+
+    // 登出
     public function logoutAction()
     {
         $request = $this->getRequest();
 
-        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');      
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         $authService->clearIdentity();
         if (!$this->isMobile($request))
         {
@@ -224,52 +228,30 @@ class UserController extends BaseAbstractActionController
         }
 
     }
-    
+
+    // 换密码
     public function changepassAction()
     {
         $result = 1;
         $errorcode = 0;
 
         $request = $this->getRequest();
-        if ($request->isPost()) {
-          
+
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if($this->isMobile($request) && $authService->hasIdentity() && $request->isPost()) {
+
             $data = $request->getPost();
-            
+
             $form = new ChangePassForm;
             $form->setInputFilter(new ChangePassFilter);
             $form->setData($data);
-            
+
             if($form->isValid()) {
-                if (!$this->isMobile($request))
-                {
-                    $userService = $this->getServiceLocator()->get('user_service');
-                    if($userService->changepass($data)) {
-                        return new ViewModel(array(
-                            'form' => new ChangePassForm(),
-                            'result' => 'Change Success!'
-                        ));
-                    }
-                }
-                else
-                {
+                $userService = $this->getServiceLocator()->get('user_service');
+                if($userService->changepass($data)) {
                     $result = 0;
                 }
             }
-
-            if (!$this->isMobile($request))
-            {
-                return new ViewModel(array(
-                    'form' => new ChangePassForm(),
-                    'result' => 'Change Error!'
-                ));
-            }
-        }
-
-        if (!$this->isMobile($request))
-        {
-            return new ViewModel(array(
-                'form' => new ChangePassForm(),
-            ));
         }
 
         return new JsonModel(array(
@@ -278,18 +260,98 @@ class UserController extends BaseAbstractActionController
         ));
     }
 
+    // 个人信息
     public function basicinfoAction()
     {
         $result = 1;
         $errorcode = 0;
 
         $request = $this->getRequest();
-        //如果是post，那么就根据提交的修改个人信息
-        if ($request->isPost()) {
+
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if($this->isMobile($request) && $authService->hasIdentity()) {
+
+            $user_id = $authService->getIdentity()->__get('user_id');
+            $nickname = $authService->getIdentity()->__get('display_name');
+            $portrait = $authService->getIdentity()->__get('portrait');
+            if (!$portrait || $portrait=='')
+                $portrait = '';
+            else
+                $portrait = 'images/avatars/'.$portrait;
+
+            $gender = $authService->getIdentity()->__get('gender');
+            $age = $authService->getIdentity()->__get('age');
+            $career = $authService->getIdentity()->__get('career');
+            $city = $authService->getIdentity()->__get('city');
+            $province = $authService->getIdentity()->__get('province');
+            $tel = $authService->getIdentity()->__get('tel');
+            $intro = $authService->getIdentity()->__get('intro');
+
+            $result_info = array(
+                'userid' => $user_id,
+                'nickname' => $nickname,
+                'avatar' => $portrait,
+                'gender' => $gender,
+                'age' => $age,
+                'career' => $career,
+                'city' => $city,
+                'province' => $province,
+                'tel' => $tel,
+                'intro' => $intro,
+            );
 
 
+            $result = 0;
+
+            return new JsonModel(array(
+                'result' => $result,
+                'result_user_info' => $result_info,
+            ));
         }
 
+        return new JsonModel(array(
+            'result' => $result,
+            'errorcode' => $errorcode,
+        ));
+    }
+
+    // 修改个人信息
+    public function changebasicinfoAction()
+    {
+        $result = 1;
+        $errorcode = 0;
+
+        $request = $this->getRequest();
+
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if($this->isMobile($request) && $authService->hasIdentity()) {
+
+            //如果是post，那么就根据提交的修改个人信息
+            if ($request->isPost()) {
+
+                $data = $request->getPost();
+
+                $form = new ChangeUserInfoForm();
+                $form->setInputFilter(new ChangeUserInfoFilter);
+                $form->setData($data);
+
+                if($form->isValid()) {
+                    $userService = $this->getServiceLocator()->get('user_service');
+                    if($userService->changeuserinfo($data)) {
+                        $result = 0;
+                    }
+
+                    $File = $this->params()->fromFiles('avatar');
+                    if ($File)
+                        $userService->saveAvatar($File, $authService->getIdentity()->__get('user_id'));
+                }
+            }
+        }
+
+        return new JsonModel(array(
+            'result' => $result,
+            'errorcode' => $errorcode,
+        ));
     }
 
     /*************Others****************/
