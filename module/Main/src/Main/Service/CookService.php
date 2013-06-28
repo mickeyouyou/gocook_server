@@ -146,10 +146,17 @@ class CookService implements ServiceManagerAwareInterface
             $tmp_id = $watch_id->__get('target_id');
             $tmp_watch = $user_repository->findOneBy(array('user_id' => $tmp_id));
             if ($tmp_watch) {
+
+                $avatar = $tmp_watch->__get('portrait');
+                if (!$avatar || $avatar=='')
+                    $avatar = '';
+                else
+                    $avatar = 'images/avatars/'.$avatar;
+
                 $result_watch = array(
                     'user_id' => $tmp_watch->__get('user_id'),
                     'name' => $tmp_watch->__get('display_name'),
-                    'portrait' => $tmp_watch->__get('portrait'),
+                    'portrait' => $avatar,
                 );
 
                 array_push($result_watches, $result_watch);
