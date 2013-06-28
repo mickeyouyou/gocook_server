@@ -101,7 +101,7 @@ class CookController extends BaseAbstractActionController {
 
             $cookService = $this->getServiceLocator()->get('cook_service');
             $result = $cookService->delMyCollection($collid);
-            if ($result == true)
+            if ($result == 0)
             {
                 return new JsonModel(array(
                     'result' => 0,
@@ -199,7 +199,7 @@ class CookController extends BaseAbstractActionController {
 
             $cookService = $this->getServiceLocator()->get('cook_service');
             $result = $cookService->delMyWatch($watchid);
-            if ($result == true)
+            if ($result == 0)
             {
                 return new JsonModel(array(
                     'result' => 0,

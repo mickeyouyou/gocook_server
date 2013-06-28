@@ -58,7 +58,7 @@ class CookService implements ServiceManagerAwareInterface
         $user_id = $authService->getIdentity()->__get('user_id');
 
         $repository = $this->entityManager->getRepository('Main\Entity\UserCollection');
-        $recipe_repository = $this->entityManager->getRepository('Main\Entity\UserRelation');
+        $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
 
         //查找是否有该记录
         $tmp_record = $repository->findOneBy(array('user_id' => $user_id, 'recipe_id' => $collid));
@@ -95,7 +95,10 @@ class CookService implements ServiceManagerAwareInterface
         {
             $this->entityManager->remove($relation_object);
             $this->entityManager->flush();
+
+            return 0;
         }
+        return 1;
     }
 
 
