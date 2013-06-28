@@ -61,10 +61,10 @@ class UserController extends BaseAbstractActionController
 
 
         /* just for debug*/
-        if (1) {//($request->isPost()) {
+        if ($request->isPost()) {
           
-            //$data = $request->getPost();
-            $data = array('login'=>'test1@a.com', 'password' => '111111');
+            $data = $request->getPost();
+            // $data = array('login'=>'test1@a.com', 'password' => '111111');
 
             $userService = $this->getServiceLocator()->get('user_service');
             if($userService->authenticate($data)) {
