@@ -61,12 +61,9 @@ class UserController extends BaseAbstractActionController
                 return $this->redirect()->toRoute('user');
         }
 
-
-        // /* just for debug*/
         if ($request->isPost()) {
 
             $data = $request->getPost();
-            //$data = array('login'=>'test1@a.com', 'password' => '111111');
 
             $userService = $this->getServiceLocator()->get('user_service');
             if($userService->authenticate($data)) {
@@ -336,6 +333,7 @@ class UserController extends BaseAbstractActionController
                 $form->setData($data);
 
                 if($form->isValid()) {
+
                     $userService = $this->getServiceLocator()->get('user_service');
                     if($userService->changeuserinfo($data)) {
                         $result = 0;
