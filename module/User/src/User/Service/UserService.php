@@ -122,6 +122,16 @@ class UserService implements ServiceManagerAwareInterface
 //                $error[] = $row;
 //            }
         } else {
+
+            $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+            $user = $authService->getIdentity();
+
+            $curFullPath = '';
+            if ($user->__get('portrait') != '')
+            {
+                $curFullPath = INDEX_ROOT_PATH."/public/images/avatars/".$user->__get('portrait');
+            }
+
             $savedfilename = $uid.date("_YmdHim").'.png';
             $savedFullPath = INDEX_ROOT_PATH."/public/images/avatars/".$savedfilename;
             @unlink($savedFullPath);
@@ -129,15 +139,18 @@ class UserService implements ServiceManagerAwareInterface
             @unlink($_FILES['avatar']['tmp_name']);
 
             if (!$cpresult)
-                return false;
+                return 2;
 
-            $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');     
-            $user = $authService->getIdentity();
             $user->__set('portrait', $savedfilename);
             $this->entityManager->persist($user);
-            $this->entityManager->flush();    
+            $this->entityManager->flush();
+
+            if ($curFullPath)
+            {
+                @unlink($curFullPath);
+            }
             
-            return true;
+            return 0;
             
 //            $adapter->setDestination(INDEX_ROOT_PATH."/public/images/avatars");
 //            if ($adapter->receive($file['name'])) {
@@ -173,52 +186,57 @@ class UserService implements ServiceManagerAwareInterface
 
         $is_data_changed = false;
 
-        if (isset($data['nickname']))
+        if (isset($data['nickname']) && $data['nickname']!='')
         {
+            $display_result = $repository->findOneBy(array('display_name' => $data['nickname']));
+            if ($display_result)
+            {
+                return 2;
+            }
 
-
+            $user->__set('display_name', $data['nickname']);
             $is_data_changed = true;
         }
 
-        if (isset($data['gender']))
+        if (isset($data['gender']) && $data['gender']!='')
         {
-
+            $user->__set('gender', $data['gender']);
             $is_data_changed = true;
         }
 
-        if (isset($data['age']))
+        if (isset($data['age']) && $data['age']!='')
         {
-
+            $user->__set('age', $data['age']);
             $is_data_changed = true;
         }
 
-        if (isset($data['career']))
+        if (isset($data['career']) && $data['career']!='')
         {
-
+            $user->__set('career', $data['career']);
             $is_data_changed = true;
         }
 
-        if (isset($data['tel']))
+        if (isset($data['tel']) && $data['tel']!='')
         {
-
+            $user->__set('tel', $data['tel']);
             $is_data_changed = true;
         }
 
-        if (isset($data['city']))
+        if (isset($data['city']) && $data['city']!='')
         {
-
+            $user->__set('city', $data['city']);
             $is_data_changed = true;
         }
 
-        if (isset($data['province']))
+        if (isset($data['province']) && $data['province']!='')
         {
-
+            $user->__set('province', $data['province']);
             $is_data_changed = true;
         }
 
-        if (isset($data['intro']))
+        if (isset($data['intro']) && $data['intro']!='')
         {
-
+            $user->__set('intro', $data['intro']);
             $is_data_changed = true;
         }
 
@@ -226,11 +244,11 @@ class UserService implements ServiceManagerAwareInterface
         {
             $this->entityManager->persist($user);
             $this->entityManager->flush();
-            return true;
+            return 0;
         }
 
 
-        return false;
+        return 1;
 
     }
 

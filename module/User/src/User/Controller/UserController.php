@@ -323,7 +323,6 @@ class UserController extends BaseAbstractActionController
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         if($this->isMobile($request) && $authService->hasIdentity()) {
 
-            //如果是post，那么就根据提交的修改个人信息
             if ($request->isPost()) {
 
                 $data = $request->getPost();
@@ -335,13 +334,14 @@ class UserController extends BaseAbstractActionController
                 if($form->isValid()) {
 
                     $userService = $this->getServiceLocator()->get('user_service');
-                    if($userService->changeuserinfo($data)) {
+                    $change_result = $userService->changeuserinfo($data);
+                    if($change_result == 0)
                         $result = 0;
+                    else
+                    {
+                        $result = 1;
+                        $errorcode = $change_result;
                     }
-
-                    $File = $this->params()->fromFiles('avatar');
-                    if ($File)
-                        $userService->saveAvatar($File, $authService->getIdentity()->__get('user_id'));
                 }
             }
         }
@@ -351,6 +351,46 @@ class UserController extends BaseAbstractActionController
             'errorcode' => $errorcode,
         ));
     }
+
+    //修改头像
+    public function changeavatarAction()
+    {
+        $result = 1;
+        $errorcode = 0;
+        $icon = '';
+
+        $request = $this->getRequest();
+
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if($this->isMobile($request) && $authService->hasIdentity()) {
+
+            if ($request->isPost()) {
+                $userService = $this->getServiceLocator()->get('user_service');
+                $File = $this->params()->fromFiles('avatar');
+                if ($File)
+                {
+                    $save_result = $userService->saveAvatar($File, $authService->getIdentity()->__get('user_id'));
+                    if ($save_result == 0)
+                    {
+                        $result = 0;
+                        $icon = $authService->getIdentity()->__get('portrait');
+                    }
+                    else
+                    {
+                        $result = 1;
+                        $errorcode = $save_result;
+                    }
+                }
+            }
+        }
+
+        return new JsonModel(array(
+            'result' => $result,
+            'errorcode' => $errorcode,
+            'avatar' => $icon,
+        ));
+    }
+
 
     /*************Others****************/
     public function setEntityManager(EntityManager $em)
