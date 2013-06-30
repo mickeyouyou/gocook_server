@@ -51,6 +51,19 @@ class CookService implements ServiceManagerAwareInterface
         return $result_recipes;
     }
 
+    // 获取我收藏的菜谱数
+    public function  getAllMyCollCount()
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_id = $authService->getIdentity()->__get('user_id');
+
+        $query = $this->entityManager->createQuery('SELECT COUNT(u.user_id) FROM Main\Entity\UserCollection u WHERE u.user_id=?1');
+        $query->setParameter(1, $user_id);
+        $count = $query->getSingleScalarResult();
+
+        return $count;
+    }
+
     // 加入收藏菜谱
     public function addMyCollection($collid)
     {
@@ -165,6 +178,19 @@ class CookService implements ServiceManagerAwareInterface
         return $result_watches;
     }
 
+    // 获取我关注的人数
+    public function  getAllMyWatchCount()
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_id = $authService->getIdentity()->__get('user_id');
+
+        $query = $this->entityManager->createQuery('SELECT COUNT(u.user_id) FROM Main\Entity\UserRelation u WHERE u.user_id=?1');
+        $query->setParameter(1, $user_id);
+        $count = $query->getSingleScalarResult();
+
+        return $count;
+    }
+
     // 关注
     public function addMyWatch($watchid)
     {
@@ -213,6 +239,56 @@ class CookService implements ServiceManagerAwareInterface
         }
 
         return 1;
+    }
+
+
+    // 我关注的人
+    public function getMyFans($limit, $offset=0)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_id = $authService->getIdentity()->__get('user_id');
+
+        $repository = $this->entityManager->getRepository('Main\Entity\UserRelation');
+        $user_repository = $this->entityManager->getRepository('User\Entity\User');
+
+        $result_watches = array();
+
+        $watch_id_s = $repository->findBy(array('target_id' => $user_id), null, $limit, $offset);
+
+        foreach ($watch_id_s as $watch_id){
+            $tmp_id = $watch_id->__get('user_id');
+            $tmp_watch = $user_repository->findOneBy(array('user_id' => $tmp_id));
+            if ($tmp_watch) {
+
+                $avatar = $tmp_watch->__get('portrait');
+                if (!$avatar || $avatar=='')
+                    $avatar = '';
+                else
+                    $avatar = 'images/avatars/'.$avatar;
+
+                $result_watch = array(
+                    'user_id' => $tmp_watch->__get('user_id'),
+                    'name' => $tmp_watch->__get('display_name'),
+                    'portrait' => $avatar,
+                );
+
+                array_push($result_watches, $result_watch);
+            }
+        }
+        return $result_watches;
+    }
+
+    // 获取我粉丝的数目
+    public function  getAllMyFansCount()
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_id = $authService->getIdentity()->__get('user_id');
+
+        $query = $this->entityManager->createQuery('SELECT COUNT(u.user_id) FROM Main\Entity\UserRelation u WHERE u.target_id=?1');
+        $query->setParameter(1, $user_id);
+        $count = $query->getSingleScalarResult();
+
+        return $count;
     }
 
 

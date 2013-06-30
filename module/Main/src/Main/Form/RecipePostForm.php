@@ -25,22 +25,42 @@ class RecipePostForm extends Form
              ->setObject(new Recipe());
 
         $this->add(array(
-            'name' => 'login',
+            'name' => 'recipe_id',
             'attributes' => array(
                 'type' => 'text',
             ),
             'options' => array(
-                'label' => 'Email or User Name',
+                'label' => 'recipe id',
             ),
         ));
 
         $this->add(array(
-            'name' => 'password',
+            'name' => 'desc',
             'attributes' => array(
-                'type' => 'password',
+                'type' => 'text',
             ),
             'options' => array(
-                'label' => 'Password',
+                'label' => 'DEsc',
+            ),
+        ));
+
+        $this->add(array(
+            'name' => 'category',
+            'attributes' => array(
+                'type' => 'text',
+            ),
+            'options' => array(
+                'label' => 'Category',
+            ),
+        ));
+
+        $this->add(array(
+            'name' => 'cover_img',
+            'attributes' => array(
+                'type' => 'text',
+            ),
+            'options' => array(
+                'label' => 'Name',
             ),
         ));
 

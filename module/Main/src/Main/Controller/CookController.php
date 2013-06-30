@@ -34,9 +34,11 @@ class CookController extends BaseAbstractActionController {
 
             $cookService = $this->getServiceLocator()->get('cook_service');
             $collect_recipes = $cookService->getMyCollection(10,($page-1)*10);
+            $collect_count = intval($cookService->getAllMyCollCount());
 
             return new JsonModel(array(
                 'result' => 0,
+                'total' => $collect_count,
                 'result_recipes' => $collect_recipes,
             ));
         }
@@ -132,9 +134,11 @@ class CookController extends BaseAbstractActionController {
 
             $cookService = $this->getServiceLocator()->get('cook_service');
             $mywatchusers = $cookService->getMyWatch(10,($page-1)*10);
+            $watch_count = intval($cookService->getAllMyWatchCount());
 
             return new JsonModel(array(
                 'result' => 0,
+                'total' => $watch_count,
                 'result_users' => $mywatchusers,
             ));
         }
@@ -214,6 +218,35 @@ class CookController extends BaseAbstractActionController {
         ));
     }
 
+    //我的粉丝
+    public function myfansAction()
+    {
+        $request = $this->getRequest();
+
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if ($this->isMobile($request) && $authService->hasIdentity())
+        {
+            $page = 1;
+            if ($this->params()->fromQuery('page')&&$this->params()->fromQuery('page')!='')
+            {
+                $page = intval($this->params()->fromQuery('page'));
+            }
+
+            $cookService = $this->getServiceLocator()->get('cook_service');
+            $myfans = $cookService->getMyFans(10,($page-1)*10);
+            $fans_count = intval($cookService->getAllMyFansCount());
+
+            return new JsonModel(array(
+                'result' => 0,
+                'total' => $fans_count,
+                'result_users' => $myfans,
+            ));
+        }
+
+        return new JsonModel(array(
+            'result' => 1,
+        ));
+    }
 
     //我的菜谱
     public function myrecipesAction()

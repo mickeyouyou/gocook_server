@@ -194,7 +194,8 @@ class RecipeController extends BaseAbstractActionController {
     public function postAction()
     {
         $request = $this->getRequest();
-        if ($this->isMobile($request))
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if ($authService->hasIdentity()&&$this->isMobile($request))
         {
             if ($request->isPost())
             {
