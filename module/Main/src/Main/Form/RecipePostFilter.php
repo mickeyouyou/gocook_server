@@ -14,8 +14,24 @@ class RecipePostFilter extends InputFilter {
     public function __construct() {
 
         $this->add(array(
-            'name' => 'login',
+            'name' => 'recipe_id',
+            'required' => false,
+            'allow_empty' => true,
+            'filters' => array(
+                array('name' => 'Int'),
+            ),
+            'validators' => array(
+                array(
+                    'name' => 'GreaterThan',
+                    'options' => array( 'min' => 0),
+                ),
+            ),
+        ));
+
+        $this->add(array(
+            'name' => 'name',
             'required' => true,
+            'allow_empty' => false,
             'filters' => array(
                 array('name' => 'StringTrim'),
             ),
@@ -26,24 +42,83 @@ class RecipePostFilter extends InputFilter {
                 ),
             ),
         ));
-        
+
+
         $this->add(array(
-            'name' => 'password',
-            'required' => true,
+            'name' => 'desc',
+            'required' => false,
+            'allow_empty' => true,
             'filters' => array(
                 array('name' => 'StringTrim'),
             ),
             'validators' => array(
                 array(
                     'name' => 'StringLength',
-                    'options' => array(
-                        'encoding' => 'UTF-8',
-                        'min'      => 6,
-                        'max'      => 128,
-                    ),
+                    'options' => array( 'min' => 0 ),
                 ),
             ),
         ));
+
+        $this->add(array(
+            'name' => 'category',
+            'required' => false,
+            'allow_empty' => true,
+            'filters' => array(
+                array('name' => 'StringTrim'),
+            ),
+            'validators' => array(
+                array(
+                    'name' => 'StringLength',
+                    'options' => array( 'min' => 6 ),
+                ),
+            ),
+        ));
+
+        $this->add(array(
+            'name' => 'materials',
+            'required' => true,
+            'allow_empty' => false,
+            'filters' => array(
+                array('name' => 'StringTrim'),
+            ),
+            'validators' => array(
+                array(
+                    'name' => 'StringLength',
+                    'options' => array( 'min' => 2 ),
+                ),
+            ),
+        ));
+
+        $this->add(array(
+            'name' => 'steps',
+            'required' => true,
+            'allow_empty' => false,
+            'filters' => array(
+                array('name' => 'StringTrim'),
+            ),
+            'validators' => array(
+                array(
+                    'name' => 'StringLength',
+                    'options' => array( 'min' => 6 ),
+                ),
+            ),
+        ));
+
+        $this->add(array(
+            'name' => 'tips',
+            'required' => false,
+            'allow_empty' => true,
+            'filters' => array(
+                array('name' => 'StringTrim'),
+            ),
+            'validators' => array(
+                array(
+                    'name' => 'StringLength',
+                    'options' => array( 'min' => 6 ),
+                ),
+            ),
+        ));
+
     }
 
 }

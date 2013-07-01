@@ -190,29 +190,54 @@ class RecipeController extends BaseAbstractActionController {
         ));
     }
 
-    //TODO:发表菜谱需要好好做一下
-    public function postAction()
+    // 发布一个菜谱
+    public function createAction()
     {
+        $result = 1;
+        $errorcode = 0;
+
         $request = $this->getRequest();
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         if ($authService->hasIdentity()&&$this->isMobile($request))
         {
             if ($request->isPost())
             {
+                $data = $request->getPost();
 
+                $form = new RecipePostForm;
+                $form->setInputFilter(new RecipeCommentFilter);
+                $form->setData($data);
+
+                if ($form->isValid()) {
+                    $recipeService = $this->getServiceLocator()->get('recipe_service');
+                    $save_result = $recipeService->saveRecipe($form->getData());
+
+                    if ($save_result == 0)
+                    {
+                        $result = 0;
+                    }
+                    else
+                    {
+                        $result = 1;
+                        $errorcode = $save_result;
+                    }
+                }
             }
         }
 
         return new JsonModel(array(
-            'result' => 1,
+            'result' => $result,
+            'errorcode' => $errorcode,
         ));
     }
 
-    public function modifyAction()
+    // 修改菜谱
+    public function editAction()
     {
 
     }
 
+    // 评论菜谱
     public function commentAction()
     {
         $request = $this->getRequest();

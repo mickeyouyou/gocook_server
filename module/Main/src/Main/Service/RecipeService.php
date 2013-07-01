@@ -79,6 +79,69 @@ class RecipeService implements ServiceManagerAwareInterface
         return false;
     }
 
+    // 创建/修改菜谱
+    public function saveRecipe($data)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_id = $authService->getIdentity()->__get('user_id');
+
+        $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
+
+        $recipe = null;
+        $is_create = false;
+
+
+        //判断是创建还是修改
+        if (isset($data['reicpe_id']) && $data['recipe_id']!='')
+        {
+            $recipe = $recipe_repository->findOneBy(array('recipe_id' => $data['recipe_id']));
+        }
+
+        if ($recipe == null)
+        {
+            $is_create = true;
+            $recipe = new Recipe();
+        }
+
+        if (isset($data['name']) && $data['name']!='')
+        {
+            $recipe->__set('name', $data['name']);
+        }
+
+        if (isset($data['desc']))
+        {
+            $recipe->__set('desc', $data['desc']);
+        }
+
+        if (isset($data['category']))
+        {
+            $recipe->__set('catgory', $data['category']);
+        }
+
+        if (isset($data['materials']) && $data['materials']!='')
+        {
+
+
+
+        }
+
+        if (isset($data['recipe_steps']) && $data['recipe_steps']!='')
+        {
+
+
+
+        }
+
+        if (isset($data['tips']))
+        {
+            $recipe->__set('tips', $data['tips']);
+        }
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+        return 0;
+    }
+
     /*************Manager****************/
     public function setServiceManager(ServiceManager $serviceManager)
     {

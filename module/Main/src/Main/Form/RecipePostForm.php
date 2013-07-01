@@ -35,6 +35,16 @@ class RecipePostForm extends Form
         ));
 
         $this->add(array(
+            'name' => 'name',
+            'attributes' => array(
+                'type' => 'text',
+            ),
+            'options' => array(
+                'label' => 'Name',
+            ),
+        ));
+
+        $this->add(array(
             'name' => 'desc',
             'attributes' => array(
                 'type' => 'text',
@@ -57,10 +67,40 @@ class RecipePostForm extends Form
         $this->add(array(
             'name' => 'cover_img',
             'attributes' => array(
+                'type' => 'file',
+            ),
+            'options' => array(
+                'label' => 'cover image',
+            ),
+        ));
+
+        $this->add(array(
+            'name' => 'materials',
+            'attributes' => array(
                 'type' => 'text',
             ),
             'options' => array(
-                'label' => 'Name',
+                'label' => 'materials',
+            ),
+        ));
+
+        $this->add(array(
+            'name' => 'steps',
+            'attributes' => array(
+                'type' => 'text',
+            ),
+            'options' => array(
+                'label' => 'materials',
+            ),
+        ));
+
+        $this->add(array(
+            'name' => 'tips',
+            'attributes' => array(
+                'type' => 'text',
+            ),
+            'options' => array(
+                'label' => 'tips',
             ),
         ));
 
