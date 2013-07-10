@@ -33,10 +33,24 @@ class RecipeController extends BaseAbstractActionController {
         if ($this->isMobile($request))
         {
             $repository = $this->getEntityManager()->getRepository('Main\Entity\Recipe');
+            $collect_repository = $this->getEntityManager()->getRepository('Main\Entity\UserCollection');
+            $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
             if ($request->isGet() && $this->params()->fromQuery('id')!='') {
 
                 $recipe_id = intval($this->params()->fromQuery('id'));
                 $recipe = $repository->findOneBy(array('recipe_id' => $recipe_id));
+                //查找收藏状态
+                $collect  = 1;
+                if ($authService->hasIdentity())
+                {
+                    $user_id = $authService->getIdentity()->__get('user_id');
+                    $user_collect = $collect_repository->findOneBy(array('user_id'=>$user_id, 'recipe_id' => $recipe_id));
+                    if ($user_collect)
+                    {
+                        $collect = 0;
+                    }
+                }
+
                 if ($recipe)
                 {
                     $steps_array = Json::decode($recipe->recipe_steps, Json::TYPE_ARRAY);
@@ -56,6 +70,7 @@ class RecipeController extends BaseAbstractActionController {
                             'materials' => $recipe->materials,
                             'steps' => $steps_array['steps'],
                             'tips' => $recipe->tips,
+                            'collect' => $collect,
                         ),
                     ));
                 }
