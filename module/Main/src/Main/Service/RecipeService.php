@@ -59,7 +59,7 @@ class RecipeService implements ServiceManagerAwareInterface
     public function commitOnRecipe($data)
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
-        $user_id = $authService->getIdentity()->__get('user_id');
+        $user_id = intval($authService->getIdentity()->__get('user_id'));
         $recipe_id = intval($data['recipe_id']);
         $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
         $recipe = $recipe_repository->findOneBy(array('recipe_id' => $recipe_id));
@@ -72,6 +72,13 @@ class RecipeService implements ServiceManagerAwareInterface
             $recipe_comment->__set('user_id', $user_id);
             $recipe_comment->__set('recipe_id', $recipe_id);
             $recipe_comment->__set('content', $data['content']);
+
+            $recipe_comment->__set('recipe', $recipe);
+            $recipe_comment->__set('user', $authService->getIdentity());
+
+
+            var_dump($recipe_comment);
+
             $this->entityManager->persist($recipe_comment);
             $this->entityManager->flush();
             return true;
@@ -92,15 +99,19 @@ class RecipeService implements ServiceManagerAwareInterface
 
 
         //判断是创建还是修改
-        if (isset($data['reicpe_id']) && $data['recipe_id']!='')
-        {
+        if (isset($data['reicpe_id']) && $data['recipe_id'] != '') {
             $recipe = $recipe_repository->findOneBy(array('recipe_id' => $data['recipe_id']));
         }
 
-        if ($recipe == null)
-        {
+        if ($recipe == null) {
             $is_create = true;
             $recipe = new Recipe();
+        }
+
+        // 封面
+        if ($is_create)
+        {
+
         }
 
         if (isset($data['name']) && $data['name']!='')
@@ -140,6 +151,59 @@ class RecipeService implements ServiceManagerAwareInterface
         $this->entityManager->persist($user);
         $this->entityManager->flush();
         return 0;
+    }
+
+
+    //保存头像
+    public function saveCoverPicture($file)
+    {
+        $size = new \Zend\Validator\File\Size(array('min'=>1000)); //minimum bytes filesize
+        $adapter = new \Zend\File\Transfer\Adapter\Http();
+        $adapter->setValidators(array($size), $file['name']);
+        if (!$adapter->isValid()){
+            return false;
+//            $dataError = $adapter->getMessages();
+//            $error = array();
+//            foreach($dataError as $key=>$row)
+//            {
+//                $error[] = $row;
+//            }
+        } else {
+
+            $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+            $user = $authService->getIdentity();
+
+            $curFullPath = '';
+            if ($user->__get('portrait') != '')
+            {
+                $curFullPath = INDEX_ROOT_PATH."/public/images/avatars/".$user->__get('portrait');
+            }
+
+            $savedfilename = $uid.date("_YmdHim").'.png';
+            $savedFullPath = INDEX_ROOT_PATH."/public/images/avatars/".$savedfilename;
+            @unlink($savedFullPath);
+            $cpresult = copy($_FILES['avatar']['tmp_name'], $savedFullPath);
+            @unlink($_FILES['avatar']['tmp_name']);
+
+            if (!$cpresult)
+                return 2;
+
+            $user->__set('portrait', $savedfilename);
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+
+            if ($curFullPath)
+            {
+                @unlink($curFullPath);
+            }
+
+            return 0;
+
+//            $adapter->setDestination(INDEX_ROOT_PATH."/public/images/avatars");
+//            if ($adapter->receive($file['name'])) {
+//                return true;
+//            }
+        }
     }
 
     /*************Manager****************/
