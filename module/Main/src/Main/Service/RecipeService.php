@@ -76,9 +76,6 @@ class RecipeService implements ServiceManagerAwareInterface
             $recipe_comment->__set('recipe', $recipe);
             $recipe_comment->__set('user', $authService->getIdentity());
 
-
-            var_dump($recipe_comment);
-
             $this->entityManager->persist($recipe_comment);
             $this->entityManager->flush();
             return true;
