@@ -169,7 +169,7 @@ class RecipeController extends BaseAbstractActionController {
                 $recipe_id = intval($this->params()->fromQuery('recipe_id'));
 
                 $repository = $this->getEntityManager()->getRepository('Main\Entity\RecipeComment');
-                $recipe_comments = $repository->findBy(array('recipe_id' => $recipe_id), array('create_time' => 'ASC'));
+                $recipe_comments = $repository->findBy(array('recipe_id' => $recipe_id), array('create_time' => 'DESC'));
                 if ($recipe_comments)
                 {
                     $result_recipe_comments = array();
