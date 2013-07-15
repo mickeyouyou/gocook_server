@@ -13,6 +13,7 @@ use Zend\Mvc\MvcEvent;
 use Main\Repository\RecipeRepository;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
+use Zend\Json\Json;
 
 class IndexController extends BaseAbstractActionController {
 
@@ -38,7 +39,7 @@ class IndexController extends BaseAbstractActionController {
 	        'some_parameter' => 'some value',
             'success'=>true,
         ));
- 
+
         return $result;
     }
 

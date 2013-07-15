@@ -249,7 +249,42 @@ class RecipeController extends BaseAbstractActionController {
     // 修改菜谱
     public function editAction()
     {
+        $result = 1;
+        $errorcode = 0;
 
+        $request = $this->getRequest();
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if ($authService->hasIdentity()&&$this->isMobile($request))
+        {
+            if ($request->isPost())
+            {
+                $data = $request->getPost();
+
+                $form = new RecipePostForm;
+                $form->setInputFilter(new RecipeCommentFilter);
+                $form->setData($data);
+
+                if ($form->isValid()) {
+                    $recipeService = $this->getServiceLocator()->get('recipe_service');
+                    $save_result = $recipeService->saveRecipe($data);
+
+                    if ($save_result == 0)
+                    {
+                        $result = 0;
+                    }
+                    else
+                    {
+                        $result = 1;
+                        $errorcode = $save_result;
+                    }
+                }
+            }
+        }
+
+        return new JsonModel(array(
+            'result' => $result,
+            'errorcode' => $errorcode,
+        ));
     }
 
     // 评论菜谱
@@ -285,7 +320,7 @@ class RecipeController extends BaseAbstractActionController {
         ));
     }
 
-    // 上传临时图片
+    // 上传临时封面图片
     public function uploadCoverPhotoAction()
     {
         $result = 1;
@@ -298,15 +333,15 @@ class RecipeController extends BaseAbstractActionController {
         if($this->isMobile($request) && $authService->hasIdentity()) {
 
             if ($request->isPost()) {
-                $userService = $this->getServiceLocator()->get('user_service');
-                $File = $this->params()->fromFiles('avatar');
+                $recipeService = $this->getServiceLocator()->get('recipe_service');
+                $File = $this->params()->fromFiles('cover');
                 if ($File)
                 {
-                    $save_result = $userService->saveAvatar($File, $authService->getIdentity()->__get('user_id'));
-                    if ($save_result == 0)
+                    $save_result = $recipeService->uploadTmpCoverPicture($File);
+                    if ($save_result != "")
                     {
                         $result = 0;
-                        $icon = $authService->getIdentity()->__get('portrait');
+                        $icon = $save_result;
                     }
                     else
                     {
@@ -324,7 +359,7 @@ class RecipeController extends BaseAbstractActionController {
         ));
     }
 
-    // 上传临时图片
+    // 上传临时步骤图片
     public function uploadStepPhotoAction()
     {
         $result = 1;
@@ -338,19 +373,19 @@ class RecipeController extends BaseAbstractActionController {
 
             if ($request->isPost()) {
                 $recipeService = $this->getServiceLocator()->get('recipe_service');
-                $File = $this->params()->fromFiles('avatar');
+                $File = $this->params()->fromFiles('step');
                 if ($File)
                 {
-                    $save_result = $recipeService->saveAvatar($File, $authService->getIdentity()->__get('user_id'));
-                    if ($save_result == 0)
+                    $save_result = $recipeService->uploadTmpStepPicture($File);
+                    if ($save_result != "")
                     {
                         $result = 0;
-                        $icon = $authService->getIdentity()->__get('portrait');
+                        $icon = $save_result;
                     }
                     else
                     {
                         $result = 1;
-                        $errorcode = $save_result;
+                        $errorcode = 1;
                     }
                 }
             }

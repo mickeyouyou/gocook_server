@@ -5,13 +5,14 @@ namespace Main\Service;
 use Main\Entity\RecipeComment;
 use Zend\Authentication\AuthenticationService;
 use Zend\Form\Form;
+use Zend\Json\Json;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\ServiceManager\ServiceManager;
 use Doctrine\ORM\EntityManager;
 use Zend\Crypt\Password\Bcrypt;
 use Main\Entity\Recipe;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
-
+use Application\Lib\Zebra_Image;
 
 class RecipeService implements ServiceManagerAwareInterface
 {
@@ -103,17 +104,23 @@ class RecipeService implements ServiceManagerAwareInterface
         if ($recipe == null) {
             $is_create = true;
             $recipe = new Recipe();
+            $recipe->__set('user_id', $user_id);
         }
-
-        // 封面
-        if ($is_create)
+        else
         {
-
+            if ($recipe->__get('user_id') != $user_id)
+            {
+                return 1;
+            }
         }
 
         if (isset($data['name']) && $data['name']!='')
         {
             $recipe->__set('name', $data['name']);
+        }
+        else if ($is_create)
+        {
+            return 1;
         }
 
         if (isset($data['desc']))
@@ -128,80 +135,186 @@ class RecipeService implements ServiceManagerAwareInterface
 
         if (isset($data['materials']) && $data['materials']!='')
         {
-
-
-
+            //检查meterials
+            $materials = $data['materials'];
+            $mate_array = explode('|', $materials);
+            if (count($mate_array)%2 != 0)
+            {
+                return 1;
+            }
+            $recipe->set('materials', $data['materials']);
         }
-
-        if (isset($data['recipe_steps']) && $data['recipe_steps']!='')
+        else if ($is_create)
         {
-
-
-
+            return 1;
         }
 
-        if (isset($data['tips']))
+        if (isset($data['tips']) && $data['materials']!='')
         {
             $recipe->__set('tips', $data['tips']);
         }
 
-        $this->entityManager->persist($user);
+        if (isset($data['recipe_steps']) && $data['recipe_steps']!='')
+        {
+            $steps = Json::decode($data['recipe_steps'], Json::TYPE_ARRAY);
+            $step_array = $steps['steps'];
+            $index = 0;
+            foreach ($step_array as $step){
+
+                $step_img = $step['img'];
+                if ($step_img != '')
+                {
+                    // 看看是否已经有了图片
+                    $alreadyFullPath = INDEX_ROOT_PATH."/public/images/recipe/step/".$step_img;
+                    if (!file_exists($alreadyFullPath))
+                    {
+                        $tmpFullPath = INDEX_ROOT_PATH."/public/images/tmp/".$step_img;
+                        if (file_exists($tmpFullPath))
+                        {
+                            // 处理临时文件
+                            // create a new instance of the class
+                            $image = new Zebra_Image();
+                            $image->source_path = $tmpFullPath;
+
+                            $image->preserve_aspect_ratio = true;
+                            $image->enlarge_smaller_images = true;
+                            $image->preserve_time = true;
+
+                            $stepFullPath_200 = INDEX_ROOT_PATH."/public/images/recipe/step/".$step_img;
+                            $image->target_path = $stepFullPath_200;
+                            $image->resize(200, 0, ZEBRA_IMAGE_CROP_CENTER);
+
+                            @unlink($tmpFullPath);
+                        }
+                        else
+                        {
+                            $step_array[$index]['img'] = '';
+                        }
+                    }
+                }
+
+                $index++;
+            }
+
+            $steps['steps'] = $step_array;
+            $steps_str = Json::encode($steps);
+
+            $recipe->__set('$recipe_steps', $steps_str);
+        }
+        else if ($is_create)
+        {
+            return 1;
+        }
+
+        // 最后处理图片
+        // 封面
+        // 判断是否带上图片上来了
+        if (isset($data['cover_img']) && $data['name']!='')
+        {
+            $cover_img = $dat['cover_img'];
+            $tmpFullPath = INDEX_ROOT_PATH."/public/images/tmp/".$cover_img;
+            if (file_exists($tmpFullPath))
+            {
+                // 处理临时文件
+                // create a new instance of the class
+                $image = new Zebra_Image();
+                $image->source_path = $tmpFullPath;
+
+                $image->preserve_aspect_ratio = true;
+                $image->enlarge_smaller_images = true;
+                $image->preserve_time = true;
+
+                $coverFullPath_140 = INDEX_ROOT_PATH."/public/images/recipe/140/".$cover_img;
+                $image->target_path = $coverFullPath_140;
+                $image->resize(140, 0, ZEBRA_IMAGE_CROP_CENTER);
+
+                $coverFullPath_526 = INDEX_ROOT_PATH."/public/images/recipe/526/".$cover_img;
+                $image->target_path = $coverFullPath_526;
+                $image->resize(526, 0, ZEBRA_IMAGE_CROP_CENTER);
+
+                @unlink($tmpFullPath);
+            }
+            else
+                return 1;
+        }
+        else
+        {
+            if ($is_create)//如果是新创建，并且没有图片的话，则创建失败
+            return 1;
+        }
+
+        $this->entityManager->persist($recipe);
         $this->entityManager->flush();
         return 0;
     }
 
 
-    //保存头像
-    public function saveCoverPicture($file)
+    //保存cover
+    public function uploadTmpCoverPicture($file)
     {
         $size = new \Zend\Validator\File\Size(array('min'=>1000)); //minimum bytes filesize
         $adapter = new \Zend\File\Transfer\Adapter\Http();
         $adapter->setValidators(array($size), $file['name']);
         if (!$adapter->isValid()){
-            return false;
-//            $dataError = $adapter->getMessages();
-//            $error = array();
-//            foreach($dataError as $key=>$row)
-//            {
-//                $error[] = $row;
-//            }
+            return '';
         } else {
 
             $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
             $user = $authService->getIdentity();
 
             $curFullPath = '';
-            if ($user->__get('portrait') != '')
-            {
-                $curFullPath = INDEX_ROOT_PATH."/public/images/avatars/".$user->__get('portrait');
-            }
 
             $savedfilename = $uid.date("_YmdHim").'.png';
-            $savedFullPath = INDEX_ROOT_PATH."/public/images/avatars/".$savedfilename;
+            $savedFullPath = INDEX_ROOT_PATH."/public/images/tmp/".$savedfilename;
             @unlink($savedFullPath);
-            $cpresult = copy($_FILES['avatar']['tmp_name'], $savedFullPath);
-            @unlink($_FILES['avatar']['tmp_name']);
+            $cpresult = copy($_FILES['cover']['tmp_name'], $savedFullPath);
+            @unlink($_FILES['cover']['tmp_name']);
 
             if (!$cpresult)
-                return 2;
-
-            $user->__set('portrait', $savedfilename);
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
+                return '';
 
             if ($curFullPath)
             {
                 @unlink($curFullPath);
             }
 
-            return 0;
-
-//            $adapter->setDestination(INDEX_ROOT_PATH."/public/images/avatars");
-//            if ($adapter->receive($file['name'])) {
-//                return true;
-//            }
+            return $savedfilename;
         }
     }
+
+    //保存step
+    public function uploadTmpStepPicture($file)
+    {
+        $size = new \Zend\Validator\File\Size(array('min'=>1000)); //minimum bytes filesize
+        $adapter = new \Zend\File\Transfer\Adapter\Http();
+        $adapter->setValidators(array($size), $file['name']);
+        if (!$adapter->isValid()){
+            return '';
+        } else {
+
+            $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+            $user = $authService->getIdentity();
+
+            $curFullPath = '';
+
+            $savedfilename = $uid.date("_YmdHim").'.png';
+            $savedFullPath = INDEX_ROOT_PATH."/public/images/tmp/".$savedfilename;
+            @unlink($savedFullPath);
+            $cpresult = copy($_FILES['step']['tmp_name'], $savedFullPath);
+            @unlink($_FILES['step']['tmp_name']);
+
+            if (!$cpresult)
+                return '';
+
+            if ($curFullPath)
+            {
+                @unlink($curFullPath);
+            }
+
+            return $savedfilename;
+        }
+    }
+
 
     /*************Manager****************/
     public function setServiceManager(ServiceManager $serviceManager)
