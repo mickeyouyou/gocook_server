@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Lib;
+namespace Main\Service;
 
 /**
  *  Methods used with the {@link resize()} method.

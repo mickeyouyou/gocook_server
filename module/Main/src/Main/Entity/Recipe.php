@@ -24,7 +24,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @property integer $comment_count
  * @property integer $browser_count
  * @property string $catgory
- * @property bigint $cover_img_id
+ * @property bigint $cover_img
  * @property text $materials
  * @property text $recipe_steps
  * @property text $tips
@@ -55,73 +55,73 @@ class Recipe
      * @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
      **/
    protected $user;
-   
+
     /**
      * @ORM\OneToMany(targetEntity="Dish", mappedBy="recipe")
      * @ORM\JoinColumn(name="recipe_id", referencedColumnName="recipe_id")
      **/
    protected $dishes;
-    
+
     /**
      * @ORM\Column(type="datetime")
      */
     protected $create_time;
-    
+
     /**
      * @ORM\Column(type="string")
      */
     protected $name;
-    
+
     /**
      * @ORM\Column(type="text")
      */
-    protected $desc;    
-    
+    protected $description;
+
     /**
      * @ORM\Column(type="integer")
      */
-    protected $collected_count;    
-    
+    protected $collected_count;
+
     /**
      * @ORM\Column(type="integer")
      */
-    protected $dish_count;        
-    
+    protected $dish_count;
+
     /**
      * @ORM\Column(type="integer")
      */
-    protected $comment_count;        
-    
+    protected $comment_count;
+
     /**
      * @ORM\Column(type="integer")
      */
     protected $browse_count;
-    
+
     /**
      * @ORM\Column(type="string")
      */
-    protected $catgory;        
+    protected $catgory;
 
     /**
      * @ORM\Column(type="string")
      */
     protected $cover_img;
-    
+
     /**
      * @ORM\Column(type="text")
      */
-    protected $materials;      
-    
+    protected $materials;
+
     /**
      * @ORM\Column(type="text")
      */
-    protected $recipe_steps;  
-    
+    protected $recipe_steps;
+
     /**
      * @ORM\Column(type="text")
      */
     protected $tips;
-    
+
     
     public function __construct()
     {

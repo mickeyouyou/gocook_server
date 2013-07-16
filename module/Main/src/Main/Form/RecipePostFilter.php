@@ -30,15 +30,15 @@ class RecipePostFilter extends InputFilter {
 
         $this->add(array(
             'name' => 'name',
-            'required' => true,
-            'allow_empty' => false,
+            'required' => false,
+            'allow_empty' => true,
             'filters' => array(
                 array('name' => 'StringTrim'),
             ),
             'validators' => array(
                 array(
                     'name' => 'StringLength',
-                    'options' => array( 'min' => 6 ),
+                    'options' => array( 'min' => 4 ),
                 ),
             ),
         ));
@@ -69,15 +69,15 @@ class RecipePostFilter extends InputFilter {
             'validators' => array(
                 array(
                     'name' => 'StringLength',
-                    'options' => array( 'min' => 6 ),
+                    'options' => array( 'min' => 4 ),
                 ),
             ),
         ));
 
         $this->add(array(
             'name' => 'materials',
-            'required' => true,
-            'allow_empty' => false,
+            'required' => false,
+            'allow_empty' => true,
             'filters' => array(
                 array('name' => 'StringTrim'),
             ),
@@ -91,8 +91,8 @@ class RecipePostFilter extends InputFilter {
 
         $this->add(array(
             'name' => 'steps',
-            'required' => true,
-            'allow_empty' => false,
+            'required' => false,
+            'allow_empty' => true,
             'filters' => array(
                 array('name' => 'StringTrim'),
             ),
@@ -114,7 +114,7 @@ class RecipePostFilter extends InputFilter {
             'validators' => array(
                 array(
                     'name' => 'StringLength',
-                    'options' => array( 'min' => 6 ),
+                    'options' => array( 'min' => 4 ),
                 ),
             ),
         ));

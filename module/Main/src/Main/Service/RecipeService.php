@@ -12,7 +12,9 @@ use Doctrine\ORM\EntityManager;
 use Zend\Crypt\Password\Bcrypt;
 use Main\Entity\Recipe;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Application\Lib\Zebra_Image;
+use User\Entity\User;
+
+require_once __DIR__.'/Zebra_Image.php';
 
 class RecipeService implements ServiceManagerAwareInterface
 {
@@ -88,13 +90,12 @@ class RecipeService implements ServiceManagerAwareInterface
     public function saveRecipe($data)
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
-        $user_id = $authService->getIdentity()->__get('user_id');
+        $user_id = intval($authService->getIdentity()->__get('user_id'));
 
         $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
 
         $recipe = null;
         $is_create = false;
-
 
         //判断是创建还是修改
         if (isset($data['reicpe_id']) && $data['recipe_id'] != '') {
@@ -105,6 +106,11 @@ class RecipeService implements ServiceManagerAwareInterface
             $is_create = true;
             $recipe = new Recipe();
             $recipe->__set('user_id', $user_id);
+
+            $user = $authService->getIdentity();
+            $recipe->__set('user', $user);
+
+            $recipe->__set('create_time', new \DateTime());
         }
         else
         {
@@ -125,7 +131,7 @@ class RecipeService implements ServiceManagerAwareInterface
 
         if (isset($data['desc']))
         {
-            $recipe->__set('desc', $data['desc']);
+            $recipe->__set('description', $data['desc']);
         }
 
         if (isset($data['category']))
@@ -142,7 +148,7 @@ class RecipeService implements ServiceManagerAwareInterface
             {
                 return 1;
             }
-            $recipe->set('materials', $data['materials']);
+            $recipe->__set('materials', $data['materials']);
         }
         else if ($is_create)
         {
@@ -154,9 +160,12 @@ class RecipeService implements ServiceManagerAwareInterface
             $recipe->__set('tips', $data['tips']);
         }
 
-        if (isset($data['recipe_steps']) && $data['recipe_steps']!='')
+        if (isset($data['steps']) && $data['steps']!='')
         {
-            $steps = Json::decode($data['recipe_steps'], Json::TYPE_ARRAY);
+            var_dump($data['steps']);
+
+            $steps = Json::decode($data['steps'], Json::TYPE_ARRAY);
+
             $step_array = $steps['steps'];
             $index = 0;
             foreach ($step_array as $step){
@@ -174,6 +183,7 @@ class RecipeService implements ServiceManagerAwareInterface
                             // 处理临时文件
                             // create a new instance of the class
                             $image = new Zebra_Image();
+                            $image->Zebra_Image();
                             $image->source_path = $tmpFullPath;
 
                             $image->preserve_aspect_ratio = true;
@@ -184,7 +194,7 @@ class RecipeService implements ServiceManagerAwareInterface
                             $image->target_path = $stepFullPath_200;
                             $image->resize(200, 0, ZEBRA_IMAGE_CROP_CENTER);
 
-                            @unlink($tmpFullPath);
+                            unlink($tmpFullPath);
                         }
                         else
                         {
@@ -197,9 +207,11 @@ class RecipeService implements ServiceManagerAwareInterface
             }
 
             $steps['steps'] = $step_array;
-            $steps_str = Json::encode($steps);
 
-            $recipe->__set('$recipe_steps', $steps_str);
+            $this->arrayRecursive($steps, 'urlencode', false);
+            $steps_str = urldecode(Json::encode($steps));
+
+            $recipe->__set('recipe_steps', $steps_str);
         }
         else if ($is_create)
         {
@@ -211,13 +223,14 @@ class RecipeService implements ServiceManagerAwareInterface
         // 判断是否带上图片上来了
         if (isset($data['cover_img']) && $data['name']!='')
         {
-            $cover_img = $dat['cover_img'];
+            $cover_img = $data['cover_img'];
             $tmpFullPath = INDEX_ROOT_PATH."/public/images/tmp/".$cover_img;
             if (file_exists($tmpFullPath))
             {
                 // 处理临时文件
                 // create a new instance of the class
                 $image = new Zebra_Image();
+                $image->Zebra_Image();
                 $image->source_path = $tmpFullPath;
 
                 $image->preserve_aspect_ratio = true;
@@ -226,13 +239,23 @@ class RecipeService implements ServiceManagerAwareInterface
 
                 $coverFullPath_140 = INDEX_ROOT_PATH."/public/images/recipe/140/".$cover_img;
                 $image->target_path = $coverFullPath_140;
-                $image->resize(140, 0, ZEBRA_IMAGE_CROP_CENTER);
+
+                $result = $image->resize(140, 0, ZEBRA_IMAGE_CROP_CENTER);
+
+                var_dump($tmpFullPath);
+
+                var_dump($coverFullPath_140);
 
                 $coverFullPath_526 = INDEX_ROOT_PATH."/public/images/recipe/526/".$cover_img;
                 $image->target_path = $coverFullPath_526;
                 $image->resize(526, 0, ZEBRA_IMAGE_CROP_CENTER);
 
-                @unlink($tmpFullPath);
+                var_dump($tmpFullPath);
+
+                unlink($tmpFullPath);
+
+                $recipe->__set('cover_img', $cover_img);
+
             }
             else
                 return 1;
@@ -336,5 +359,41 @@ class RecipeService implements ServiceManagerAwareInterface
     public function getEntityManager()
     {
         return $this->entityManager;      
-    } 
+    }
+
+    /**************************************************************
+     *
+     *	使用特定function对数组中所有元素做处理
+     *	@param	string	&$array		要处理的字符串
+     *	@param	string	$function	要执行的函数
+     *	@return boolean	$apply_to_keys_also		是否也应用到key上
+     *	@access public
+     *
+     *************************************************************/
+    public function arrayRecursive(&$array, $function, $apply_to_keys_also = false)
+    {
+        static $recursive_counter = 0;
+        if (++$recursive_counter > 1000) {
+            die('possible deep recursion attack');
+        }
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $this->arrayRecursive($array[$key], $function, $apply_to_keys_also);
+            } else {
+                if (is_string($value))
+                {
+                    $array[$key] = $function($value);
+                }
+            }
+
+            if ($apply_to_keys_also && is_string($key)) {
+                $new_key = $function($key);
+                if ($new_key != $key) {
+                    $array[$new_key] = $array[$key];
+                    unset($array[$key]);
+                }
+            }
+        }
+        $recursive_counter--;
+    }
 }

@@ -62,7 +62,7 @@ class RecipeController extends BaseAbstractActionController {
                             'author_id' => $recipe->user->user_id,//不知道为啥user_id拿来是string，大概是doctrine的bug
                             'author_name' => $recipe->user->display_name,
                             'recipe_name' => $recipe->name,
-                            'intro' => $recipe->desc,
+                            'intro' => $recipe->description,
                             'collected_count' => $recipe->collected_count,
                             'dish_count' => $recipe->dish_count,
                             'comment_count' => $recipe->comment_count,
@@ -220,10 +220,11 @@ class RecipeController extends BaseAbstractActionController {
                 $data = $request->getPost();
 
                 $form = new RecipePostForm;
-                $form->setInputFilter(new RecipeCommentFilter);
+                $form->setInputFilter(new RecipePostFilter);
                 $form->setData($data);
 
                 if ($form->isValid()) {
+
                     $recipeService = $this->getServiceLocator()->get('recipe_service');
                     $save_result = $recipeService->saveRecipe($data);
 
