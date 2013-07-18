@@ -141,6 +141,34 @@ class CookService implements ServiceManagerAwareInterface
         return $result_recipes;
     }
 
+    // 获取某人的菜谱
+    public function getUserRecipes($userid, $limit, $offset=0)
+    {
+        $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
+
+        $result_recipes = array();
+
+        $recipes = $recipe_repository->findBy(array('user_id' => $userid), null, $limit, $offset);
+
+        foreach ($recipes as $recipe){
+            $result_recipe = array(
+                'recipe_id' => $recipe->__get('recipe_id'),
+                'name' => $recipe->__get('name'),
+                'materials' => $recipe->materials,
+                'image' => 'images/recipe/140/'.$recipe->__get('cover_img'),
+                'dish_count' => $recipe->__get('dish_count')
+            );
+
+            array_push($result_recipes, $result_recipe);
+        }
+
+        $query = $this->entityManager->createQuery('SELECT COUNT(u.user_id) FROM Main\Entity\UserRelation u WHERE u.user_id=?1');
+        $query->setParameter(1, $userid);
+        $count = $query->getSingleScalarResult();
+
+        return array($count, $result_recipes);
+    }
+
 
     // 我关注的人
     public function getMyWatch($limit, $offset=0)
@@ -220,6 +248,21 @@ class CookService implements ServiceManagerAwareInterface
 
         return 1;
 
+    }
+
+    public function isMyWatch($watchid)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_id = $authService->getIdentity()->__get('user_id');
+
+        $repository = $this->entityManager->getRepository('Main\Entity\UserRelation');
+
+        //查找是否有该记录
+        $tmp_record = $repository->findOneBy(array('user_id' => $user_id, 'target_id' => $watchid));
+        if ($tmp_record)
+            return 0;
+
+        return -1;
     }
 
     // 取消关注

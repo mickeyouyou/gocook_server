@@ -87,7 +87,7 @@ CREATE TABLE `photo` (
   `image_name` varchar(100) DEFAULT NULL,
   `image_path` varchar(100) DEFAULT NULL,
   `thumb_path` varchar(100) DEFAULT NULL,
-  `desc` varchar(100) DEFAULT NULL COMMENT '暂时无用',
+  `description` varchar(100) DEFAULT NULL COMMENT '暂时无用',
   `refer_count` int(11) DEFAULT NULL COMMENT '引用数，暂时无用',
   PRIMARY KEY (`photo_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -105,7 +105,7 @@ CREATE TABLE `recipe` (
   `user_id` int(11) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
   `name` varchar(100) DEFAULT NULL,
-  `desc` text,
+  `description` text,
   `collected_count` int(11) DEFAULT NULL,
   `dish_count` int(11) DEFAULT NULL,
   `comment_count` int(11) DEFAULT NULL,

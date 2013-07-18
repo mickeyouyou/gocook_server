@@ -118,6 +118,75 @@ class CookController extends BaseAbstractActionController {
         ));
     }
 
+    //查询用户信息
+    public function kitchenAction()
+    {
+        $result = 1;
+        $errorcode = 0;
+
+        $request = $this->getRequest();
+
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        $user_repository = $this->getEntityManager()->getRepository('User\Entity\User');
+
+        if($this->isMobile($request)) {
+
+            $user_id = -1;
+            if ($this->params()->fromQuery('userid')&&$this->params()->fromQuery('userid')!='')
+            {
+                $user_id = intval($this->params()->fromQuery('userid'));
+            }
+
+            $user = $user_repository->findOneBy(array('user_id' => $user_id));
+            if ($user)
+            {
+                $user_id = $user->__get('user_id');
+                $nickname = $user->__get('display_name');
+                $portrait = $user->__get('portrait');
+                if (!$portrait || $portrait=='')
+                    $portrait = '';
+                else
+                    $portrait = 'images/avatars/'.$portrait;
+
+                $gender = $user->__get('gender');
+                $city = $authService->getIdentity()->__get('city');
+                $intro = $authService->getIdentity()->__get('intro');
+
+                $cookService = $this->getServiceLocator()->get('cook_service');
+                $result_array = $cookService->getUserRecipes($user_id,3,0);
+
+
+                $watch = 1;
+                if ($authService->hasIdentity())
+                    $watch = $cookService->isMyWatch($user_id);
+
+                $result_info = array(
+                    'userid' => $user_id,
+                    'nickname' => $nickname,
+                    'avatar' => $portrait,
+                    'gender' => $gender,
+                    'city' => $city,
+                    'intro' => $intro,
+                    'totalrecipecount' => $result_array[0],
+                    'recipes' => $result_array[1],
+                    'watch' => $watch
+                );
+
+                $result = 0;
+
+                return new JsonModel(array(
+                    'result' => $result,
+                    'result_kitchen_info' => $result_info,
+                ));
+            }
+        }
+
+        return new JsonModel(array(
+            'result' => $result,
+            'errorcode' => $errorcode,
+        ));
+    }
+
     //我的关注
     public function mywatchAction()
     {
