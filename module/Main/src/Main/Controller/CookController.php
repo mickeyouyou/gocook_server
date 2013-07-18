@@ -345,6 +345,42 @@ class CookController extends BaseAbstractActionController {
         ));
     }
 
+    //某人的菜谱
+    public function usersrecipesAction()
+    {
+        $request = $this->getRequest();
+
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if ($this->isMobile($request))
+        {
+            $user_id = -1;
+            if ($this->params()->fromQuery('userid')&&$this->params()->fromQuery('userid')!='')
+            {
+                $user_id = intval($this->params()->fromQuery('userid'));
+            }
+
+            $page = 1;
+            if ($this->params()->fromQuery('page')&&$this->params()->fromQuery('page')!='')
+            {
+                $page = intval($this->params()->fromQuery('page'));
+            }
+
+            $cookService = $this->getServiceLocator()->get('cook_service');
+            $result_recipes = $cookService->getUserRecipes($user_id, 10,($page-1)*10);
+
+            return new JsonModel(array(
+                'result' => 0,
+                'totalrecipecount' => $result_recipes[0],
+                'result_recipes' => $result_recipes[1],
+            ));
+        }
+
+        return new JsonModel(array(
+            'result' => 1,
+        ));
+    }
+
+
     //收藏，粉丝数量，关注数量
 
     /*************Others****************/
