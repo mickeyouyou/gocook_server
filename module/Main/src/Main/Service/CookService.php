@@ -162,7 +162,7 @@ class CookService implements ServiceManagerAwareInterface
             array_push($result_recipes, $result_recipe);
         }
 
-        $query = $this->entityManager->createQuery('SELECT COUNT(u.user_id) FROM Main\Entity\UserRelation u WHERE u.user_id=?1');
+        $query = $this->entityManager->createQuery('SELECT COUNT(u.user_id) FROM Main\Entity\Recipe u WHERE u.user_id=?1');
         $query->setParameter(1, $userid);
         $count = $query->getSingleScalarResult();
 
