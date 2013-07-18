@@ -149,8 +149,8 @@ class CookController extends BaseAbstractActionController {
                     $portrait = 'images/avatars/'.$portrait;
 
                 $gender = $user->__get('gender');
-                $city = $authService->getIdentity()->__get('city');
-                $intro = $authService->getIdentity()->__get('intro');
+                $city = $user->__get('city');
+                $intro = $user->__get('intro');
 
                 $cookService = $this->getServiceLocator()->get('cook_service');
                 $result_array = $cookService->getUserRecipes($user_id,3,0);
