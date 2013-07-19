@@ -285,9 +285,10 @@ class RecipeService implements ServiceManagerAwareInterface
             $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
             $user = $authService->getIdentity();
 
+            $user_id = intval($authService->getIdentity()->__get('user_id'));
             $curFullPath = '';
 
-            $savedfilename = $uid.date("_YmdHim").'.png';
+            $savedfilename = $user_id.date("_YmdHim").'.png';
             $savedFullPath = INDEX_ROOT_PATH."/public/images/tmp/".$savedfilename;
             @unlink($savedFullPath);
             $cpresult = copy($_FILES['cover']['tmp_name'], $savedFullPath);
@@ -318,9 +319,11 @@ class RecipeService implements ServiceManagerAwareInterface
             $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
             $user = $authService->getIdentity();
 
+            $user_id = intval($authService->getIdentity()->__get('user_id'));
+
             $curFullPath = '';
 
-            $savedfilename = $uid.date("_YmdHim").'.png';
+            $savedfilename = $user_id.date("_YmdHim").'.png';
             $savedFullPath = INDEX_ROOT_PATH."/public/images/tmp/".$savedfilename;
             @unlink($savedFullPath);
             $cpresult = copy($_FILES['step']['tmp_name'], $savedFullPath);
