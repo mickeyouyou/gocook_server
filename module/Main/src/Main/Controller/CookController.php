@@ -167,7 +167,7 @@ class CookController extends BaseAbstractActionController {
                     'gender' => $gender,
                     'city' => $city,
                     'intro' => $intro,
-                    'totalrecipecount' => gmp_intval($result_array[0]),
+                    'totalrecipecount' => intval($result_array[0]),
                     'recipes' => $result_array[1],
                     'watch' => $watch
                 );
