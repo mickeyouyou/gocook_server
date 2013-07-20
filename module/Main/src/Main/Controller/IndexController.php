@@ -56,7 +56,7 @@ class IndexController extends BaseAbstractActionController {
             $tophot_img = 'images/recipe/140/'.$topRecipe->cover_img;
 
             $recommend_items = array();
-            $recommend_keywords = array('家常菜','猪肉','快手菜','汤羹');
+            $recommend_keywords = array('家常菜','猪肉','快手菜','汤羹','鱼','夏日菜');
             foreach ($recommend_keywords as $keyword){
                 $recipes = $recipeService->getRecipesByKeywordOfCatgory($keyword, 4, 0);
                 $recommend_item = array();
