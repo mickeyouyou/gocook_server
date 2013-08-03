@@ -12,6 +12,8 @@ use User\Entity\User;
 use User\Entity\UserInfo;
 use User\Form\LoginForm;
 use User\Form\LoginFilter;
+use Zend\Authentication\Storage\Session;
+use Zend\Session\Container;
 use User\Form\RegisterForm;
 use User\Form\RegisterFilter;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
@@ -57,6 +59,14 @@ class UserService implements ServiceManagerAwareInterface
             
             if ($authResult->isValid())
             {
+
+                $authNamespace = new Container(Session::NAMESPACE_DEFAULT);
+                $authNamespace->getManager()->rememberMe(60 * 60 * 24);
+
+               // $authns = new \Zend\Session\Namespace($authService->getStorage()->getNamespace());
+
+                // set an expiration on the Zend_Auth namespace where identity is held
+                //$authns->setExpirationSeconds(60 * 30);  // expire auth storage after 30 min
                 return true;
             }
         }
