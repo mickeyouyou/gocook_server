@@ -39,6 +39,7 @@ class CookController extends BaseAbstractActionController {
             return new JsonModel(array(
                 'result' => 0,
                 'total' => $collect_count,
+                'cur_page' => $page,
                 'result_recipes' => $collect_recipes,
             ));
         }
@@ -208,6 +209,7 @@ class CookController extends BaseAbstractActionController {
             return new JsonModel(array(
                 'result' => 0,
                 'total' => $watch_count,
+                'cur_page' => $page,
                 'result_users' => $mywatchusers,
             ));
         }
@@ -308,6 +310,7 @@ class CookController extends BaseAbstractActionController {
             return new JsonModel(array(
                 'result' => 0,
                 'total' => $fans_count,
+                'cur_page' => $page,
                 'result_users' => $myfans,
             ));
         }
@@ -333,9 +336,12 @@ class CookController extends BaseAbstractActionController {
 
             $cookService = $this->getServiceLocator()->get('cook_service');
             $collect_recipes = $cookService->getMyRecipes(10,($page-1)*10);
+            $recipes_count = intval($cookService->getAllMyRecipesCount());
 
             return new JsonModel(array(
                 'result' => 0,
+                'total' => $recipes_count,
+                'cur_page' => $page,
                 'result_recipes' => $collect_recipes,
             ));
         }

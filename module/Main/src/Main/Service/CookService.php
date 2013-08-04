@@ -141,6 +141,18 @@ class CookService implements ServiceManagerAwareInterface
         return $result_recipes;
     }
 
+    public function getAllMyRecipesCount()
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_id = $authService->getIdentity()->__get('user_id');
+
+        $query = $this->entityManager->createQuery('SELECT COUNT(u.recipe_id) FROM Main\Entity\Recipe u WHERE u.user_id=?1');
+        $query->setParameter(1, $user_id);
+        $count = $query->getSingleScalarResult();
+
+        return $count;
+    }
+
     // 获取某人的菜谱
     public function getUserRecipes($userid, $limit, $offset=0)
     {
