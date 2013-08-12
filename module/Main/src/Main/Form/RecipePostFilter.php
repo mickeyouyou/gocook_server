@@ -38,7 +38,7 @@ class RecipePostFilter extends InputFilter {
             'validators' => array(
                 array(
                     'name' => 'StringLength',
-                    'options' => array( 'min' => 4 ),
+                    'options' => array( 'min' => 3 ),
                 ),
             ),
         ));
@@ -69,7 +69,7 @@ class RecipePostFilter extends InputFilter {
             'validators' => array(
                 array(
                     'name' => 'StringLength',
-                    'options' => array( 'min' => 4 ),
+                    'options' => array( 'min' => 3 ),
                 ),
             ),
         ));
@@ -114,7 +114,7 @@ class RecipePostFilter extends InputFilter {
             'validators' => array(
                 array(
                     'name' => 'StringLength',
-                    'options' => array( 'min' => 4 ),
+                    'options' => array( 'min' => 3 ),
                 ),
             ),
         ));

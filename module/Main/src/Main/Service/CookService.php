@@ -297,7 +297,7 @@ class CookService implements ServiceManagerAwareInterface
     }
 
 
-    // 我关注的人
+    // 我的粉丝
     public function getMyFans($limit, $offset=0)
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');

@@ -98,7 +98,7 @@ class RecipeService implements ServiceManagerAwareInterface
         $is_create = false;
 
         //判断是创建还是修改
-        if (isset($data['reicpe_id']) && $data['recipe_id'] != '') {
+        if (isset($data['reicpe_id']) && intval($data['recipe_id']) != 0 && $data['recipe_id'] != '') {
             $recipe = $recipe_repository->findOneBy(array('recipe_id' => $data['recipe_id']));
         }
 
@@ -150,10 +150,11 @@ class RecipeService implements ServiceManagerAwareInterface
             }
             $recipe->__set('materials', $data['materials']);
         }
-        else if ($is_create)
-        {
-            return 1;
-        }
+//        else if ($is_create)
+//        {
+//            return 1;
+//        }
+
 
         if (isset($data['tips']) && $data['materials']!='')
         {
@@ -162,8 +163,6 @@ class RecipeService implements ServiceManagerAwareInterface
 
         if (isset($data['steps']) && $data['steps']!='')
         {
-            var_dump($data['steps']);
-
             $steps = Json::decode($data['steps'], Json::TYPE_ARRAY);
 
             $step_array = $steps['steps'];
@@ -218,6 +217,7 @@ class RecipeService implements ServiceManagerAwareInterface
             return 1;
         }
 
+
         // 最后处理图片
         // 封面
         // 判断是否带上图片上来了
@@ -242,15 +242,9 @@ class RecipeService implements ServiceManagerAwareInterface
 
                 $result = $image->resize(140, 0, ZEBRA_IMAGE_CROP_CENTER);
 
-                var_dump($tmpFullPath);
-
-                var_dump($coverFullPath_140);
-
                 $coverFullPath_526 = INDEX_ROOT_PATH."/public/images/recipe/526/".$cover_img;
                 $image->target_path = $coverFullPath_526;
                 $image->resize(526, 0, ZEBRA_IMAGE_CROP_CENTER);
-
-                var_dump($tmpFullPath);
 
                 unlink($tmpFullPath);
 

@@ -223,8 +223,8 @@ class RecipeController extends BaseAbstractActionController {
                 $form->setInputFilter(new RecipePostFilter);
                 $form->setData($data);
 
-                if ($form->isValid()) {
 
+                if ($form->isValid()) {
                     $recipeService = $this->getServiceLocator()->get('recipe_service');
                     $save_result = $recipeService->saveRecipe($data);
 
