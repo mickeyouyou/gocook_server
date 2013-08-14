@@ -100,6 +100,7 @@ class UserController extends BaseAbstractActionController
             return new JsonModel(array(
                 'result' => 0,
                 'errorcode' => 0,
+                'user_id' => intval($authService->getIdentity()->__get('user_id')),
                 'username' => $username,
                 'icon' => $avatar
             ));
