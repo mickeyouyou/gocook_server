@@ -288,6 +288,51 @@ class RecipeController extends BaseAbstractActionController {
         ));
     }
 
+    // 删除菜谱
+    public function deleteAction() {
+        $result = 1;
+        $error_code = 0;
+
+        $request = $this->getRequest();
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if ($authService->hasIdentity()&&$this->isMobile($request))
+        {
+
+            $recipeService = $this->getServiceLocator()->get('recipe_service');
+            $recipe_id = -1;
+            if ($this->params()->fromQuery('recipe_id')&&$this->params()->fromQuery('recipe_id')!='')
+            {
+                $recipe_id = intval($this->params()->fromQuery('recipe_id'));
+            }
+
+            if ($recipe_id != -1)
+            {
+                $result_array = $recipeService->delRecipe($recipe_id);
+                $result = $result_array[0];
+                $error_code = $result_array[1];
+            } else {
+                $result = 1;
+                $error_code = 403;
+            }
+        } else {
+            if (!$this->isMobile($request))
+            {
+                $result = 1;
+                $error_code = 101;
+            } else {
+                $result = 1;
+                $error_code = 102;
+            }
+        }
+
+        return new JsonModel(array(
+            'result' => $result,
+            'errorcode' => $error_code,
+        ));
+
+
+    }
+
     // 评论菜谱
     public function commentAction()
     {

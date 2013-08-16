@@ -335,6 +335,33 @@ class RecipeService implements ServiceManagerAwareInterface
         }
     }
 
+    public function delRecipe($recipe_id) {
+
+        $result = 0;
+        $errorcode = 1;
+
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_id = intval($authService->getIdentity()->__get('user_id'));
+
+        $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
+
+        $recipe = $recipe_repository->findOneBy(array('recipe_id' => $recipe_id));
+        if ($recipe == null) {
+            $result = 1;
+            $errorcode = 401;
+        } else {
+            if ($recipe->__get('user_id') == $user_id) {
+                $result = 0;
+                $errorcode = 0;
+            } else {
+                $result = 1;
+                $errorcode = 402;
+            }
+        }
+
+        return array($result, $errorcode);
+    }
+
 
     /*************Manager****************/
     public function setServiceManager(ServiceManager $serviceManager)
