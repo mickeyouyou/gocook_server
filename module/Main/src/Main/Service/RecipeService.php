@@ -101,8 +101,8 @@ class RecipeService implements ServiceManagerAwareInterface
         $is_create = false;
 
         //判断是创建还是修改
-        if (isset($data['reicpe_id']) && intval($data['recipe_id']) != 0 && $data['recipe_id'] != '') {
-            $recipe = $recipe_repository->findOneBy(array('recipe_id' => $data['recipe_id']));
+        if (isset($data['recipe_id']) && intval($data['recipe_id']) != 0 && $data['recipe_id'] != '') {
+            $recipe = $recipe_repository->findOneBy(array('recipe_id' => intval($data['recipe_id'])));
         }
 
         if ($recipe == null) {
@@ -267,7 +267,7 @@ class RecipeService implements ServiceManagerAwareInterface
 
             }
             else if (file_exists($coverFullPath)) {
-
+                $recipe->__set('cover_img', $cover_img);
             } else {
                 $result = 1;
                 $error_code = 408;
