@@ -89,6 +89,9 @@ class RecipeService implements ServiceManagerAwareInterface
     // 创建/修改菜谱
     public function saveRecipe($data)
     {
+        $result = 1;
+        $error_code = 1;
+
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
         $user_id = intval($authService->getIdentity()->__get('user_id'));
 
@@ -116,7 +119,9 @@ class RecipeService implements ServiceManagerAwareInterface
         {
             if ($recipe->__get('user_id') != $user_id)
             {
-                return 1;
+                $result = 1;
+                $error_code = 402;
+                return array($result, $error_code);
             }
         }
 
@@ -126,7 +131,9 @@ class RecipeService implements ServiceManagerAwareInterface
         }
         else if ($is_create)
         {
-            return 1;
+            $result = 1;
+            $error_code = 404;
+            return array($result, $error_code);
         }
 
         if (isset($data['desc']))
@@ -146,14 +153,18 @@ class RecipeService implements ServiceManagerAwareInterface
             $mate_array = explode('|', $materials);
             if (count($mate_array)%2 != 0)
             {
-                return 1;
+                $result = 1;
+                $error_code = 405;
+                return array($result, $error_code);
             }
             $recipe->__set('materials', $data['materials']);
         }
-//        else if ($is_create)
-//        {
-//            return 1;
-//        }
+        else if ($is_create)
+        {
+            $result = 1;
+            $error_code = 406;
+            return array($result, $error_code);
+        }
 
 
         if (isset($data['tips']) && $data['materials']!='')
@@ -214,7 +225,9 @@ class RecipeService implements ServiceManagerAwareInterface
         }
         else if ($is_create)
         {
-            return 1;
+            $result = 1;
+            $error_code = 407;
+            return array($result, $error_code);
         }
 
 
@@ -225,6 +238,8 @@ class RecipeService implements ServiceManagerAwareInterface
         {
             $cover_img = $data['cover_img'];
             $tmpFullPath = INDEX_ROOT_PATH."/public/images/tmp/".$cover_img;
+            $coverFullPath = INDEX_ROOT_PATH."/public/images/recipe/526/".$cover_img;
+
             if (file_exists($tmpFullPath))
             {
                 // 处理临时文件
@@ -251,18 +266,29 @@ class RecipeService implements ServiceManagerAwareInterface
                 $recipe->__set('cover_img', $cover_img);
 
             }
-            else
-                return 1;
+            else if (file_exists($coverFullPath)) {
+
+            } else {
+                $result = 1;
+                $error_code = 408;
+                return array($result, $error_code);
+            }
         }
         else
         {
             if ($is_create)//如果是新创建，并且没有图片的话，则创建失败
-            return 1;
+            {
+                $result = 1;
+                $error_code = 409;
+                return array($result, $error_code);
+            }
         }
 
         $this->entityManager->persist($recipe);
         $this->entityManager->flush();
-        return 0;
+        $result = 0;
+        $error_code = 0;
+        return array($result, $error_code);
     }
 
 
@@ -337,7 +363,7 @@ class RecipeService implements ServiceManagerAwareInterface
 
     public function delRecipe($recipe_id) {
 
-        $result = 0;
+        $result = 1;
         $errorcode = 1;
 
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
@@ -351,6 +377,10 @@ class RecipeService implements ServiceManagerAwareInterface
             $errorcode = 401;
         } else {
             if ($recipe->__get('user_id') == $user_id) {
+
+                $this->entityManager->remove($relation_object);
+                $this->entityManager->flush();
+
                 $result = 0;
                 $errorcode = 0;
             } else {
