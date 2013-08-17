@@ -370,6 +370,7 @@ class RecipeService implements ServiceManagerAwareInterface
         $user_id = intval($authService->getIdentity()->__get('user_id'));
 
         $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
+        $comment_repository = $this->entityManager->getRepository('Main\Entity\RecipeComment');
 
         $recipe = $recipe_repository->findOneBy(array('recipe_id' => $recipe_id));
         if ($recipe == null) {
@@ -379,6 +380,12 @@ class RecipeService implements ServiceManagerAwareInterface
             if ($recipe->__get('user_id') == $user_id) {
 
                 $this->entityManager->remove($relation_object);
+                $this->entityManager->flush();
+
+                $comments = $comment_repository->findBy(array('recipe_id' => $recipe_id));
+                foreach ($comments as $comment){
+                    $this->entityManager->remove($comment);
+                }
                 $this->entityManager->flush();
 
                 $result = 0;

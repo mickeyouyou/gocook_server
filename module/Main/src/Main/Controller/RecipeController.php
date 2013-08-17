@@ -209,7 +209,7 @@ class RecipeController extends BaseAbstractActionController {
     public function createAction()
     {
         $result = 1;
-        $errorcode = 0;
+        $error_code = 0;
 
         $request = $this->getRequest();
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
@@ -220,30 +220,36 @@ class RecipeController extends BaseAbstractActionController {
                 $data = $request->getPost();
 
                 $form = new RecipePostForm;
-                $form->setInputFilter(new RecipePostFilter);
+                $form->setInputFilter(new RecipeCommentFilter);
                 $form->setData($data);
-
 
                 if ($form->isValid()) {
                     $recipeService = $this->getServiceLocator()->get('recipe_service');
-                    $save_result = $recipeService->saveRecipe($data);
-
-                    if ($save_result == 0)
-                    {
-                        $result = 0;
-                    }
-                    else
-                    {
-                        $result = 1;
-                        $errorcode = $save_result;
-                    }
+                    $result_array = $recipeService->saveRecipe($data);
+                    $result = $result_array[0];
+                    $error_code = $result_array[1];
+                } else {
+                    $result = 1;
+                    $error_code = 104;
                 }
+            } else {
+                $result = 1;
+                $error_code = 103;
+            }
+        }else {
+            if (!$this->isMobile($request))
+            {
+                $result = 1;
+                $error_code = 101;
+            } else {
+                $result = 1;
+                $error_code = 102;
             }
         }
 
         return new JsonModel(array(
             'result' => $result,
-            'errorcode' => $errorcode,
+            'errorcode' => $error_code,
         ));
     }
 
