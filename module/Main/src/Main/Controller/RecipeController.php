@@ -220,7 +220,7 @@ class RecipeController extends BaseAbstractActionController {
                 $data = $request->getPost();
 
                 $form = new RecipePostForm;
-                $form->setInputFilter(new RecipeCommentFilter);
+                $form->setInputFilter(new RecipePostFilter);
                 $form->setData($data);
 
                 if ($form->isValid()) {
@@ -268,7 +268,7 @@ class RecipeController extends BaseAbstractActionController {
                 $data = $request->getPost();
 
                 $form = new RecipePostForm;
-                $form->setInputFilter(new RecipeCommentFilter);
+                $form->setInputFilter(new RecipePostFilter);
                 $form->setData($data);
 
                 if ($form->isValid()) {
