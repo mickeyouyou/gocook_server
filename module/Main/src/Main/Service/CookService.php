@@ -125,7 +125,7 @@ class CookService implements ServiceManagerAwareInterface
 
         $result_recipes = array();
 
-        $recipes = $recipe_repository->findBy(array('user_id' => $user_id), null, $limit, $offset);
+        $recipes = $recipe_repository->findBy(array('user_id' => $user_id), array('create_time' => 'DESC'), $limit, $offset);
 
         foreach ($recipes as $recipe){
             $result_recipe = array(
@@ -193,7 +193,7 @@ class CookService implements ServiceManagerAwareInterface
 
         $result_watches = array();
 
-        $watch_id_s = $repository->findBy(array('user_id' => $user_id), null, $limit, $offset);
+        $watch_id_s = $repository->findBy(array('user_id' => $user_id), array('id' => 'DESC'), $limit, $offset);
 
         foreach ($watch_id_s as $watch_id){
             $tmp_id = $watch_id->__get('target_id');
@@ -308,7 +308,7 @@ class CookService implements ServiceManagerAwareInterface
 
         $result_watches = array();
 
-        $watch_id_s = $repository->findBy(array('target_id' => $user_id), null, $limit, $offset);
+        $watch_id_s = $repository->findBy(array('target_id' => $user_id), array('id' => 'DESC'), $limit, $offset);
 
         foreach ($watch_id_s as $watch_id){
             $tmp_id = $watch_id->__get('user_id');
