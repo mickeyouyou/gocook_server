@@ -21,6 +21,8 @@
         "zendframework/zendservice-recaptcha": "2.*",
 		"monolog/monolog": "1.4.*@dev",
         "zendframework/zend-developer-tools": "dev-master"
+    },
+	"autoload": {
+        "psr-0": {"Omega": "vendor/Omega/lib/"}
     }
-    
 }

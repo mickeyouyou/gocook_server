@@ -14,6 +14,8 @@ use User\Form\LoginForm;
 use User\Form\LoginFilter;
 use Zend\Authentication\Storage\Session;
 use Zend\Session\Container;
+use Zend\Http\Request;
+use Zend\Http\Client;
 use User\Form\RegisterForm;
 use User\Form\RegisterFilter;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
@@ -21,7 +23,7 @@ use Zend\ServiceManager\ServiceLocatorAwareInterface;
 
 class UserService implements ServiceManagerAwareInterface
 {
-    const PASSWORDCOST = 14;
+    //const PASSWORDCOST = 14;
 
     protected $serviceManager;
     protected $entityManager;
@@ -77,23 +79,45 @@ class UserService implements ServiceManagerAwareInterface
     
     public function register($data)
     {
+        $result = 1;
+        $error_code = 1;
+
         $user  = new User();
 
-        $bcrypt = new Bcrypt;
-        $bcrypt->setCost(self::PASSWORDCOST);
-        $user->__set('password', $bcrypt->create($data['password']));
+        $user->__set('password', '1');
         $user->__set('email', $data['email']);
         if (trim($data['nickname'])!="")
           $user->__set('display_name', trim($data['nickname']));
         $user->__set('register_time', new \DateTime());
                 
         $repository = $this->entityManager->getRepository('User\Entity\User');
-        $email_result = $repository->findOneBy(array('email' => $data['email']));
+        $tel_result = $repository->findOneBy(array('tel' => $data['tel']));
         $display_result = $repository->findOneBy(array('display_name' => $data['nickname']));
-        if ($email_result)
-            return 2;//errorcode
+        if ($tel_result)
+        {
+            $error_code = 101;
+            return array($result, $error_code);
+        }
         if($display_result)
-            return 3;//errorcode
+        {
+            $error_code = 102;
+            return array($result, $error_code);
+        }
+
+        // 开始向甲方服务器请求数据
+        $reg_request = new Request();
+        $reg_request->setUri('http://o2o.m6fresh.com/mobile/app.ashx');
+        $reg_request->setMethod('POST');
+        $reg_request->getPost()->set('Cmd', '1');
+
+        $reg_client = new Client();
+        $reg_response = $reg_client->dispatch($reg_request);
+
+        if ($reg_response->isSuccess()) {
+
+
+            //  the POST was successful
+        }
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();

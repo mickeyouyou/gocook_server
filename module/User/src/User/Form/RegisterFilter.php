@@ -9,8 +9,26 @@ class RegisterFilter extends InputFilter {
     public function __construct() {
 
         $this->add(array(
-            'name' => 'email',
+            'name' => 'tel',
             'required' => true,
+            'allow_empty' => false,
+            'filters' => array(
+                array('name' => 'Int'),
+            ),
+            'validators' => array(
+                array(
+                    'name' => 'Between',
+                    'options' => array(
+                        'min' => 11,
+                        'max' => 11,
+                    ),
+                ),
+            ),
+        ));
+
+        $this->add(array(
+            'name' => 'email',
+            'required' => false,
             'filters' => array(
                 array('name' => 'StringTrim'),
             ),

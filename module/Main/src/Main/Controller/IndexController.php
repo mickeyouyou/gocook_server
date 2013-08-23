@@ -14,6 +14,7 @@ use Main\Repository\RecipeRepository;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use Zend\Json\Json;
+use Omega\Common\Test;
 
 class IndexController extends BaseAbstractActionController {
 
@@ -35,6 +36,9 @@ class IndexController extends BaseAbstractActionController {
     }
   
     public function indexAction() {
+
+        Test::test2();
+
         $result = new JsonModel(array(
 	        'some_parameter' => 'some value',
             'success'=>true,

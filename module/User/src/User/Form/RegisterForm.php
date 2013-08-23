@@ -26,6 +26,16 @@ class RegisterForm extends Form
         $this->setAttribute('enctype','multipart/form-data');
 
         $this->add(array(
+            'name' => 'tel',
+            'attributes' => array(
+                'type' => 'text',
+            ),
+            'options' => array(
+                'label' => 'Tel',
+            ),
+        ));
+
+        $this->add(array(
             'name' => 'email',
             'attributes' => array(
                 'type' => 'Zend\Form\Element\Email',
