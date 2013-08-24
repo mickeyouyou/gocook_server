@@ -32,23 +32,6 @@ class RecipeService implements ServiceManagerAwareInterface
     // 获取收藏次数最多的菜谱
     public function getTopCollectedRecipes($limit, $offset=0)
     {
-        // 处理临时文件
-        // create a new instance of the class
-        $image = new Zebra_Image();
-        $image->Zebra_Image();
-        $image->source_path = INDEX_ROOT_PATH."/public/images/recipe/1.jpg";
-
-        $image->preserve_aspect_ratio = true;
-        $image->enlarge_smaller_images = true;
-        $image->preserve_time = true;
-
-        $stepFullPath_200 = INDEX_ROOT_PATH."/public/images/recipe/2.jpg";
-        $image->target_path = $stepFullPath_200;
-        $image->resize(200, 0, ZEBRA_IMAGE_CROP_CENTER);
-
-        unlink(INDEX_ROOT_PATH."/public/images/recipe/1.jpg");
-
-
         $recipes = $this->entityManager->getRepository('Main\Entity\Recipe')->getRecipesByCollectedCount($limit,$offset);
         return $recipes;
     }
