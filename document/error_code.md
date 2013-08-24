@@ -46,6 +46,13 @@ error == 1 : authecation error
 
 102: 昵称重复
 
+103: 甲方服务器错误
+
+
+
+
+
+
 
 
 

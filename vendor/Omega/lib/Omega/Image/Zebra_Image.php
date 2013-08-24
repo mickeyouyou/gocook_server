@@ -1,6 +1,6 @@
 <?php
 
-namespace Main\Service;
+namespace Omega\Image;
 
 /**
  *  Methods used with the {@link resize()} method.

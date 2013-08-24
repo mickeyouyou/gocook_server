@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the Omega package.
- * @copyright Copyright (c) 2005-2013 BadPanda Inc.
+ * @copyright Copyright (c) 2010-2013 BadPanda Inc.
  */
  
  namespace Omega\Common;

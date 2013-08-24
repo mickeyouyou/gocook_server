@@ -7,7 +7,7 @@
 
 namespace Main\Controller;
 
-use Application\Controller\BaseAbstractActionController;
+use App\Controller\BaseAbstractActionController;
 use Zend\View\Model\JsonModel;
 
 class CookController extends BaseAbstractActionController {

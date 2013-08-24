@@ -85,9 +85,14 @@ class UserService implements ServiceManagerAwareInterface
         $user  = new User();
 
         $user->__set('password', '1');
-        $user->__set('email', $data['email']);
-        if (trim($data['nickname'])!="")
-          $user->__set('display_name', trim($data['nickname']));
+
+        $user->__set('tel', $data['tel']);
+
+        if (isset($data['email']))
+            $user->__set('email', $data['email']);
+
+        $user->__set('display_name', trim($data['nickname']));
+
         $user->__set('register_time', new \DateTime());
                 
         $repository = $this->entityManager->getRepository('User\Entity\User');
@@ -104,41 +109,50 @@ class UserService implements ServiceManagerAwareInterface
             return array($result, $error_code);
         }
 
+        $account = (string)$data['tel'];
+        $token = $data['password'];
+        $login_info = '{"Account":"'. $account .'","Password":"' . $token . '"}';
+
         // 开始向甲方服务器请求数据
         $reg_request = new Request();
         $reg_request->setUri('http://o2o.m6fresh.com/mobile/app.ashx');
         $reg_request->setMethod('POST');
         $reg_request->getPost()->set('Cmd', '1');
+        $reg_request->getPost()->set('Data', $login_info);
 
         $reg_client = new Client();
+        $reg_client->setAdapter('Zend\Http\Client\Adapter\Curl');
         $reg_response = $reg_client->dispatch($reg_request);
 
         if ($reg_response->isSuccess()) {
 
 
-            //  the POST was successful
+
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+
+            $user_info = new UserInfo();
+            $user_info->__set('collect_count', 0);
+            $user_info->__set('dish_count', 0);
+            $user_info->__set('recipe_count', 0);
+            $user_info->__set('following_count', 0);
+            $user_info->__set('followed_count', 0);
+
+            $user->__set('user_info', $user_info);
+            $user_info->__set('user', $user);
+
+            $this->entityManager->persist($user_info);
+            $this->entityManager->flush();
+
+            $login_data = array('login' => $data['email'], 'password' => $data['password']);
+            $this->authenticate($login_data);
+
+            return 0;//result
+
+        } else {
+            $error_code = 103;
+            return array($result, $error_code);
         }
-
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
-
-        $user_info = new UserInfo();
-        $user_info->__set('collect_count', 0);
-        $user_info->__set('dish_count', 0);
-        $user_info->__set('recipe_count', 0);
-        $user_info->__set('following_count', 0);
-        $user_info->__set('followed_count', 0);
-
-        $user->__set('user_info', $user_info);
-        $user_info->__set('user', $user);
-
-        $this->entityManager->persist($user_info);
-        $this->entityManager->flush();     
-        
-        $login_data = array('login' => $data['email'], 'password' => $data['password']);
-        $this->authenticate($login_data);
-
-        return 0;//result
     }
 
     //保存头像

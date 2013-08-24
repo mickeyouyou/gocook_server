@@ -7,7 +7,7 @@
 
 namespace Main\Controller;
 
-use Application\Controller\BaseAbstractActionController;
+use App\Controller\BaseAbstractActionController;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Mvc\MvcEvent;
 use Main\Repository\RecipeRepository;

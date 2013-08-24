@@ -1,7 +1,7 @@
 <?php
 
 namespace User\Controller;
-use Application\Controller\BaseAbstractActionController,
+use App\Controller\BaseAbstractActionController,
     Zend\View\Model\ViewModel,
     Zend\Authentication\AuthenticationService,
     Zend\Authentication\Adapter\AdapterInterface,

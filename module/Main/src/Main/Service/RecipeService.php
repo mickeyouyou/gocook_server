@@ -13,8 +13,7 @@ use Zend\Crypt\Password\Bcrypt;
 use Main\Entity\Recipe;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use User\Entity\User;
-
-require_once __DIR__.'/Zebra_Image.php';
+use Omega\Image\Zebra_Image;
 
 class RecipeService implements ServiceManagerAwareInterface
 {
@@ -33,6 +32,23 @@ class RecipeService implements ServiceManagerAwareInterface
     // 获取收藏次数最多的菜谱
     public function getTopCollectedRecipes($limit, $offset=0)
     {
+        // 处理临时文件
+        // create a new instance of the class
+        $image = new Zebra_Image();
+        $image->Zebra_Image();
+        $image->source_path = INDEX_ROOT_PATH."/public/images/recipe/1.jpg";
+
+        $image->preserve_aspect_ratio = true;
+        $image->enlarge_smaller_images = true;
+        $image->preserve_time = true;
+
+        $stepFullPath_200 = INDEX_ROOT_PATH."/public/images/recipe/2.jpg";
+        $image->target_path = $stepFullPath_200;
+        $image->resize(200, 0, ZEBRA_IMAGE_CROP_CENTER);
+
+        unlink(INDEX_ROOT_PATH."/public/images/recipe/1.jpg");
+
+
         $recipes = $this->entityManager->getRepository('Main\Entity\Recipe')->getRecipesByCollectedCount($limit,$offset);
         return $recipes;
     }
@@ -310,16 +326,16 @@ class RecipeService implements ServiceManagerAwareInterface
 
             $savedfilename = $user_id.date("_YmdHim").'.png';
             $savedFullPath = INDEX_ROOT_PATH."/public/images/tmp/".$savedfilename;
-            @unlink($savedFullPath);
+            unlink($savedFullPath);
             $cpresult = copy($_FILES['cover']['tmp_name'], $savedFullPath);
-            @unlink($_FILES['cover']['tmp_name']);
+            unlink($_FILES['cover']['tmp_name']);
 
             if (!$cpresult)
                 return '';
 
             if ($curFullPath)
             {
-                @unlink($curFullPath);
+                unlink($curFullPath);
             }
 
             return $savedfilename;
@@ -345,16 +361,16 @@ class RecipeService implements ServiceManagerAwareInterface
 
             $savedfilename = $user_id.date("_YmdHim").'.png';
             $savedFullPath = INDEX_ROOT_PATH."/public/images/tmp/".$savedfilename;
-            @unlink($savedFullPath);
+            unlink($savedFullPath);
             $cpresult = copy($_FILES['step']['tmp_name'], $savedFullPath);
-            @unlink($_FILES['step']['tmp_name']);
+            unlink($_FILES['step']['tmp_name']);
 
             if (!$cpresult)
                 return '';
 
             if ($curFullPath)
             {
-                @unlink($curFullPath);
+                unlink($curFullPath);
             }
 
             return $savedfilename;
