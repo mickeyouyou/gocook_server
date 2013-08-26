@@ -137,16 +137,10 @@ class UserController extends BaseAbstractActionController
 
             if($form->isValid()) {
                 $reg_result = $userService->register($data);
-                if ($reg_result == 0)
-                {
-                    $result = $reg_result;
-                    $errorcode = 0;
-                }
-                else
-                {
-                    $result = 1;
-                    $errorcode = $reg_result;
-                }
+
+                $result = $reg_result[0];
+                $errorcode = $reg_result[1];
+
                 if (!$this->isMobile($request))
                     return $this->redirect()->toRoute('user/login');
             }
@@ -154,8 +148,8 @@ class UserController extends BaseAbstractActionController
             {
                 if ($this->isMobile($request))
                 {
-                   $result = 1;
-                    $errorcode = 1;//TODO:判断是哪种错误码
+                    $result = 1;
+                    $errorcode = 104;
                 }
                 else
                 {

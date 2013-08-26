@@ -19,7 +19,7 @@ use Zend\Http\Client;
 use User\Form\RegisterForm;
 use User\Form\RegisterFilter;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
-
+use App\Lib\Common;
 
 class UserService implements ServiceManagerAwareInterface
 {
@@ -83,18 +83,14 @@ class UserService implements ServiceManagerAwareInterface
         $error_code = 1;
 
         $user  = new User();
-
         $user->__set('password', '1');
-
         $user->__set('tel', $data['tel']);
-
-        if (isset($data['email']))
+        if (isset($data['email'])){
             $user->__set('email', $data['email']);
-
+        }
         $user->__set('display_name', trim($data['nickname']));
-
         $user->__set('register_time', new \DateTime());
-                
+
         $repository = $this->entityManager->getRepository('User\Entity\User');
         $tel_result = $repository->findOneBy(array('tel' => $data['tel']));
         $display_result = $repository->findOneBy(array('display_name' => $data['nickname']));
@@ -111,43 +107,61 @@ class UserService implements ServiceManagerAwareInterface
 
         $account = (string)$data['tel'];
         $token = $data['password'];
-        $login_info = '{"Account":"'. $account .'","Password":"' . $token . '"}';
+        $login_info = '{\"Account\":\"'. $account .'\",\"Password\":\"' . $token . '\"}';
 
-        // 开始向甲方服务器请求数据
+        $post_array = array();
+        $post_array['Cmd'] = Common::REGISTER_CMD;
+        $post_array['Data'] = $login_info;
+        $post_array['Md5'] = Common::EncryptAppReqData(Common::REGISTER_CMD, $login_info);
+
+        $post_str = json_encode($post_array);
+
+        // 开始向服务器请求数据
         $reg_request = new Request();
-        $reg_request->setUri('http://o2o.m6fresh.com/mobile/app.ashx');
+        $reg_request->setUri(Common::M6SERVER);
         $reg_request->setMethod('POST');
-        $reg_request->getPost()->set('Cmd', '1');
-        $reg_request->getPost()->set('Data', $login_info);
+        $reg_request->getHeaders()->addHeaders(array('Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8'));
+        $reg_request->getPost()->set('Data', $post_str);
 
         $reg_client = new Client();
         $reg_client->setAdapter('Zend\Http\Client\Adapter\Curl');
+        $reg_client->setOptions(array(
+            'maxredirects' => 0,
+            'timeout'      => 30
+        ));
+
         $reg_response = $reg_client->dispatch($reg_request);
 
         if ($reg_response->isSuccess()) {
 
+            echo ($reg_response->toString());
 
+            $res_content = $reg_response->getBody();
+            $res_json = json_decode($res_content);
 
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
+            if ($res_json['Flag'] == Common::M6FLAG_Success) {
+                $this->entityManager->persist($user);
+                $this->entityManager->flush();
 
-            $user_info = new UserInfo();
-            $user_info->__set('collect_count', 0);
-            $user_info->__set('dish_count', 0);
-            $user_info->__set('recipe_count', 0);
-            $user_info->__set('following_count', 0);
-            $user_info->__set('followed_count', 0);
+                $user_info = new UserInfo();
+                $user_info->__set('collect_count', 0);
+                $user_info->__set('dish_count', 0);
+                $user_info->__set('recipe_count', 0);
+                $user_info->__set('following_count', 0);
+                $user_info->__set('followed_count', 0);
 
-            $user->__set('user_info', $user_info);
-            $user_info->__set('user', $user);
+                $user->__set('user_info', $user_info);
+                $user_info->__set('user', $user);
 
-            $this->entityManager->persist($user_info);
-            $this->entityManager->flush();
+                $this->entityManager->persist($user_info);
+                $this->entityManager->flush();
 
-            $login_data = array('login' => $data['email'], 'password' => $data['password']);
-            $this->authenticate($login_data);
+                $login_data = array('login' => $data['email'], 'password' => $data['password']);
+                $this->authenticate($login_data);
 
-            return 0;//result
+                $result = 0;
+                return array($result, $error_code);
+            }
 
         } else {
             $error_code = 103;

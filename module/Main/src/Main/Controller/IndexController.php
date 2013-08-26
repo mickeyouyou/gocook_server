@@ -11,10 +11,12 @@ use App\Controller\BaseAbstractActionController;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Mvc\MvcEvent;
 use Main\Repository\RecipeRepository;
-use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use Zend\Json\Json;
-use Omega\Common\Test;
+use App\Lib\Common;
+use Zend\Http\Request;
+use Zend\Http\Client;
+use Zend\Http\Client\Adapter\Curl;
 
 class IndexController extends BaseAbstractActionController {
 
@@ -36,13 +38,81 @@ class IndexController extends BaseAbstractActionController {
     }
   
     public function indexAction() {
-
-        Test::test2();
-
         $result = new JsonModel(array(
 	        'some_parameter' => 'some value',
             'success'=>true,
         ));
+
+        $reg_request = new Request();
+        $reg_request->setUri(Common::M6SERVER);
+        $reg_request->setMethod('POST');
+        $reg_request->getHeaders()->addHeaders(array('Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8'));
+
+        $account = '15000021035';
+        $token = 'rmHSyDSm1Dk=';
+        $login_info = '{"Account":"'. $account .'","Password":"' . $token . '"}';
+
+
+//        // 注册
+//        $post_array = array();
+//        $post_array['Cmd'] = Common::REGISTER_CMD;
+//        $post_array['Data'] = addslashes($login_info);
+//        $post_array['Md5'] = Common::EncryptAppReqData(Common::REGISTER_CMD, $login_info);
+
+
+//        // 登陆
+//        $post_array = array();
+//        $post_array['Cmd'] = Common::AUTH_CMD;
+//        $post_array['Data'] = addslashes($login_info);
+//        $post_array['Md5'] = Common::EncryptAppReqData(Common::AUTH_CMD, $login_info);
+
+//
+//        // 搜索
+//        $search_info = '{"Keyword":"'. '牛肉' .'","PageIndex":' . (string)1 . ',"PageRows":'. (string)10 . '}';
+//        $post_array = array();
+//        $post_array['Cmd'] = Common::SEARCH_CMD;
+//        $post_array['Data'] = addslashes($search_info);
+//        $post_array['Md5'] = Common::EncryptAppReqData(Common::SEARCH_CMD, $search_info);
+//
+//        // 下单
+//        $search_info = '{"CustId":'. '17' .',"Wares":[{"WareId":6745,"Quantity":1,"Remark":"好，ok"}]}';
+//        $post_array = array();
+//        $post_array['Cmd'] = Common::ORDER_CMD;
+//        $post_array['Data'] = addslashes($search_info);
+//        $post_array['Md5'] = Common::EncryptAppReqData(Common::ORDER_CMD, $search_info);
+
+//
+        // 查询历史订单
+        $search_info = '{"CustId":'. '17' .',"StartDay":"2013-03-02","EndDay":"2013-09-10","PageIndex":1,"PageRows":10}';
+        $post_array = array();
+        $post_array['Cmd'] = Common::HIS_ORDERS_CMD;
+        $post_array['Data'] = addslashes($search_info);
+        $post_array['Md5'] = Common::EncryptAppReqData(Common::HIS_ORDERS_CMD, $search_info);
+
+        $this->arrayRecursive($post_array, 'urlencode', false);
+        $post_str = urldecode(json_encode($post_array));//not use Json::encode because of escape
+
+        echo $post_str . "\n\n";
+        //$request_post_data = '{' . '"Cmd":' . (string)Common::HIS_ORDERS_CMD . ',"Data":"' . '{\"CustId\":19,\"StartDay\":\"2013-03-12\",\"EndDay\":\"2013-09-11\",\"PageIndex\":1,\"PageRows\":10}' . '","Md5":"' . 'x5ybbJQmrRAuV7bTMCUHZw==' . '"}';
+
+       // echo $post_str;
+
+        $reg_request->getPost()->set('Data', $post_str);
+
+        //var_dump($reg_request->getPost());
+
+        $reg_client = new Client();
+        $reg_client->setAdapter('Zend\Http\Client\Adapter\Curl');
+
+        $reg_client->setOptions(array(
+            'maxredirects' => 0,
+            'timeout'      => 30
+        ));
+        $reg_response = $reg_client->send($reg_request);
+
+        if ($reg_response->isSuccess()) {
+            var_dump ($reg_response->getBody());
+        }
 
         return $result;
     }
@@ -144,4 +214,40 @@ class IndexController extends BaseAbstractActionController {
         return $this->em;
     }
 
+
+    /**************************************************************
+     *
+     *	使用特定function对数组中所有元素做处理
+     *	@param	string	&$array		要处理的字符串
+     *	@param	string	$function	要执行的函数
+     *	@return boolean	$apply_to_keys_also		是否也应用到key上
+     *	@access public
+     *
+     *************************************************************/
+    public function arrayRecursive(&$array, $function, $apply_to_keys_also = false)
+    {
+        static $recursive_counter = 0;
+        if (++$recursive_counter > 1000) {
+            die('possible deep recursion attack');
+        }
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $this->arrayRecursive($array[$key], $function, $apply_to_keys_also);
+            } else {
+                if (is_string($value))
+                {
+                    $array[$key] = $function($value);
+                }
+            }
+
+            if ($apply_to_keys_also && is_string($key)) {
+                $new_key = $function($key);
+                if ($new_key != $key) {
+                    $array[$new_key] = $array[$key];
+                    unset($array[$key]);
+                }
+            }
+        }
+        $recursive_counter--;
+    }
 }

@@ -8,19 +8,21 @@ class RegisterFilter extends InputFilter {
 
     public function __construct() {
 
+
         $this->add(array(
             'name' => 'tel',
             'required' => true,
             'allow_empty' => false,
             'filters' => array(
-                array('name' => 'Int'),
+                array('name' => 'StringTrim'),
             ),
             'validators' => array(
                 array(
-                    'name' => 'Between',
+                    'name' => 'StringLength',
                     'options' => array(
-                        'min' => 11,
-                        'max' => 11,
+                        'encoding' => 'UTF-8',
+                        'min'      => 11,
+                        'max'      => 11,
                     ),
                 ),
             ),
