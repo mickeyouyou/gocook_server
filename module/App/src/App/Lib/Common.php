@@ -22,6 +22,18 @@ class Common
     const M6SERVER = 'http://o.m6fresh.com/ws/app.ashx';
 
     const M6FLAG_Success = 1;
+    const M6FLAG_Fail = -1;
+    const M6FLAG_MD5_Error = -10;
+    const M6FLAG_Reg_ActExist = -2;
+    const M6FLAG_Auth_ActInvalid = -3;
+    const M6FLAG_Auth_PswInvalid = -4;
+    const M6FLAG_Order_ActInvalid = -5;
+    const M6FLAG_Search_ActInvalid = -6;
+    const M6FLAG_Arg_Error = -11;
+    const M6FLAG_Product_Invalid = -12;
+    const M6FLAG_Order_Invalid = -13;
+    const M6FLAG_Search_ArgError = -15;
+
 
     static public function EncryptAppReqData($cmd, $data)
     {

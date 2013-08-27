@@ -5,6 +5,7 @@ return array(
         'ZendDeveloperTools',
         'DoctrineModule',
         'DoctrineORMModule',
+        'Omega\Log',
         'Omega',
         'App',
         'Main',

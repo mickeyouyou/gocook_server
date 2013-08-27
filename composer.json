@@ -1,10 +1,10 @@
 {
-    "name": "zendframework/skeleton-application",
-    "description": "Skeleton Application for ZF2",
+    "name": "gocook/gocook",
+    "description": "GoCook for M6",
     "license": "BSD-3-Clause",
     "keywords": [
-        "framework",
-        "zf2"
+        "gocook",
+        "m6"
     ],
     "homepage": "http://framework.zend.com/",
     "repositories": [
@@ -19,10 +19,16 @@
         "doctrine/doctrine-module": "dev-master",
         "doctrine/doctrine-orm-module": "dev-master",
         "zendframework/zendservice-recaptcha": "2.*",
-		"monolog/monolog": "1.4.*@dev",
+				"monolog/monolog": "1.6.*@dev",
         "zendframework/zend-developer-tools": "dev-master"
     },
 	"autoload": {
-        "psr-0": {"Omega": "vendor/Omega/lib/"}
+        "psr-0": {
+            "Omega": "vendor/Omega/lib/",
+            "Omega\\Log": "vendor/Omega/log/src/"
+        },
+        "classmap": [
+            "vendor/Omega/log/Module.php"
+        ]
     }
 }

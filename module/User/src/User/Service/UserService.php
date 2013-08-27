@@ -20,16 +20,23 @@ use User\Form\RegisterForm;
 use User\Form\RegisterFilter;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use App\Lib\Common;
+use Zend\Log\Logger;
+use Zend\Log\LoggerAwareInterface;
+use Zend\Log\LoggerInterface;
 
-class UserService implements ServiceManagerAwareInterface
+class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
 {
     //const PASSWORDCOST = 14;
 
     protected $serviceManager;
     protected $entityManager;
-    
+    protected $logger;
+
     public function authenticate($data)
-    {        
+    {
+
+        $this->doSomething();
+
         $form = new LoginForm;
         $form->setInputFilter(new LoginFilter());
         $form->setData($data);
@@ -107,11 +114,11 @@ class UserService implements ServiceManagerAwareInterface
 
         $account = (string)$data['tel'];
         $token = $data['password'];
-        $login_info = '{\"Account\":\"'. $account .'\",\"Password\":\"' . $token . '\"}';
+        $login_info = '{"Account":"'. $account .'","Password":"' . $token . '"}';
 
         $post_array = array();
         $post_array['Cmd'] = Common::REGISTER_CMD;
-        $post_array['Data'] = $login_info;
+        $post_array['Data'] = addslashes($login_info);
         $post_array['Md5'] = Common::EncryptAppReqData(Common::REGISTER_CMD, $login_info);
 
         $post_str = json_encode($post_array);
@@ -134,12 +141,23 @@ class UserService implements ServiceManagerAwareInterface
 
         if ($reg_response->isSuccess()) {
 
-            echo ($reg_response->toString());
+            echo ($reg_response->getBody());
 
             $res_content = $reg_response->getBody();
             $res_json = json_decode($res_content);
 
             if ($res_json['Flag'] == Common::M6FLAG_Success) {
+
+                $msix_id = intval($res_json['Data']);
+                if ($msix_id == 0) {
+                    $error_code = 103;
+                    return array($result, $error_code);
+                }
+
+
+                $user->__set('', $res_json['Flag']);
+
+
                 $this->entityManager->persist($user);
                 $this->entityManager->flush();
 
@@ -161,6 +179,9 @@ class UserService implements ServiceManagerAwareInterface
 
                 $result = 0;
                 return array($result, $error_code);
+            } else if ($res_json['Flag'] == -2){
+
+
             }
 
         } else {
@@ -335,5 +356,20 @@ class UserService implements ServiceManagerAwareInterface
     public function getEntityManager()
     {
         return $this->entityManager;      
-    } 
+    }
+
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    public function doSomething()
+    {
+        // Do your work
+
+        if (null !== $this->logger) {
+            $this->logger->info('Something done here!');
+        }
+    }
 }

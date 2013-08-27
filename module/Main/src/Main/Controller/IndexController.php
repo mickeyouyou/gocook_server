@@ -53,11 +53,11 @@ class IndexController extends BaseAbstractActionController {
         $login_info = '{"Account":"'. $account .'","Password":"' . $token . '"}';
 
 
-//        // 注册
-//        $post_array = array();
-//        $post_array['Cmd'] = Common::REGISTER_CMD;
-//        $post_array['Data'] = addslashes($login_info);
-//        $post_array['Md5'] = Common::EncryptAppReqData(Common::REGISTER_CMD, $login_info);
+        // 注册
+        $post_array = array();
+        $post_array['Cmd'] = Common::REGISTER_CMD;
+        $post_array['Data'] = addslashes($login_info);
+        $post_array['Md5'] = Common::EncryptAppReqData(Common::REGISTER_CMD, $login_info);
 
 
 //        // 登陆
@@ -82,12 +82,12 @@ class IndexController extends BaseAbstractActionController {
 //        $post_array['Md5'] = Common::EncryptAppReqData(Common::ORDER_CMD, $search_info);
 
 //
-        // 查询历史订单
-        $search_info = '{"CustId":'. '17' .',"StartDay":"2013-03-02","EndDay":"2013-09-10","PageIndex":1,"PageRows":10}';
-        $post_array = array();
-        $post_array['Cmd'] = Common::HIS_ORDERS_CMD;
-        $post_array['Data'] = addslashes($search_info);
-        $post_array['Md5'] = Common::EncryptAppReqData(Common::HIS_ORDERS_CMD, $search_info);
+//        // 查询历史订单
+//        $search_info = '{"CustId":'. '17' .',"StartDay":"2013-03-02","EndDay":"2013-09-10","PageIndex":1,"PageRows":10}';
+//        $post_array = array();
+//        $post_array['Cmd'] = Common::HIS_ORDERS_CMD;
+//        $post_array['Data'] = addslashes($search_info);
+//        $post_array['Md5'] = Common::EncryptAppReqData(Common::HIS_ORDERS_CMD, $search_info);
 
         $this->arrayRecursive($post_array, 'urlencode', false);
         $post_str = urldecode(json_encode($post_array));//not use Json::encode because of escape
@@ -112,6 +112,11 @@ class IndexController extends BaseAbstractActionController {
 
         if ($reg_response->isSuccess()) {
             var_dump ($reg_response->getBody());
+
+            $res_content = $reg_response->getBody();
+            $res_json = json_decode($res_content);
+
+            var_dump($res_json);
         }
 
         return $result;
