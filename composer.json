@@ -19,7 +19,7 @@
         "doctrine/doctrine-module": "dev-master",
         "doctrine/doctrine-orm-module": "dev-master",
         "zendframework/zendservice-recaptcha": "2.*",
-				"monolog/monolog": "1.6.*@dev",
+        "monolog/monolog": "1.6.*@dev",
         "zendframework/zend-developer-tools": "dev-master"
     },
 	"autoload": {

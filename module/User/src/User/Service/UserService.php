@@ -370,6 +370,11 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
 
         if (null !== $this->logger) {
             $this->logger->info('Something done here!');
+
+           // $this->logger->err('This is an error!');
+
+            $this->logger->warn('This is not an error!');
+
         }
     }
 }

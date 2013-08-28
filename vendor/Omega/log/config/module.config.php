@@ -11,19 +11,39 @@ return array(
     'omega_log' => array(
         'writers' => array(
             'firephp'   => array(
+                'name'             => 'firephp',
                 'enabled'          => false,
                 //'check_dependency' => 'FirePHP',
             ),
             'chromephp' => array(
+                'name'             => 'stream',
                 'enabled'          => false,
                 //'check_dependency' => 'ChromePhp',
             ),
             'stream'    => array(
+                'name'                     => 'stream',
                 'enabled'                  => true,
-                'fingers_crossed'          => true,
-                'fingers_crossed_priority' => Logger::ERR,
                 'priority'                 => Logger::INFO,
-                'stream'                   => 'data/log/application.log',
+                'stream'                   => 'log/'. 'server_' . date('Y_m_d') .'.log',
+            ),
+            'stream_err'    => array(
+                'name'                     => 'stream',
+                'enabled'                  => true,
+                'priority'                 => Logger::ERR,
+                'stream'                   => 'log/'. 'server_error_' . date('Y_m_d') .'.log',
+            ),
+            'finger_crossed_err'    => array(
+                'name'                     => 'fingerscrossed',
+                'enabled'                  => true,
+                'priority'                 => Logger::ERR,
+                'writer'                   => array(
+                    'name'                 => 'stream',
+                    'options'              => array(
+                        'priority'         => Logger::INFO,
+                        'stream'           => 'log/'. 'server_fingercrossed_' . date('Y_m_d') .'.log',
+                    ),
+                ),
+
             ),
         ),
     ),

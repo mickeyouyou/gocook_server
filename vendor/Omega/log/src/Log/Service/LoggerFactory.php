@@ -8,6 +8,7 @@
 namespace Omega\Log\Service;
 
 use Zend\Log\Logger;
+use Zend\Log\Filter\Priority;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -20,13 +21,22 @@ class LoggerFactory implements FactoryInterface
 
         $logger  = new Logger;
         $plugins = $logger->getWriterPluginManager();
-        foreach ($config['writers'] as $name => $options) {
+        foreach ($config['writers'] as $options) {
             if (!$options['enabled']) {
                 continue;
             }
             unset($options['enabled']);
 
-            $writer = $plugins->get($name, $options);
+            $writer_name = $options['name'];
+            unset($options['name']);
+
+            $writer = $plugins->get($writer_name, $options);
+
+            if (isset($options['priority'])) {
+                $filter = new Priority($options['priority']);
+                $writer->addFilter($filter);
+            }
+
             $logger->addWriter($writer);
         }
 
