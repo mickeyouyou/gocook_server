@@ -2,6 +2,7 @@
     $form = $this->form;
     $form->prepare();
     echo $this->form()->openTag($form);
+    echo $this->formRow($form->get('tel'));
     echo $this->formRow($form->get('email'));
     echo $this->formRow($form->get('password'));
     echo $this->formRow($form->get('repassword'));

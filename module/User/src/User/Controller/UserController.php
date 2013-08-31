@@ -20,6 +20,7 @@ use App\Controller\BaseAbstractActionController,
     User\Form\ChangeUserInfoFilter,
     User\Form\ChangePassFilter;
 
+use App\Lib\CommonDef;
 use Zend\View\Model\JsonModel;
 
 
@@ -66,7 +67,8 @@ class UserController extends BaseAbstractActionController
             $data = $request->getPost();
 
             $userService = $this->getServiceLocator()->get('user_service');
-            if($userService->authenticate($data)) {
+            $auth_result = $userService->authenticate($data);
+            if($auth_result[0] == CommonDef::GC_Success) {
                 if($this->isMobile($request))
                     $loginSuccess = true;
                 else
@@ -119,7 +121,7 @@ class UserController extends BaseAbstractActionController
     public function registerAction()
     {
         $result = 1;
-        $errorcode = 0;
+        $error_code = 0;
 
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         $userService = $this->getServiceLocator()->get('user_service');
@@ -139,17 +141,20 @@ class UserController extends BaseAbstractActionController
                 $reg_result = $userService->register($data);
 
                 $result = $reg_result[0];
-                $errorcode = $reg_result[1];
+                $error_code = $reg_result[1];
 
                 if (!$this->isMobile($request))
-                    return $this->redirect()->toRoute('user/login');
+                {
+                    return $this->redirect()->toRoute('user');
+                }
+
             }
             else
             {
                 if ($this->isMobile($request))
                 {
-                    $result = 1;
-                    $errorcode = 104;
+                    $result = CommonDef::GC_Failed;
+                    $error_code = CommonDef::GC_NoMobileDevice;
                 }
                 else
                 {
@@ -193,7 +198,7 @@ class UserController extends BaseAbstractActionController
         {
             return new JsonModel(array(
                 'result' => 1,
-                'errorcode' => $errorcode,
+                'errorcode' => $error_code,
                 'username' => "",
                 'icon' => ''
             ));

@@ -8,6 +8,7 @@
 namespace Main\Controller;
 
 use App\Controller\BaseAbstractActionController;
+use App\Lib\CommonDef;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Mvc\MvcEvent;
 use Main\Repository\RecipeRepository;
@@ -44,7 +45,7 @@ class IndexController extends BaseAbstractActionController {
         ));
 
         $reg_request = new Request();
-        $reg_request->setUri(Common::M6SERVER);
+        $reg_request->setUri(CommonDef::M6SERVER);
         $reg_request->setMethod('POST');
         $reg_request->getHeaders()->addHeaders(array('Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8'));
 
@@ -55,9 +56,9 @@ class IndexController extends BaseAbstractActionController {
 
         // 注册
         $post_array = array();
-        $post_array['Cmd'] = Common::REGISTER_CMD;
+        $post_array['Cmd'] = CommonDef::REGISTER_CMD;
         $post_array['Data'] = addslashes($login_info);
-        $post_array['Md5'] = Common::EncryptAppReqData(Common::REGISTER_CMD, $login_info);
+        $post_array['Md5'] = Common::EncryptAppReqData(CommonDef::REGISTER_CMD, $login_info);
 
 
 //        // 登陆

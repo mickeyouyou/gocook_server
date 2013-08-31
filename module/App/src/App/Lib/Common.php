@@ -1,43 +1,28 @@
 <?php
 
 /**
- * This file is part of the Omega package.
+ * This file is part of the GoCook project.
  * @copyright Copyright (c) 2010-2013 BadPanda Inc.
  */
 
 namespace App\Lib;
 
+use App\Lib\CommonDef;
+
 class Common
 {
-    const APP_ID = 1;
-    const APP_KEY = "DAB578EC-6C01-4180-939A-37E6BE8A81AF";
-    const APP_IV = "117A5C0F";
-
-    const REGISTER_CMD = 1;
-    const AUTH_CMD = 2;
-    const SEARCH_CMD = 3;
-    const ORDER_CMD = 4;
-    const HIS_ORDERS_CMD = 5;
-
-    const M6SERVER = 'http://o.m6fresh.com/ws/app.ashx';
-
-    const M6FLAG_Success = 1;
-    const M6FLAG_Fail = -1;
-    const M6FLAG_MD5_Error = -10;
-    const M6FLAG_Reg_ActExist = -2;
-    const M6FLAG_Auth_ActInvalid = -3;
-    const M6FLAG_Auth_PswInvalid = -4;
-    const M6FLAG_Order_ActInvalid = -5;
-    const M6FLAG_Search_ActInvalid = -6;
-    const M6FLAG_Arg_Error = -11;
-    const M6FLAG_Product_Invalid = -12;
-    const M6FLAG_Order_Invalid = -13;
-    const M6FLAG_Search_ArgError = -15;
-
-
+    /**************************************************************
+     *
+     * 加密客户端发来的内容
+     * @param int $cmd
+     * @param string $data
+     * @return string 加密后的字符串
+     * @access public
+     *
+     *************************************************************/
     static public function EncryptAppReqData($cmd, $data)
     {
-        $raw_req_data = Common::APP_KEY. (string)$cmd. (string)Common::APP_ID. $data. Common::APP_IV;
+        $raw_req_data = CommonDef::APP_KEY. (string)$cmd. (string)CommonDef::APP_ID. $data. CommonDef::APP_IV;
         return base64_encode(md5($raw_req_data,true));
     }
 

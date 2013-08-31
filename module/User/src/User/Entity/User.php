@@ -43,6 +43,16 @@ class User
      **/
     protected $recipe_comments;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    protected $msix_id;
+
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected $msix_access_token;
+
    /**
      * @ORM\Column(type="string")
      */
