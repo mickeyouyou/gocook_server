@@ -20,6 +20,6 @@ class BaseAbstractActionController extends AbstractActionController
                 $isMobile = true;
             }
         }
-        return $isMobile;
+        return true;
     }
 }

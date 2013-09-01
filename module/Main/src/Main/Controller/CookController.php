@@ -7,8 +7,10 @@
 
 namespace Main\Controller;
 
+use App\Lib\GCFlag;
 use App\Controller\BaseAbstractActionController;
 use Zend\View\Model\JsonModel;
+
 
 class CookController extends BaseAbstractActionController {
 
@@ -388,6 +390,74 @@ class CookController extends BaseAbstractActionController {
 
 
     //收藏，粉丝数量，关注数量
+
+
+
+    /**************************************************************
+     *
+     * 查询M6商品
+     * url: cook/search_wares
+     * @get keyword
+     * @access public
+     *
+     *************************************************************/
+    public function searchWaresAction()
+    {
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+        $wares = array();
+
+        $request = $this->getRequest();
+
+        if($this->isMobile($request)) {
+
+            $keyword = '';
+            if ($this->params()->fromQuery('keyword') && trim($this->params()->fromQuery('keyword')) != '')
+            {
+                $keyword = trim($this->params()->fromQuery('keyword'));
+
+                $page = 1;
+                if ($this->params()->fromQuery('page')&&$this->params()->fromQuery('page')!='')
+                {
+                    $page = intval($this->params()->fromQuery('page'));
+                    if ($page < 1)
+                        $page = 1;
+                }
+
+                $cookService = $this->getServiceLocator()->get('cook_service');
+                $query_result = $cookService->QueryWaresFromM6($keyword, 10, $page);
+
+                $result = $query_result[0];
+                $error_code = $query_result[1];
+
+                if ($result == GCFlag::GC_Success){
+                    // 取得商品数据
+                    $wares = $query_result[2];
+                }
+
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_KeywordNull;
+            }
+        } else {
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_NoMobileDevice;
+        }
+
+        if ($result == GCFlag::GC_Success) {
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+                'wares' => $wares,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+            ));
+        }
+    }
+
 
     /*************Others****************/
     public function setEntityManager(EntityManager $em)

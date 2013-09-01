@@ -2,23 +2,27 @@
 
 namespace Main\Service;
 
-use Zend\Authentication\AuthenticationService;
+use App\Lib\Common;
+use App\Lib\CommonDef;
+use App\Lib\M6Flag;
+use App\Lib\GCFlag;
 use Zend\Form\Form;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\ServiceManager\ServiceManager;
 use Doctrine\ORM\EntityManager;
 use Main\Entity\UserCollection;
 use Main\Entity\UserRelation;
-use User\Entity\User;
-use Main\Repository\DishRepository;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\Log\Logger;
+use Zend\Log\LoggerAwareInterface;
+use Zend\Log\LoggerInterface;
+use Zend\Http\Request;
+use Zend\Http\Client;
 
-
-class CookService implements ServiceManagerAwareInterface
+class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
 {
     protected $serviceManager;
     protected $entityManager;
-
+    protected $logger;
 
     // 获取收藏的菜谱
     public function getMyCollection($limit, $offset=0)
@@ -346,6 +350,91 @@ class CookService implements ServiceManagerAwareInterface
         return $count;
     }
 
+    //
+    public function QueryWaresFromM6($keyword, $limit, $page)
+    {
+        $search_info = '{"Keyword":"'. $keyword .'","PageIndex":' . (string)$page . ',"PageRows":'. (string)$limit . '}';
+        $post_array = array();
+        $post_array['Cmd'] = CommonDef::SEARCH_CMD;
+        $post_array['Data'] = addslashes($search_info);
+        $post_array['Md5'] = Common::EncryptAppReqData(CommonDef::SEARCH_CMD, $search_info);
+
+        $this->arrayRecursive($post_array, 'urlencode', false);
+        $post_str = urldecode(json_encode($post_array));//not use Json::encode because of escape
+
+        // 开始向服务器请求数据
+        $reg_request = new Request();
+        $reg_request->setUri(CommonDef::M6SERVER);
+        $reg_request->setMethod('POST');
+        $reg_request->getHeaders()->addHeaders(array('Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8'));
+        $reg_request->getPost()->set('Data', $post_str);
+
+        $reg_client = new Client();
+        $reg_client->setAdapter('Zend\Http\Client\Adapter\Curl');
+        $reg_client->setOptions(array(
+            'maxredirects' => 0,
+            'timeout'      => 30
+        ));
+
+        $reg_response = $reg_client->dispatch($reg_request);
+
+        if ($reg_response->isSuccess()) {
+            $this->logger->info($reg_response->getBody());
+            $res_content = $reg_response->getBody();
+
+            $res_json = json_decode($res_content, true); // convert into array
+
+            if (intval($res_json['Flag']) == M6Flag::M6FLAG_Success) {
+
+                $data_json = json_decode($res_json['Data'], true);
+
+                $page_index = $data_json['PageIndex'];
+                $page_rows = $data_json['PageRows'];
+                $total_count = $data_json['TotalCount'];
+                $row_array = array();
+                foreach ($data_json['Rows'] as $res_row) {
+                    $row = array();
+                    $row['id'] = intval($res_row['Id']);
+                    $row['name'] = $res_row['Name'];
+                    $row['code'] = $res_row['Code'];
+                    $row['remark'] = $res_row['Remark'];
+                    $row['norm'] = $res_row['Norm'];
+                    $row['unit'] = $res_row['Unit'];
+                    $row['price'] = $res_row['Price'];
+                    $row['image_url'] = $res_row['ImageUrl'];
+                    $row['deal_method'] = $res_row['DealMethod'];
+
+                    array_push($row_array,$row);
+                }
+
+                $ware_array = array();
+                $ware_array['page'] = $page_index;
+                $ware_array['total_count'] = $total_count;
+                $ware_array['wares'] = $row_array;
+
+                //返回成功
+                $result = GCFlag::GC_Success;
+                $error_code = GCFlag::GC_NoErrorCode;
+                return array($result,$error_code,$ware_array);
+
+            } else if (intval($res_json['Flag']) == M6Flag::M6FLAG_Reg_ActExist){
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_AccountExist;
+                return array($result,$error_code);
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_M6ServerError; // M6服务器返回结果
+                return array($result,$error_code);
+            }
+
+        } else {
+            // 甲方服务器4XX，5XX
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_M6ServerConnError;
+            return array($result, $error_code);
+        }
+    }
+
 
     /*************Manager****************/
     public function setServiceManager(ServiceManager $serviceManager)
@@ -367,5 +456,50 @@ class CookService implements ServiceManagerAwareInterface
     public function getEntityManager()
     {
         return $this->entityManager;
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**************************************************************
+     *
+     *	使用特定function对数组中所有元素做处理
+     *	@param	array	&$array		要处理的字符串
+     *	@param	string	$function	要执行的函数
+     *	@return boolean	$apply_to_keys_also		是否也应用到key上
+     *	@access public
+     *
+     *************************************************************/
+    public function arrayRecursive(&$array, $function, $apply_to_keys_also = false)
+    {
+        static $recursive_counter = 0;
+        if (++$recursive_counter > 1000) {
+            die('possible deep recursion attack');
+        }
+
+        if (is_array($array)){
+            foreach ($array as $key => $value) {
+                if (is_array($value)) {
+                    $this->arrayRecursive($array[$key], $function, $apply_to_keys_also);
+                } else {
+                    if (is_string($value))
+                    {
+                        $array[$key] = $function($value);
+                    }
+                }
+
+                if ($apply_to_keys_also && is_string($key)) {
+                    $new_key = $function($key);
+                    if ($new_key != $key) {
+                        $array[$new_key] = $array[$key];
+                        unset($array[$key]);
+                    }
+                }
+            }
+        }
+
+        $recursive_counter--;
     }
 }

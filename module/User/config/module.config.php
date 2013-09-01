@@ -47,10 +47,10 @@ return array(
                 'identity_class' => __NAMESPACE__ . '\Entity\User',
                 'identity_property' => 'login',
                 'credential_property' => 'password',
-                'credential_callable' => function(\User\Entity\User $user, $password) {
-                    $bcrypt = new \Zend\Crypt\Password\Bcrypt();
-                    return $bcrypt->verify($password, $user->getPassword());
-                },
+//                'credential_callable' => function(\User\Entity\User $user, $password) {
+//                    $bcrypt = new \Zend\Crypt\Password\Bcrypt();
+//                    return $bcrypt->verify($password, $user->getPassword());
+//                },
             ),
         ),
     ),

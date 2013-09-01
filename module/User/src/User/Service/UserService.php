@@ -108,7 +108,7 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
                         'identityClass'=>'User\Entity\User',
                         'identityProperty'=>'msix_id',
                         'credentialProperty'=>'password',
-                        'credential_callable' => function(\User\Entity\User $user, $password) {
+                        'credential_callable' => function(User $user, $password) {
                             return $password == $user->__get('password');
                         },
                     ));
@@ -133,7 +133,7 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     }
                 } else {
                     // 注册
-                    $user  = new User();
+                    $user = new User();
                     $user->__set('password', '1');
                     $user->__set('tel', $account);
 
@@ -218,7 +218,7 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
         {
             $result = GCFlag::GC_Failed;
             $error_code = GCFlag::GC_NickNameExist;
-            return array($result, $error_code);
+            return array($result,$error_code);
         }
 
         $account = (string)$data['tel'];
@@ -263,7 +263,7 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 if ($msix_id == 0) {
                     $result = GCFlag::GC_Failed;
                     $error_code = GCFlag::GC_M6ServerError;
-                    return array($result, $error_code);
+                    return array($result,$error_code);
                 }
 
                 $user->__set('msix_id', $msix_id);
@@ -292,15 +292,15 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 //返回成功
                 $result = GCFlag::GC_Success;
                 $error_code = GCFlag::GC_NoErrorCode;
-                return array($result, $error_code);
+                return array($result,$error_code);
             } else if (intval($res_json['Flag']) == M6Flag::M6FLAG_Reg_ActExist){
                 $result = GCFlag::GC_Failed;
                 $error_code = GCFlag::GC_AccountExist;
-                return array($result, $error_code);
+                return array($result,$error_code);
             } else {
                 $result = GCFlag::GC_Failed;
                 $error_code = GCFlag::GC_M6ServerError; // M6服务器返回结果
-                return array($result, $error_code);
+                return array($result,$error_code);
             }
 
         } else {
@@ -311,14 +311,21 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
         }
     }
 
-    //保存头像
+    /**************************************************************
+     *
+     * 保存头像
+     * @param file uid
+     * @return array($result, $error_code) 返回结果
+     * @access public
+     *
+     *************************************************************/
     public function saveAvatar($file, $uid)
     {
         $result = GCFlag::GC_Failed;
         $error_code = GCFlag::GC_NoErrorCode;
 
         $size = new \Zend\Validator\File\Size(array('min'=>1000)); //minimum bytes filesize
-        $adapter = new \Zend\File\Transfer\Adapter\Http();
+        $adapter = new Http();
         $adapter->setValidators(array($size), $file['name']);
         if (!$adapter->isValid()){
             $result = GCFlag::GC_Failed;
@@ -374,7 +381,7 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
 
             $result = GCFlag::GC_Success;
             $error_code = GCFlag::GC_NoErrorCode;
-            return array($result, $error_code);
+            return array($result,$error_code);
         }       
     }
     
@@ -396,6 +403,13 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
 //        return false;
 //    }
 
+    /**************************************************************
+     *
+     * 修改用户信息
+     * @return array($result, $error_code) 返回结果
+     * @access public
+     *
+     *************************************************************/
     public function changeuserinfo($data)
     {
         $result = GCFlag::GC_Failed;
@@ -507,7 +521,7 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
     /**************************************************************
      *
      *	使用特定function对数组中所有元素做处理
-     *	@param	string	&$array		要处理的字符串
+     *	@param	array	&$array		要处理的字符串
      *	@param	string	$function	要执行的函数
      *	@return boolean	$apply_to_keys_also		是否也应用到key上
      *	@access public
@@ -519,24 +533,28 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
         if (++$recursive_counter > 1000) {
             die('possible deep recursion attack');
         }
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $this->arrayRecursive($array[$key], $function, $apply_to_keys_also);
-            } else {
-                if (is_string($value))
-                {
-                    $array[$key] = $function($value);
-                }
-            }
 
-            if ($apply_to_keys_also && is_string($key)) {
-                $new_key = $function($key);
-                if ($new_key != $key) {
-                    $array[$new_key] = $array[$key];
-                    unset($array[$key]);
+        if (is_array($array)){
+            foreach ($array as $key => $value) {
+                if (is_array($value)) {
+                    $this->arrayRecursive($array[$key], $function, $apply_to_keys_also);
+                } else {
+                    if (is_string($value))
+                    {
+                        $array[$key] = $function($value);
+                    }
+                }
+
+                if ($apply_to_keys_also && is_string($key)) {
+                    $new_key = $function($key);
+                    if ($new_key != $key) {
+                        $array[$new_key] = $array[$key];
+                        unset($array[$key]);
+                    }
                 }
             }
         }
+
         $recursive_counter--;
     }
 }

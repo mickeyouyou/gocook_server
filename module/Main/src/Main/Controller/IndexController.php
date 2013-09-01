@@ -9,15 +9,13 @@ namespace Main\Controller;
 
 use App\Controller\BaseAbstractActionController;
 use App\Lib\CommonDef;
-use Zend\EventManager\EventManagerInterface;
+use App\Lib\GCFlag;
 use Zend\Mvc\MvcEvent;
-use Main\Repository\RecipeRepository;
 use Zend\View\Model\JsonModel;
 use Zend\Json\Json;
 use App\Lib\Common;
 use Zend\Http\Request;
 use Zend\Http\Client;
-use Zend\Http\Client\Adapter\Curl;
 
 class IndexController extends BaseAbstractActionController {
 
@@ -39,6 +37,7 @@ class IndexController extends BaseAbstractActionController {
     }
   
     public function indexAction() {
+
         $result = new JsonModel(array(
 	        'some_parameter' => 'some value',
             'success'=>true,
@@ -59,7 +58,6 @@ class IndexController extends BaseAbstractActionController {
         $post_array['Cmd'] = CommonDef::REGISTER_CMD;
         $post_array['Data'] = addslashes($login_info);
         $post_array['Md5'] = Common::EncryptAppReqData(CommonDef::REGISTER_CMD, $login_info);
-
 
 //        // 登陆
 //        $post_array = array();
