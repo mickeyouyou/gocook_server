@@ -3,7 +3,8 @@
 namespace User\Service;
 
 use App\Lib\CommonDef;
-use Zend\Authentication\AuthenticationService;
+use App\Lib\GCFlag;
+use App\Lib\M6Flag;
 use Zend\Form\Form;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\ServiceManager\ServiceManager;
@@ -17,13 +18,11 @@ use Zend\Authentication\Storage\Session;
 use Zend\Session\Container;
 use Zend\Http\Request;
 use Zend\Http\Client;
-use User\Form\RegisterForm;
-use User\Form\RegisterFilter;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use App\Lib\Common;
 use Zend\Log\Logger;
 use Zend\Log\LoggerAwareInterface;
 use Zend\Log\LoggerInterface;
+use Omega\Image\Zebra_Image;
 
 class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
 {
@@ -48,8 +47,8 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $form->setData($data);
 
         if(!$form->isValid()) {
-            $result = CommonDef::GC_Failed;
-            $error_code = CommonDef::GC_PostInvalid;
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_PostInvalid;
             return array($result, $error_code);
         }
 
@@ -66,7 +65,6 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $post_str = urldecode(json_encode($post_array));//not use Json::encode because of escape
 
         $this->logger->info($post_str);
-
 
         // 开始向服务器请求数据
         $reg_request = new Request();
@@ -89,12 +87,12 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
             $res_content = $reg_response->getBody();
             $res_json = json_decode($res_content, true);
 
-            if (intval($res_json['Flag']) == CommonDef::M6FLAG_Success) {
+            if (intval($res_json['Flag']) == M6Flag::M6FLAG_Success) {
                 $msix_id = intval($res_json['Data']);
                 // 校验M6服务器数据
                 if ($msix_id == 0) {
-                    $result = CommonDef::GC_Failed;
-                    $error_code = CommonDef::GC_M6ServerError;
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_M6ServerError;
                     return array($result, $error_code);
                 }
 
@@ -125,12 +123,12 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
                         $authNamespace = new Container(Session::NAMESPACE_DEFAULT);
                         $authNamespace->getManager()->rememberMe(60 * 60 * 24);
 
-                        $result = CommonDef::GC_Success;
-                        $error_code = CommonDef::GC_NoErrorCode;
+                        $result = GCFlag::GC_Success;
+                        $error_code = GCFlag::GC_NoErrorCode;
                         return array($result, $error_code);
                     } else {
-                        $result = CommonDef::GC_Failed;
-                        $error_code = CommonDef::GC_CommonError;//理论上不应该会走到这里的
+                        $result = GCFlag::GC_Failed;
+                        $error_code = GCFlag::GC_CommonError;//理论上不应该会走到这里的
                         return array($result, $error_code);
                     }
                 } else {
@@ -167,27 +165,27 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     $this->authenticate($login_data);
 
                     //返回成功
-                    $result = CommonDef::GC_Success;
-                    $error_code = CommonDef::GC_NoErrorCode;
+                    $result = GCFlag::GC_Success;
+                    $error_code = GCFlag::GC_NoErrorCode;
                     return array($result, $error_code);
                 }
-            } else if (intval($res_json['Flag']) == CommonDef::M6FLAG_Auth_ActInvalid){
-                $result = CommonDef::GC_Failed;
-                $error_code = CommonDef::GC_AccountNotExist;
+            } else if (intval($res_json['Flag']) == M6Flag::M6FLAG_Auth_ActInvalid){
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_AccountNotExist;
                 return array($result, $error_code);
-            } else if (intval($res_json['Flag'])  == CommonDef::M6FLAG_Auth_PswInvalid){
-                $result = CommonDef::GC_Failed;
-                $error_code = CommonDef::GC_PasswordInvalid;
+            } else if (intval($res_json['Flag'])  == M6Flag::M6FLAG_Auth_PswInvalid){
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_PasswordInvalid;
                 return array($result, $error_code);
             } else {
-                $result = CommonDef::GC_Failed;
-                $error_code = CommonDef::GC_M6ServerError;
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_M6ServerError;
                 return array($result, $error_code);
             }
         } else {
             // 甲方服务器4XX，5XX
-            $result = CommonDef::GC_Failed;
-            $error_code = CommonDef::GC_M6ServerConnError;
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_M6ServerConnError;
             return array($result, $error_code);
         }
     }
@@ -202,8 +200,8 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
      *************************************************************/
     public function register($data)
     {
-        $result = CommonDef::GC_Failed;
-        $error_code = CommonDef::GC_NoErrorCode;
+        $result = GCFlag::GC_Failed;
+        $error_code = GCFlag::GC_NoErrorCode;
 
         $user  = new User();
         $user->__set('password', '1');
@@ -218,8 +216,8 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $display_result = $repository->findOneBy(array('display_name' => $data['nickname']));
         if($display_result)//检查昵称重复
         {
-            $result = CommonDef::GC_Failed;
-            $error_code = CommonDef::GC_NickNameExist;
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_NickNameExist;
             return array($result, $error_code);
         }
 
@@ -259,20 +257,17 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
             $res_content = $reg_response->getBody();
             $res_json = json_decode($res_content, true);
 
-            if (intval($res_json['Flag']) == CommonDef::M6FLAG_Success) {
+            if (intval($res_json['Flag']) == M6Flag::M6FLAG_Success) {
                 $msix_id = intval($res_json['Data']);
                 // 校验M6服务器数据
                 if ($msix_id == 0) {
-                    $result = CommonDef::GC_Failed;
-                    $error_code = CommonDef::GC_M6ServerError;
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_M6ServerError;
                     return array($result, $error_code);
                 }
 
                 $user->__set('msix_id', $msix_id);
                 $user->__set('msix_access_token', $token);
-
-                $this->logger->info($msix_id);
-                $this->logger->info($token);
 
                 $this->entityManager->persist($user);
                 $this->entityManager->flush();
@@ -295,23 +290,23 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 $this->authenticate($login_data);
 
                 //返回成功
-                $result = CommonDef::GC_Success;
-                $error_code = CommonDef::GC_NoErrorCode;
+                $result = GCFlag::GC_Success;
+                $error_code = GCFlag::GC_NoErrorCode;
                 return array($result, $error_code);
-            } else if (intval($res_json['Flag']) == CommonDef::M6FLAG_Reg_ActExist){
-                $result = CommonDef::GC_Failed;
-                $error_code = CommonDef::GC_AccountExist;
+            } else if (intval($res_json['Flag']) == M6Flag::M6FLAG_Reg_ActExist){
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_AccountExist;
                 return array($result, $error_code);
             } else {
-                $result = CommonDef::GC_Failed;
-                $error_code = CommonDef::GC_M6ServerError; // M6服务器返回结果
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_M6ServerError; // M6服务器返回结果
                 return array($result, $error_code);
             }
 
         } else {
             // 甲方服务器4XX，5XX
-            $result = CommonDef::GC_Failed;
-            $error_code = CommonDef::GC_M6ServerConnError;
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_M6ServerConnError;
             return array($result, $error_code);
         }
     }
@@ -319,17 +314,16 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
     //保存头像
     public function saveAvatar($file, $uid)
     {
+        $result = GCFlag::GC_Failed;
+        $error_code = GCFlag::GC_NoErrorCode;
+
         $size = new \Zend\Validator\File\Size(array('min'=>1000)); //minimum bytes filesize
         $adapter = new \Zend\File\Transfer\Adapter\Http();
         $adapter->setValidators(array($size), $file['name']);
         if (!$adapter->isValid()){
-            return false;
-//            $dataError = $adapter->getMessages();
-//            $error = array();
-//            foreach($dataError as $key=>$row)
-//            {
-//                $error[] = $row;
-//            }
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_AvatarSizeTooSmall;
+            return array($result, $error_code);
         } else {
 
             $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
@@ -341,70 +335,92 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 $curFullPath = INDEX_ROOT_PATH."/public/images/avatars/".$user->__get('portrait');
             }
 
-            $savedfilename = $uid.date("_YmdHim").'.png';
-            $savedFullPath = INDEX_ROOT_PATH."/public/images/avatars/".$savedfilename;
-            @unlink($savedFullPath);
-            $cpresult = copy($_FILES['avatar']['tmp_name'], $savedFullPath);
-            @unlink($_FILES['avatar']['tmp_name']);
+            $saved_filename = $uid.date("_YmdHim").'.png';
+            $savedFullPath = INDEX_ROOT_PATH."/public/images/avatars/".$saved_filename;
+            if (file_exists($savedFullPath)) {
+                unlink($savedFullPath);
+            }
 
-            if (!$cpresult)
-                return 2;
+            // 处理临时文件
+            // create a new instance of the class
+            $image = new Zebra_Image();
+            $image->Zebra_Image();
+            $image->source_path = $_FILES['avatar']['tmp_name'];
 
-            $user->__set('portrait', $savedfilename);
+            $image->preserve_aspect_ratio = true;
+            $image->enlarge_smaller_images = true;
+            $image->preserve_time = true;
+
+            $image->target_path = $savedFullPath;
+            $rs_result = $image->resize(150, 0, ZEBRA_IMAGE_CROP_CENTER);
+
+            if (!$rs_result)
+            {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_ChangeAvatarError;
+                return array($result, $error_code);
+            }
+
+            unlink($_FILES['avatar']['tmp_name']);
+
+            $user->__set('portrait', $saved_filename);
             $this->entityManager->persist($user);
             $this->entityManager->flush();
 
-            if ($curFullPath)
+            if ($curFullPath != '')
             {
-                @unlink($curFullPath);
+                unlink($curFullPath);
             }
-            
-            return 0;
-            
-//            $adapter->setDestination(INDEX_ROOT_PATH."/public/images/avatars");
-//            if ($adapter->receive($file['name'])) {
-//                return true;
-//            }
+
+            $result = GCFlag::GC_Success;
+            $error_code = GCFlag::GC_NoErrorCode;
+            return array($result, $error_code);
         }       
     }
     
-    public function changepass($data)
-    {
-        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');     
-        $user = $authService->getIdentity();
-        $bcrypt = new Bcrypt;
-        $bcrypt->setCost(self::PASSWORDCOST);
-        if ($bcrypt->verify($data['oripassword'], $user->__get('password')))
-        {
-            $bcrypt = new Bcrypt;
-            $bcrypt->setCost(self::PASSWORDCOST);
-            $user->__set('password', $bcrypt->create($data['password']));
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
-            return true;
-        }
-        return false;
-    }
+//    public function changepass($data)
+//    {
+//        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+//        $user = $authService->getIdentity();
+//        $bcrypt = new Bcrypt;
+//        $bcrypt->setCost(self::PASSWORDCOST);
+//        if ($bcrypt->verify($data['oripassword'], $user->__get('password')))
+//        {
+//            $bcrypt = new Bcrypt;
+//            $bcrypt->setCost(self::PASSWORDCOST);
+//            $user->__set('password', $bcrypt->create($data['password']));
+//            $this->entityManager->persist($user);
+//            $this->entityManager->flush();
+//            return true;
+//        }
+//        return false;
+//    }
 
     public function changeuserinfo($data)
     {
+        $result = GCFlag::GC_Failed;
+        $error_code = GCFlag::GC_NoErrorCode;
+
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
         $user = $authService->getIdentity();
-
         $repository = $this->entityManager->getRepository('User\Entity\User');
 
         $is_data_changed = false;
 
         if (isset($data['nickname']) && $data['nickname']!='')
         {
-            $display_result = $repository->findOneBy(array('display_name' => $data['nickname']));
-            if ($display_result)
-            {
-                return 2;
-            }
+            if ($user->__get('display_name') != $data['nickname']) {
+                $display_result = $repository->findOneBy(array('display_name' => $data['nickname']));
+                if ($display_result)
+                {
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_NickNameExist;
+                    return array($result, $error_code);
+                }
 
-            $user->__set('display_name', $data['nickname']);
-            $is_data_changed = true;
+                $user->__set('display_name', $data['nickname']);
+                $is_data_changed = true;
+            }
         }
 
         if (isset($data['gender']) && $data['gender']!='')
@@ -453,12 +469,11 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
         {
             $this->entityManager->persist($user);
             $this->entityManager->flush();
-            return 0;
         }
 
-
-        return 1;
-
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+        return array($result, $error_code);
     }
 
     
@@ -483,7 +498,6 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
     {
         return $this->entityManager;      
     }
-
 
     public function setLogger(LoggerInterface $logger)
     {

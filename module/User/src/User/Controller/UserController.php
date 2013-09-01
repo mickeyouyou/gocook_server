@@ -3,24 +3,16 @@
 namespace User\Controller;
 use App\Controller\BaseAbstractActionController,
     Zend\View\Model\ViewModel,
-    Zend\Authentication\AuthenticationService,
-    Zend\Authentication\Adapter\AdapterInterface,
-
     Doctrine\ORM\EntityManager,
     DoctrineModule\Authentication\Adapter\DoctrineObjectRepository as DoctrineAdapter,
-
-    User\Entity\User,
-    User\Entity\UserInfo,
     User\Form\LoginForm,
-    User\Service\UserService,
     User\Form\RegisterForm,
     User\Form\RegisterFilter,
-    User\Form\ChangePassForm,
     User\Form\ChangeUserInfoForm,
-    User\Form\ChangeUserInfoFilter,
-    User\Form\ChangePassFilter;
+    User\Form\ChangeUserInfoFilter;
 
-use App\Lib\CommonDef;
+use App\Lib\GCFlag;
+use Omega\Common\Common;
 use Zend\View\Model\JsonModel;
 
 
@@ -47,50 +39,60 @@ class UserController extends BaseAbstractActionController
         ));
     }
 
-    // 登录
+    /**************************************************************
+     *
+     * 登录
+     * @post_params login password
+     * @return result errorcode username user_id icon
+     * @access public
+     *
+     *************************************************************/
     public function loginAction()
     {
-        $loginSuccess = false;
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
 
         $request = $this->getRequest();
-
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         if($authService->hasIdentity()) {
-            if ($this->isMobile($request))
-                $loginSuccess = true;
-            else
+            if ($this->isMobile($request)) {
+                $result = GCFlag::GC_Success;
+                $error_code = GCFlag::GC_NoErrorCode;
+            }
+            else {
                 return $this->redirect()->toRoute('user');
-        }
+            }
+        } else {
+            if ($request->isPost()) {
+                $data = $request->getPost();
+                $userService = $this->getServiceLocator()->get('user_service');
+                $auth_result = $userService->authenticate($data);
+                $result = $auth_result[0];
+                $error_code = $auth_result[1];
 
-        if ($request->isPost()) {
-
-            $data = $request->getPost();
-
-            $userService = $this->getServiceLocator()->get('user_service');
-            $auth_result = $userService->authenticate($data);
-            if($auth_result[0] == CommonDef::GC_Success) {
-                if($this->isMobile($request))
-                    $loginSuccess = true;
-                else
-                    return $this->redirect()->toRoute('user');
+                if(!$this->isMobile($request)) {
+                    if($auth_result[0] == GCFlag::GC_Success) {
+                        return $this->redirect()->toRoute('user');
+                    } else {
+                        return new ViewModel(array(
+                            'form' => new LoginForm(),
+                            'errors' => $auth_result[0]
+                        ));
+                    }
+                }
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoPost;
             }
 
-            if(!$this->isMobile($request))
-            {
+            if(!$this->isMobile($request)){
                 return new ViewModel(array(
-                    'form' => new LoginForm(),
-                    'errors' => "Login Errors"
+                    'form' => new LoginForm()
                 ));
             }
         }
-        if(!$this->isMobile($request)){
-            return new ViewModel(array(
-                'form' => new LoginForm()
-            ));
-        }
 
-
-        if ($loginSuccess)
+        if ($result == GCFlag::GC_Success)
         {
             $username = $authService->getIdentity()->__get('display_name');
             $avatar = $authService->getIdentity()->__get('portrait');
@@ -100,8 +102,8 @@ class UserController extends BaseAbstractActionController
                 $avatar = 'images/avatars/'.$avatar;
 
             return new JsonModel(array(
-                'result' => 0,
-                'errorcode' => 0,
+                'result' => $result,
+                'errorcode' => $error_code,
                 'user_id' => intval($authService->getIdentity()->__get('user_id')),
                 'username' => $username,
                 'icon' => $avatar
@@ -109,19 +111,26 @@ class UserController extends BaseAbstractActionController
         }
         else {
             return new JsonModel(array(
-                'result' => 1,
-                'errorcode' => 1,
+                'result' => $result,
+                'errorcode' => $error_code,
                 'username' => "",
                 'icon' => ''
             ));
         }
     }
 
-    // 注册
+    /**************************************************************
+     *
+     * 注册
+     * @post_params password tel email(option) nickname
+     * @return result errorcode username user_id icon
+     * @access public
+     *
+     *************************************************************/
     public function registerAction()
     {
-        $result = 1;
-        $error_code = 0;
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
 
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         $userService = $this->getServiceLocator()->get('user_service');
@@ -130,8 +139,6 @@ class UserController extends BaseAbstractActionController
         if ($request->isPost()) {
 
             $data = $request->getPost();
-
-            // var_dump($data);
 
             $form = new RegisterForm;
             $form->setInputFilter(new RegisterFilter);
@@ -143,28 +150,26 @@ class UserController extends BaseAbstractActionController
                 $result = $reg_result[0];
                 $error_code = $reg_result[1];
 
-                if (!$this->isMobile($request))
-                {
+                if (!$this->isMobile($request)) {
                     return $this->redirect()->toRoute('user');
                 }
-
             }
             else
             {
-                if ($this->isMobile($request))
-                {
-                    $result = CommonDef::GC_Failed;
-                    $error_code = CommonDef::GC_NoMobileDevice;
-                }
-                else
-                {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoMobileDevice;
+
+                if (!$this->isMobile($request)) {
                     return new ViewModel(array(
                         'form' => new RegisterForm(),
-                        'errors' => 'Register Error!'
+                        'errors' => $error_code
                     ));
                 }
             }
 
+        } else {
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_NoPost;
         }
 
         if (!$this->isMobile($request))
@@ -174,7 +179,7 @@ class UserController extends BaseAbstractActionController
             ));
         }
 
-        if ($result == 0)
+        if ($result == GCFlag::GC_Success)
         {
             $File = $this->params()->fromFiles('avatar');
             if ($File)
@@ -182,14 +187,16 @@ class UserController extends BaseAbstractActionController
 
             $username = $authService->getIdentity()->__get('display_name');
             $avatar = $authService->getIdentity()->__get('portrait');
+            $user_id = $authService->getIdentity()->__get('user_id');
             if (!$avatar || $avatar=='')
                 $avatar = '';
             else
                 $avatar = 'images/avatars/'.$avatar;
 
             return new JsonModel(array(
-                'result' => 0,
-                'errorcode' => 0,
+                'result' => $result,
+                'errorcode' => $error_code,
+                'user_id' => $user_id,
                 'username' => $username,
                 'icon' => $avatar
             ));
@@ -197,7 +204,7 @@ class UserController extends BaseAbstractActionController
         else
         {
             return new JsonModel(array(
-                'result' => 1,
+                'result' => $result,
                 'errorcode' => $error_code,
                 'username' => "",
                 'icon' => ''
@@ -205,7 +212,13 @@ class UserController extends BaseAbstractActionController
         }
     }
 
-    // 登出
+    /**************************************************************
+     *
+     * 登出
+     * @return result errorcode
+     * @access public
+     *
+     *************************************************************/
     public function logoutAction()
     {
         $request = $this->getRequest();
@@ -219,49 +232,54 @@ class UserController extends BaseAbstractActionController
         else
         {
             return new JsonModel(array(
-                'result' => 1,
-                'errorcode' => 0
+                'result' => GCFlag::GC_Success,
+                'errorcode' => GCFlag::GC_NoErrorCode
             ));
         }
-
     }
 
-    // 换密码
-    public function changepassAction()
-    {
-        $result = 1;
-        $errorcode = 0;
+//    // 换密码
+//    public function changepassAction()
+//    {
+//        $result = 1;
+//        $errorcode = 0;
+//
+//        $request = $this->getRequest();
+//
+//        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+//        if($this->isMobile($request) && $authService->hasIdentity() && $request->isPost()) {
+//
+//            $data = $request->getPost();
+//
+//            $form = new ChangePassForm;
+//            $form->setInputFilter(new ChangePassFilter);
+//            $form->setData($data);
+//
+//            if($form->isValid()) {
+//                $userService = $this->getServiceLocator()->get('user_service');
+//                if($userService->changepass($data)) {
+//                    $result = 0;
+//                }
+//            }
+//        }
+//
+//        return new JsonModel(array(
+//            'result' => $result,
+//            'errorcode' => $errorcode
+//        ));
+//    }
 
-        $request = $this->getRequest();
-
-        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
-        if($this->isMobile($request) && $authService->hasIdentity() && $request->isPost()) {
-
-            $data = $request->getPost();
-
-            $form = new ChangePassForm;
-            $form->setInputFilter(new ChangePassFilter);
-            $form->setData($data);
-
-            if($form->isValid()) {
-                $userService = $this->getServiceLocator()->get('user_service');
-                if($userService->changepass($data)) {
-                    $result = 0;
-                }
-            }
-        }
-
-        return new JsonModel(array(
-            'result' => $result,
-            'errorcode' => $errorcode
-        ));
-    }
-
-    // 个人信息
+    /**************************************************************
+     *
+     * 获取个人信息
+     * @return result errorcode result_user_info
+     * @access public
+     *
+     *************************************************************/
     public function basicinfoAction()
     {
-        $result = 1;
-        $errorcode = 0;
+        $result = GCFlag::GC_Failed;
+        $error_code = GCFlag::GC_CommonError;
 
         $request = $this->getRequest();
 
@@ -297,66 +315,84 @@ class UserController extends BaseAbstractActionController
                 'intro' => $intro,
             );
 
-
-            $result = 0;
-
+            $result = GCFlag::GC_Success;
+            $error_code = GCFlag::GC_NoErrorCode;
             return new JsonModel(array(
                 'result' => $result,
+                'errorcode' => $error_code,
                 'result_user_info' => $result_info,
             ));
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+            ));
         }
-
-        return new JsonModel(array(
-            'result' => $result,
-            'errorcode' => $errorcode,
-        ));
     }
 
-    // 修改个人信息
+    /**************************************************************
+     *
+     * 修改个人信息
+     * @access public
+     *
+     *************************************************************/
     public function changebasicinfoAction()
     {
-        $result = 1;
-        $errorcode = 0;
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
 
         $request = $this->getRequest();
 
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         if($this->isMobile($request) && $authService->hasIdentity()) {
-
             if ($request->isPost()) {
-
                 $data = $request->getPost();
-
                 $form = new ChangeUserInfoForm();
                 $form->setInputFilter(new ChangeUserInfoFilter);
                 $form->setData($data);
 
                 if($form->isValid()) {
-
                     $userService = $this->getServiceLocator()->get('user_service');
                     $change_result = $userService->changeuserinfo($data);
-                    if($change_result == 0)
-                        $result = 0;
-                    else
-                    {
-                        $result = 1;
-                        $errorcode = $change_result;
-                    }
+                    $result = $change_result[0];
+                    $error_code = $change_result[1];
+                } else {
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_PostInvalid;
                 }
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoPost;
             }
+        } else if (!$this->isMobile($request)){
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_NoMobileDevice;
+        } else {
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_AuthAccountInvalid;
         }
 
         return new JsonModel(array(
             'result' => $result,
-            'errorcode' => $errorcode,
+            'errorcode' => $error_code,
         ));
     }
 
-    //修改头像
+    /**************************************************************
+     *
+     * 修改个人头像
+     * @access public
+     *
+     *************************************************************/
     public function changeavatarAction()
     {
-        $result = 1;
-        $errorcode = 0;
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
         $icon = '';
 
         $request = $this->getRequest();
@@ -367,26 +403,38 @@ class UserController extends BaseAbstractActionController
             if ($request->isPost()) {
                 $userService = $this->getServiceLocator()->get('user_service');
                 $File = $this->params()->fromFiles('avatar');
-                if ($File)
-                {
+                if ($File) {
                     $save_result = $userService->saveAvatar($File, $authService->getIdentity()->__get('user_id'));
-                    if ($save_result == 0)
+                    if ($save_result[0] == GCFlag::GC_Success)
                     {
-                        $result = 0;
+                        $result = $save_result[0];
+                        $error_code = $save_result[1];
                         $icon = $authService->getIdentity()->__get('portrait');
                     }
                     else
                     {
-                        $result = 1;
-                        $errorcode = $save_result;
+                        $result = $save_result[0];
+                        $error_code = $save_result[1];
                     }
+                } else {
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_NoPostAvatarFile;
                 }
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoPost;
             }
+        } else if (!$this->isMobile($request)){
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_NoMobileDevice;
+        } else {
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_AuthAccountInvalid;
         }
 
         return new JsonModel(array(
             'result' => $result,
-            'errorcode' => $errorcode,
+            'errorcode' => $error_code,
             'avatar' => $icon,
         ));
     }
