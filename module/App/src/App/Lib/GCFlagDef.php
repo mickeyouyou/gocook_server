@@ -37,6 +37,10 @@ final class GCFlag {
     const GC_AvatarSizeTooSmall = 210;          // 头像文件小于1k
     const GC_NoPostAvatarFile = 211;            // 上传的post中不包含avatar
 
+    const GC_ProductInvalid = 301;              // 商品不存在或无效错误
+    const GC_OrderAccountInvalid = 302;         // 订购失败,客户不存在或无效
+    const GC_OrderInvalid = 303;                // 订购失败,订单已经存在且订单状态错误
+
     const GC_RecipeNotExist = 401;              // 不存在该菜谱
     const GC_RecipeNotBelong2U = 402;           // 此菜谱不属于当前用户
 }

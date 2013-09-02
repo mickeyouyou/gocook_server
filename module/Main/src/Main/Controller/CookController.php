@@ -358,7 +358,6 @@ class CookController extends BaseAbstractActionController {
     {
         $request = $this->getRequest();
 
-        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         if ($this->isMobile($request))
         {
             $user_id = -1;
@@ -458,6 +457,130 @@ class CookController extends BaseAbstractActionController {
         }
     }
 
+    /**************************************************************
+     *
+     * 订购M6商品
+     * url: cook/order
+     * @post wares
+     * @access public
+     *
+     *************************************************************/
+    public function orderAction()
+    {
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+        $order_id = 0;
+
+        $request = $this->getRequest();
+        if($this->isMobile($request)) {
+            if ($request->isPost()) {
+                $data = $request->getPost();
+                if($this->params()->fromPost('wares') && $this->params()->fromPost('wares') != '') {
+                    $cookService = $this->getServiceLocator()->get('cook_service');
+                    $order_result = $cookService->orderWares($data['wares']);
+                    $result = $order_result[0];
+                    $error_code = $order_result[1];
+
+                    if ($result == GCFlag::GC_Success){
+                        $order_id = $order_result[2];
+                    }
+                } else {
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_PostInvalid;
+                }
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoPost;
+            }
+        } else {
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_NoMobileDevice;
+        }
+
+        if ($result == GCFlag::GC_Success) {
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+                'order_id' => $order_id,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+            ));
+        }
+    }
+
+    /**************************************************************
+     *
+     * 查询M6历史订单
+     * url: cook/his_orders
+     * @get start_day end_day page
+     * @access public
+     *
+     *************************************************************/
+    public function hisOrdersAction()
+    {
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+        $his_orders = array();
+        $request = $this->getRequest();
+        if($this->isMobile($request)) {
+            if ($request->isPost()) {
+                $data = $request->getPost();
+                $start_day = '';
+                $end_day = '';
+                if ($this->params()->fromPost('start_day') && trim($this->params()->fromPost('start_day')) != ''
+                    && $this->params()->fromPost('end_day') && $this->params()->fromPost('end_day')){
+
+                    $start_day = trim($this->params()->fromPost('start_day'));
+                    $end_day = trim($this->params()->fromPost('start_day'));
+
+                    $page = 1;
+                    if ($this->params()->fromQuery('page')&&$this->params()->fromQuery('page')!='')
+                    {
+                        $page = intval($this->params()->fromQuery('page'));
+                        if ($page < 1)
+                            $page = 1;
+                    }
+
+                    $cookService = $this->getServiceLocator()->get('cook_service');
+                    $query_result = $cookService->QueryHistoryOrders($start_day, $end_day, 10, $page);
+
+                    $result = $query_result[0];
+                    $error_code = $query_result[1];
+
+                    if ($result == GCFlag::GC_Success){
+                        // 取得数据
+                        $his_orders = $query_result[2];
+                    }
+                } else {
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_PostInvalid;
+                }
+
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoPost;
+            }
+        } else {
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_NoMobileDevice;
+        }
+
+        if ($result == GCFlag::GC_Success) {
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+                'wares' => $his_orders,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+            ));
+        }
+    }
 
     /*************Others****************/
     public function setEntityManager(EntityManager $em)

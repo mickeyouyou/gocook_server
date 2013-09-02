@@ -350,7 +350,12 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         return $count;
     }
 
-    //
+    /**************************************************************
+     *
+     * 查询M6商品
+     * @access public
+     *
+     *************************************************************/
     public function QueryWaresFromM6($keyword, $limit, $page)
     {
         $search_info = '{"Keyword":"'. $keyword .'","PageIndex":' . (string)$page . ',"PageRows":'. (string)$limit . '}';
@@ -417,9 +422,9 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 $error_code = GCFlag::GC_NoErrorCode;
                 return array($result,$error_code,$ware_array);
 
-            } else if (intval($res_json['Flag']) == M6Flag::M6FLAG_Reg_ActExist){
+            } else if (intval($res_json['Flag']) == M6Flag::M6FLAG_Product_Invalid){
                 $result = GCFlag::GC_Failed;
-                $error_code = GCFlag::GC_AccountExist;
+                $error_code = GCFlag::GC_ProductInvalid;
                 return array($result,$error_code);
             } else {
                 $result = GCFlag::GC_Failed;
@@ -435,6 +440,185 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         }
     }
 
+    /**************************************************************
+     *
+     * 订购M6商品
+     * @access public
+     *
+     *************************************************************/
+    public function orderWares($wares_str) {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $msix_id = $authService->getIdentity()->__get('msix_id');
+
+        $order_info = '{"CustId":'. (string)$msix_id .',' . $wares_str .'}';
+        $post_array = array();
+        $post_array['Cmd'] = CommonDef::ORDER_CMD;
+        $post_array['Data'] = addslashes($order_info);
+        $post_array['Md5'] = Common::EncryptAppReqData(CommonDef::ORDER_CMD, $order_info);
+
+        $this->arrayRecursive($post_array, 'urlencode', false);
+        $post_str = urldecode(json_encode($post_array));//not use Json::encode because of escape
+
+        // 开始向服务器请求数据
+        $reg_request = new Request();
+        $reg_request->setUri(CommonDef::M6SERVER);
+        $reg_request->setMethod('POST');
+        $reg_request->getHeaders()->addHeaders(array('Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8'));
+        $reg_request->getPost()->set('Data', $post_str);
+
+        $reg_client = new Client();
+        $reg_client->setAdapter('Zend\Http\Client\Adapter\Curl');
+        $reg_client->setOptions(array(
+            'maxredirects' => 0,
+            'timeout'      => 30
+        ));
+
+        $reg_response = $reg_client->dispatch($reg_request);
+
+        if ($reg_response->isSuccess()) {
+            $this->logger->info($reg_response->getBody());
+            $res_content = $reg_response->getBody();
+
+            $res_json = json_decode($res_content, true); // convert into array
+
+            if (intval($res_json['Flag']) == M6Flag::M6FLAG_Success) {
+
+                $order_id = $res_json['Data'];
+
+                $result = GCFlag::GC_Success;
+                $error_code = GCFlag::GC_NoErrorCode;
+                return array($result,$error_code,$order_id);
+            } else if (intval($res_json['Flag']) == M6Flag::M6FLAG_Order_ActInvalid){
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_OrderAccountInvalid;
+                return array($result,$error_code);
+            } else if (intval($res_json['Flag']) == M6Flag::M6FLAG_Order_Invalid) {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_OrderAccountInvalid;
+                return array($result,$error_code);
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_M6ServerError; // M6服务器返回结果
+                return array($result,$error_code);
+            }
+
+        } else {
+            // 甲方服务器4XX，5XX
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_M6ServerConnError;
+            return array($result,$error_code);
+        }
+    }
+
+    /**************************************************************
+     *
+     * 查询历史订单
+     * @access public
+     *
+     *************************************************************/
+    public function QueryHistoryOrders($start_day, $end_day, $limit, $page)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $msix_id = $authService->getIdentity()->__get('msix_id');
+
+        $search_info = '{"CustId":'. (string)$msix_id .',"StartDay":"' . $start_day . '","EndDay":"' .
+            $end_day . '","PageIndex":' . (string)$page . ',"PageRows":'. (string)$limit . '}';
+        $post_array = array();
+        $post_array['Cmd'] = CommonDef::HIS_ORDERS_CMD;
+        $post_array['Data'] = addslashes($search_info);
+        $post_array['Md5'] = Common::EncryptAppReqData(CommonDef::HIS_ORDERS_CMD, $search_info);
+
+        $this->arrayRecursive($post_array, 'urlencode', false);
+        $post_str = urldecode(json_encode($post_array));//not use Json::encode because of escape
+
+        // 开始向服务器请求数据
+        $reg_request = new Request();
+        $reg_request->setUri(CommonDef::M6SERVER);
+        $reg_request->setMethod('POST');
+        $reg_request->getHeaders()->addHeaders(array('Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8'));
+        $reg_request->getPost()->set('Data', $post_str);
+
+        $reg_client = new Client();
+        $reg_client->setAdapter('Zend\Http\Client\Adapter\Curl');
+        $reg_client->setOptions(array(
+            'maxredirects' => 0,
+            'timeout'      => 30
+        ));
+
+        $reg_response = $reg_client->dispatch($reg_request);
+
+        if ($reg_response->isSuccess()) {
+            $this->logger->info($reg_response->getBody());
+            $res_content = $reg_response->getBody();
+
+            $res_json = json_decode($res_content, true); // convert into array
+
+            if (intval($res_json['Flag']) == M6Flag::M6FLAG_Success) {
+
+                $data_json = json_decode($res_json['Data'], true);
+
+                $page_index = $data_json['PageIndex'];
+                $page_rows = $data_json['PageRows'];
+                $total_count = $data_json['TotalCount'];
+                $row_array = array();
+                foreach ($data_json['Rows'] as $res_row) {
+                    $row = array();
+                    $row['id'] = intval($res_row['Id']);
+                    $row['cust_name'] = $res_row['CustName'];
+                    $row['code'] = $res_row['Code'];
+                    $row['delivery_type'] = $res_row['DeliveryType'];
+                    $row['delivery_time_type'] = $res_row['DeliveryTimeType'];
+                    $row['recv_mobile'] = $res_row['RecvMobile'];
+                    $row['cost'] = $res_row['Cost'];
+                    $row['create_time'] = $res_row['CreateTime'];
+
+                    $row['order_wares'] = array();
+                    foreach ($data_json['Rows']['OrderWares'] as $ware_item) {
+                        $order_ware = array();
+                        $order_ware['id'] = intval($ware_item['Id']);
+                        $order_ware['name'] = $ware_item['Name'];
+                        $order_ware['code'] = $ware_item['Code'];
+                        $order_ware['remark'] = $ware_item['Remark'];
+                        $order_ware['norm'] = $ware_item['Norm'];
+                        $order_ware['unit'] = $ware_item['Unit'];
+                        $order_ware['price'] = $ware_item['Price'];
+                        $order_ware['image_url'] = $ware_item['ImageUrl'];
+                        $order_ware['deal_method'] = $ware_item['DealMethod'];
+                        $order_ware['quantity'] = $ware_item['Quantity'];
+                        $order_ware['cost'] = $ware_item['Cost'];
+                        array_push($row['order_wares'],$order_ware);
+                    }
+
+                    array_push($row_array,$row);
+                }
+
+                $ware_order_array = array();
+                $ware_order_array['page'] = $page_index;
+                $ware_order_array['total_count'] = $total_count;
+                $ware_order_array['orders'] = $row_array;
+
+                //返回成功
+                $result = GCFlag::GC_Success;
+                $error_code = GCFlag::GC_NoErrorCode;
+                return array($result,$error_code,$ware_order_array);
+
+            } else if (intval($res_json['Flag']) == M6Flag::M6FLAG_Product_Invalid){
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_ProductInvalid;
+                return array($result,$error_code);
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_M6ServerError; // M6服务器返回结果
+                return array($result,$error_code);
+            }
+
+        } else {
+            // 甲方服务器4XX，5XX
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_M6ServerConnError;
+            return array($result, $error_code);
+        }
+    }
 
     /*************Manager****************/
     public function setServiceManager(ServiceManager $serviceManager)
@@ -466,9 +650,10 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
     /**************************************************************
      *
      *	使用特定function对数组中所有元素做处理
-     *	@param	array	&$array		要处理的字符串
-     *	@param	string	$function	要执行的函数
-     *	@return boolean	$apply_to_keys_also		是否也应用到key上
+     *	@param	array	&$array		        要处理的字符串
+     *	@param	string	$function	        要执行的函数
+     *	@param	boolean $apply_to_keys_also	是否也应用到key上
+     *  @return boolean
      *	@access public
      *
      *************************************************************/
