@@ -80,7 +80,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         //查找是否有该记录
         $tmp_record = $repository->findOneBy(array('user_id' => $user_id, 'recipe_id' => $collid));
         if ($tmp_record)
-            return -1;
+            return GCFlag::GC_AlreadyCollectRecipe;
 
         //查找是否有该菜谱
         $tmp_recipe = $recipe_repository->findOneBy(array('recipe_id' => $collid));
@@ -92,11 +92,10 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
             $this->entityManager->persist($user_collection);
             $this->entityManager->flush();
 
-            return 0;
+            return GCFlag::GC_NoErrorCode;
+        } else {
+            return GCFlag::GC_RecipeNotExist;
         }
-
-        return 1;
-
     }
 
     // 删除收藏菜谱
@@ -113,9 +112,9 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
             $this->entityManager->remove($relation_object);
             $this->entityManager->flush();
 
-            return 0;
+            return GCFlag::GC_NoErrorCode;
         }
-        return 1;
+        return GCFlag::GC_NotMyCollectRecipe;
     }
 
 
@@ -247,7 +246,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         //查找是否有该记录
         $tmp_record = $repository->findOneBy(array('user_id' => $user_id, 'target_id' => $watchid));
         if ($tmp_record)
-            return -1;
+            return GCFlag::GC_AlreadyWatchUser;
 
         //查找是否有该用户
         $tmp_user = $user_repository->findOneBy(array('user_id' => $watchid));
@@ -259,11 +258,10 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
             $this->entityManager->persist($user_relation);
             $this->entityManager->flush();
 
-            return 0;
+            return GCFlag::GC_NoErrorCode;
+        } else {
+            return GCFlag::GC_AccountNotExist;
         }
-
-        return 1;
-
     }
 
     public function isMyWatch($watchid)
@@ -276,9 +274,9 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         //查找是否有该记录
         $tmp_record = $repository->findOneBy(array('user_id' => $user_id, 'target_id' => $watchid));
         if ($tmp_record)
-            return 0;
+            return GCFlag::E_IsMyWatch;
 
-        return -1;
+        return GCFlag::E_NotMyWatch;
     }
 
     // 取消关注
@@ -294,10 +292,10 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         {
             $this->entityManager->remove($relation_object);
             $this->entityManager->flush();
-            return 0;
+            return GCFlag::GC_NoErrorCode;
         }
 
-        return 1;
+        return GCFlag::GC_NotMyWatchUser;
     }
 
 

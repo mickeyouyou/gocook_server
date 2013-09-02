@@ -32,6 +32,8 @@ class CookController extends BaseAbstractActionController {
             if ($this->params()->fromQuery('page')&&$this->params()->fromQuery('page')!='')
             {
                 $page = intval($this->params()->fromQuery('page'));
+                if ($page < 1)
+                    $page = 1;
             }
 
             $cookService = $this->getServiceLocator()->get('cook_service');
@@ -39,16 +41,23 @@ class CookController extends BaseAbstractActionController {
             $collect_count = intval($cookService->getAllMyCollCount());
 
             return new JsonModel(array(
-                'result' => 0,
+                'result' => GCFlag::GC_Success,
+                'errorcode' => GCFlag::GC_NoErrorCode,
                 'total' => $collect_count,
                 'cur_page' => $page,
                 'result_recipes' => $collect_recipes,
             ));
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+            ));
         }
-
-        return new JsonModel(array(
-            'result' => 1,
-        ));
     }
 
     //添加收藏
@@ -63,31 +72,42 @@ class CookController extends BaseAbstractActionController {
             if ($this->params()->fromQuery('collid')&&$this->params()->fromQuery('collid')!='')
             {
                 $collid = intval($this->params()->fromQuery('collid'));
+                if ($collid < 1)
+                    $collid = 1;
             }
 
             $cookService = $this->getServiceLocator()->get('cook_service');
-            $result = $cookService->addMyCollection($collid);
+            $error_result = $cookService->addMyCollection($collid);
 
-            if ($result == 0)
+            if ($error_result == GCFlag::GC_NoErrorCode)
             {
                 return new JsonModel(array(
-                    'result' => 0,
+                    'result' => GCFlag::GC_Success,
+                    'errorcode' => $error_result,
                     'collid' => $collid,
                 ));
             }
             else
             {
                 return new JsonModel(array(
-                    'result' => $result,
+                    'result' => GCFlag::GC_Failed,
+                    'errorcode' => $error_result,
                     'collid' => -1,
                 ));
             }
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+                'collid' => -1,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+                'collid' => -1,
+            ));
         }
-
-        return new JsonModel(array(
-            'result' => 1,
-            'collid' => -1,
-        ));
     }
 
     //取消收藏
@@ -102,31 +122,43 @@ class CookController extends BaseAbstractActionController {
             if ($this->params()->fromQuery('collid')&&$this->params()->fromQuery('collid')!='')
             {
                 $collid = intval($this->params()->fromQuery('collid'));
+                if ($collid < 1)
+                    $collid = 1;
             }
 
             $cookService = $this->getServiceLocator()->get('cook_service');
-            $result = $cookService->delMyCollection($collid);
-            if ($result == 0)
-            {
+            $code_result = $cookService->delMyCollection($collid);
+            if ($code_result == GCFlag::GC_NoErrorCode) {
                 return new JsonModel(array(
-                    'result' => 0,
+                    'result' => GCFlag::GC_Success,
+                    'errorcode' => $code_result,
                     'collid' => $collid,
                 ));
+            } else {
+                return new JsonModel(array(
+                    'result' => GCFlag::GC_Failed,
+                    'errorcode' => $code_result,
+                    'collid' => -1,
+                ));
             }
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+                'collid' => -1,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+                'collid' => -1,
+            ));
         }
-
-        return new JsonModel(array(
-            'result' => 1,
-            'collid' => -1,
-        ));
     }
 
     //查询用户信息
     public function kitchenAction()
     {
-        $result = 1;
-        $errorcode = 0;
-
         $request = $this->getRequest();
 
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
@@ -158,8 +190,7 @@ class CookController extends BaseAbstractActionController {
                 $cookService = $this->getServiceLocator()->get('cook_service');
                 $result_array = $cookService->getUserRecipes($user_id,3,0);
 
-
-                $watch = 1;
+                $watch = GCFlag::E_NotMyWatch;
                 if ($authService->hasIdentity())
                     $watch = $cookService->isMyWatch($user_id);
 
@@ -175,19 +206,23 @@ class CookController extends BaseAbstractActionController {
                     'watch' => $watch
                 );
 
-                $result = 0;
-
                 return new JsonModel(array(
-                    'result' => $result,
+                    'result' => GCFlag::GC_Success,
+                    'errorcode' => GCFlag::GC_NoErrorCode,
                     'result_kitchen_info' => $result_info,
                 ));
+            } else {
+                return new JsonModel(array(
+                    'result' => GCFlag::GC_Failed,
+                    'errorcode' => GCFlag::GC_AccountNotExist,
+                ));
             }
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+            ));
         }
-
-        return new JsonModel(array(
-            'result' => $result,
-            'errorcode' => $errorcode,
-        ));
     }
 
     //我的关注
@@ -209,16 +244,23 @@ class CookController extends BaseAbstractActionController {
             $watch_count = intval($cookService->getAllMyWatchCount());
 
             return new JsonModel(array(
-                'result' => 0,
+                'result' => GCFlag::GC_Success,
+                'errorcode' => GCFlag::GC_NoErrorCode,
                 'total' => $watch_count,
                 'cur_page' => $page,
                 'result_users' => $mywatchusers,
             ));
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+            ));
         }
-
-        return new JsonModel(array(
-            'result' => 1,
-        ));
     }
 
     //添加关注
@@ -238,26 +280,35 @@ class CookController extends BaseAbstractActionController {
             $cookService = $this->getServiceLocator()->get('cook_service');
             $result = $cookService->addMyWatch($watch_id);
 
-            if ($result == 0)
+            if ($result == GCFlag::GC_NoErrorCode)
             {
                 return new JsonModel(array(
-                    'result' => 0,
+                    'result' => GCFlag::GC_Success,
+                    'errorcode' => $result,
                     'watchid' => $watch_id,
                 ));
             }
             else
             {
                 return new JsonModel(array(
-                    'result' => $result,
-                    'collid' => -1,
+                    'result' => GCFlag::GC_Failed,
+                    'errorcode' => $result,
+                    'watchid' => -1,
                 ));
             }
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+                'watchid' => -1,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+                'watchid' => -1,
+            ));
         }
-
-        return new JsonModel(array(
-            'result' => 1,
-            'collid' => -1,
-        ));
     }
 
     //取消关注
@@ -276,19 +327,34 @@ class CookController extends BaseAbstractActionController {
 
             $cookService = $this->getServiceLocator()->get('cook_service');
             $result = $cookService->delMyWatch($watchid);
-            if ($result == 0)
+            if ($result == GCFlag::GC_NoErrorCode)
             {
                 return new JsonModel(array(
-                    'result' => 0,
+                    'result' => GCFlag::GC_Success,
+                    'errorcode' => $result,
                     'watchid' => $watchid,
                 ));
+            } else {
+                return new JsonModel(array(
+                    'result' => GCFlag::GC_Failed,
+                    'errorcode' => $result,
+                    'watchid' => -1,
+                ));
             }
-        }
 
-        return new JsonModel(array(
-            'result' => 1,
-            'watchid' => -1,
-        ));
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+                'watchid' => -1,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+                'watchid' => -1,
+            ));
+        }
     }
 
     //我的粉丝
@@ -310,16 +376,23 @@ class CookController extends BaseAbstractActionController {
             $fans_count = intval($cookService->getAllMyFansCount());
 
             return new JsonModel(array(
-                'result' => 0,
+                'result' => GCFlag::GC_Success,
+                'errorcode' => GCFlag::GC_NoErrorCode,
                 'total' => $fans_count,
                 'cur_page' => $page,
                 'result_users' => $myfans,
             ));
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+            ));
         }
-
-        return new JsonModel(array(
-            'result' => 1,
-        ));
     }
 
     //我的菜谱
@@ -341,16 +414,23 @@ class CookController extends BaseAbstractActionController {
             $recipes_count = intval($cookService->getAllMyRecipesCount());
 
             return new JsonModel(array(
-                'result' => 0,
+                'result' => GCFlag::GC_Success,
+                'errorcode' => GCFlag::GC_NoErrorCode,
                 'total' => $recipes_count,
                 'cur_page' => $page,
                 'result_recipes' => $collect_recipes,
             ));
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+            ));
         }
-
-        return new JsonModel(array(
-            'result' => 1,
-        ));
     }
 
     //某人的菜谱
@@ -376,15 +456,17 @@ class CookController extends BaseAbstractActionController {
             $result_recipes = $cookService->getUserRecipes($user_id, 10,($page-1)*10);
 
             return new JsonModel(array(
-                'result' => 0,
+                'result' => GCFlag::GC_Success,
+                'errorcode' => GCFlag::GC_NoErrorCode,
                 'totalrecipecount' => $result_recipes[0],
                 'result_recipes' => $result_recipes[1],
             ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+            ));
         }
-
-        return new JsonModel(array(
-            'result' => 1,
-        ));
     }
 
 

@@ -10,6 +10,11 @@ namespace App\Lib;
 final class GCFlag {
     private function __construct() {}
 
+    // is my watch
+    const E_IsMyWatch = 0;                     // 是我的关注
+    const E_NotMyWatch = 1;                    // 不是我的关注
+
+
     // go_cook return operator code
     const GC_Success = 0;                       // 成功
     const GC_Failed = 1;                        // 失败
@@ -24,6 +29,7 @@ final class GCFlag {
     const GC_NoPost = 103;                      // 不是post上传
     const GC_PostInvalid = 104;                 // 上传post不合法
     const GC_KeywordNull = 105;                 // 查询的keyword为空
+    const GC_GetParamInvalid = 106;             // get参数不正确
 
     const GC_TelExist = 201;                    // 电话号码重复
     const GC_NickNameExist = 202;               // 昵称重复
@@ -43,4 +49,10 @@ final class GCFlag {
 
     const GC_RecipeNotExist = 401;              // 不存在该菜谱
     const GC_RecipeNotBelong2U = 402;           // 此菜谱不属于当前用户
+    const GC_AddRecipeCollectionError = 403;    // 加入收藏失败
+    const GC_AlreadyCollectRecipe = 404;        // 已经收藏该菜谱
+    const GC_NotMyCollectRecipe = 405;          // 该菜谱本人未收藏
+
+    const GC_AlreadyWatchUser = 501;            // 已经关注过此用户
+    const GC_NotMyWatchUser = 502;              // 并未关注此用户
 }

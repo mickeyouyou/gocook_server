@@ -8,9 +8,6 @@
 namespace Main\Controller;
 
 use App\Controller\BaseAbstractActionController;
-use Zend\EventManager\EventManagerInterface;
-use Zend\Mvc\MvcEvent;
-use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use Zend\Json\Json;
 

@@ -145,23 +145,27 @@ class IndexController extends BaseAbstractActionController {
                 }
                 array_push($recommend_items, $recommend_item);
             }
-            $result = new JsonModel(array(
-                'result' => 0,
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Success,
+                'errorcode' => GCFlag::GC_NoErrorCode,
                 'topnew_img' => $topnew_img,
                 'tophot_img' => $tophot_img,
                 'recommend_items' => $recommend_items,
             ));
 
-            return $result;
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+            ));
         }
-
-        return new JsonModel(array(
-            'result' => 1,
-        ));
     }
 
     public function searchAction()
     {
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+
         $request = $this->getRequest();
 
         if ($this->isMobile($request))
@@ -193,16 +197,23 @@ class IndexController extends BaseAbstractActionController {
                 }
 
                 return new JsonModel(array(
-                    'result' => 0,
+                    'result' => GCFlag::GC_Success,
+                    'errorcode' => GCFlag::GC_NoErrorCode,
                     'result_recipes' => $result_recipes,
                 ));
 
+            } else {
+                return new JsonModel(array(
+                    'result' => GCFlag::GC_Failed,
+                    'errorcode' => GCFlag::GC_GetParamInvalid,
+                ));
             }
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+            ));
         }
-
-        return new JsonModel(array(
-            'result' => 1,
-        ));
     }
 
     /*************Others****************/
@@ -234,21 +245,24 @@ class IndexController extends BaseAbstractActionController {
         if (++$recursive_counter > 1000) {
             die('possible deep recursion attack');
         }
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $this->arrayRecursive($array[$key], $function, $apply_to_keys_also);
-            } else {
-                if (is_string($value))
-                {
-                    $array[$key] = $function($value);
-                }
-            }
 
-            if ($apply_to_keys_also && is_string($key)) {
-                $new_key = $function($key);
-                if ($new_key != $key) {
-                    $array[$new_key] = $array[$key];
-                    unset($array[$key]);
+        if (is_array($array)) {
+            foreach ($array as $key => $value) {
+                if (is_array($value)) {
+                    $this->arrayRecursive($array[$key], $function, $apply_to_keys_also);
+                } else {
+                    if (is_string($value))
+                    {
+                        $array[$key] = $function($value);
+                    }
+                }
+
+                if ($apply_to_keys_also && is_string($key)) {
+                    $new_key = $function($key);
+                    if ($new_key != $key) {
+                        $array[$new_key] = $array[$key];
+                        unset($array[$key]);
+                    }
                 }
             }
         }
