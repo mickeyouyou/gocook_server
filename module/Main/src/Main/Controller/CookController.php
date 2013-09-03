@@ -486,7 +486,7 @@ class CookController extends BaseAbstractActionController {
     {
         $result = GCFlag::GC_Success;
         $error_code = GCFlag::GC_NoErrorCode;
-        $wares = array();
+        $query_wares = array();
 
         $request = $this->getRequest();
 
@@ -513,7 +513,7 @@ class CookController extends BaseAbstractActionController {
 
                 if ($result == GCFlag::GC_Success){
                     // 取得商品数据
-                    $wares = $query_result[2];
+                    $query_wares = $query_result[2];
                 }
 
             } else {
@@ -529,7 +529,9 @@ class CookController extends BaseAbstractActionController {
             return new JsonModel(array(
                 'result' => $result,
                 'errorcode' => $error_code,
-                'wares' => $wares,
+                'page' => $query_wares['page'],
+                'total_count' => $query_wares['total_count'],
+                'wares' => $query_wares['wares'],
             ));
         } else {
             return new JsonModel(array(
@@ -605,7 +607,7 @@ class CookController extends BaseAbstractActionController {
     {
         $result = GCFlag::GC_Success;
         $error_code = GCFlag::GC_NoErrorCode;
-        $his_orders = array();
+        $his_orders_result = array();
         $request = $this->getRequest();
         if($this->isMobile($request)) {
             if ($request->isPost()) {
@@ -634,7 +636,7 @@ class CookController extends BaseAbstractActionController {
 
                     if ($result == GCFlag::GC_Success){
                         // 取得数据
-                        $his_orders = $query_result[2];
+                        $his_orders_result = $query_result[2];
                     }
                 } else {
                     $result = GCFlag::GC_Failed;
@@ -654,7 +656,9 @@ class CookController extends BaseAbstractActionController {
             return new JsonModel(array(
                 'result' => $result,
                 'errorcode' => $error_code,
-                'wares' => $his_orders,
+                'page' => $his_orders_result['page'],
+                'total_count' => $his_orders_result['total_count'],
+                'orders' => $his_orders_result['orders'],
             ));
         } else {
             return new JsonModel(array(

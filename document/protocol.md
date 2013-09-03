@@ -60,9 +60,73 @@ ios主页协议。分别返回收总藏数最多的菜谱的图片，最新上�
 菜谱详细内容协议。返回内容如上。其中meterials需要单独在客户端解析，结构如"A|B|C||E|"这样，材料和用量成对出现，如果无用量，也要空出位置，例如C后面要空一个，E后面要空一个。
 
 
-	
+<br />
+###跟甲方服务器交互相关协议
+------------
 
 
 
+
+
+
+
+
+
+
+
+
+
+######登录
+
+	protocol: user/login
+	type: post
+	params: `login` string
+			`password` string
+	return: {"result":0, "errorcode":0, "username":"user", "icon":"iconurl"}
 	
+password为3des加密后的字符串。
+
+######注册
+
+	protocol: user/register
+	type: post
+	params: `tel` string
+			`nickname` string
+			`password` string
+			`repassword` string
+			`email` string (optional)
+			`avatar` file (optional)
+	return: {"result":0, "errorcode":0, "username":"user", "icon":"iconurl"}
 	
+avatar为可选，类型为file；email为可选；password和repassword为3des加密后的字符串。
+
+######商品查询
+
+	protocol: cook/search_wares
+	type: get
+	params: `keyword` string
+			`page` integer
+	return: {"result":0, "errorcode":0, "page":1, "total_count":100, "wares":[{"id":1,"name":"name","code":"code","remark":"remark","norm":"norm","unit":"unit","price":"price","image_url":"image_url","deal_method":["method1","method2"]}…]}
+	
+page从1开始
+	
+######订购M6商品
+
+	protocol: cook/order
+	type: post
+	params: `wares` string
+	return: {"result":0, "errorcode":0, "order_id":"1111"}
+	
+发送的wares字段格式为`"Wares":[{"WareId":6745,"Quantity":1,"Remark":"切块洗洗"}]`
+
+	
+######历史订单查询
+
+	protocol: cook/his_orders
+	type: post
+	params: `start_day` string
+			`end_day` string
+			`page` integer
+	return: json {result, errorcode, orders:[id, cust_name, code, delivery_type, delivery_time_type, recv_mobile, cost, create_time, order_wares:[id, name, code, remark, norm, unit, price, image_url, deal_method, quantity, cost]]}
+	
+start_day和end_day为”yyyy-MM-dd”格式的日期
