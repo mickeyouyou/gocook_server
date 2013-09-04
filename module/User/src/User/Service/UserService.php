@@ -40,8 +40,6 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
      *************************************************************/
     public function authenticate($data)
     {
-        var_dump($data);
-
         $form = new LoginForm;
         $form->setInputFilter(new LoginFilter());
         $form->setData($data);
