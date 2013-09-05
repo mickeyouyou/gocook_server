@@ -14,9 +14,11 @@ use App\Controller\BaseAbstractActionController,
 use App\Lib\GCFlag;
 use Omega\Common\Common;
 use Zend\View\Model\JsonModel;
+use Zend\Log\Logger;
+use Zend\Log\LoggerAwareInterface;
+use Zend\Log\LoggerInterface;
 
-
-class UserController extends BaseAbstractActionController
+class UserController extends BaseAbstractActionController implements LoggerAwareInterface
 {
 
     /**
@@ -25,6 +27,7 @@ class UserController extends BaseAbstractActionController
     protected $em;
 
     protected $userRepository;
+    protected $logger;
 
     // just for test
     public function indexAction()
@@ -49,6 +52,7 @@ class UserController extends BaseAbstractActionController
      *************************************************************/
     public function loginAction()
     {
+        $this->logger->info('11111');
         $result = GCFlag::GC_Success;
         $error_code = GCFlag::GC_NoErrorCode;
 
@@ -458,5 +462,10 @@ class UserController extends BaseAbstractActionController
         if (null == $this->userRepository)
             $this->userRepository = $this->getEntityManager()->getRepository('User\Entity\User');
         return $this->userRepository;
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 }
