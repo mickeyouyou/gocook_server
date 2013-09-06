@@ -52,7 +52,6 @@ class UserController extends BaseAbstractActionController implements LoggerAware
      *************************************************************/
     public function loginAction()
     {
-        $this->logger->info('11111');
         $result = GCFlag::GC_Success;
         $error_code = GCFlag::GC_NoErrorCode;
 
