@@ -204,7 +204,7 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $user  = new User();
         $user->__set('password', '1');
         $user->__set('tel', $data['tel']);
-        if (isset($data['email'])){
+        if (isset($data['email']) && trim($data['email']) != ''){
             $user->__set('email', $data['email']);
         }
         $user->__set('display_name', trim($data['nickname']));
@@ -232,7 +232,6 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $post_str = urldecode(json_encode($post_array));//not use Json::encode because of escape
 
         $this->logger->info($post_str);
-
 
         // 开始向服务器请求数据
         $reg_request = new Request();
