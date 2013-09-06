@@ -9,3 +9,4 @@ psr
 doctrine
 symfony
 bin
+!Omega/lib/Omega/Doctrine
