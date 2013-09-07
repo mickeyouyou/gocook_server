@@ -10,6 +10,8 @@ use Zend\Log\LoggerInterface;
 
 class BaseAbstractActionController extends AbstractActionController implements LoggerAwareInterface
 {
+    protected $logger;
+
     /*************Helper****************/
     public function isMobile($request)
     {

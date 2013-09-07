@@ -18,16 +18,14 @@ use Zend\Log\Logger;
 use Zend\Log\LoggerAwareInterface;
 use Zend\Log\LoggerInterface;
 
-class UserController extends BaseAbstractActionController implements LoggerAwareInterface
+class UserController extends BaseAbstractActionController
 {
 
     /**
      * @var Doctrine\ORM\EntityManager
      */
     protected $em;
-
     protected $userRepository;
-    protected $logger;
 
     // just for test
     public function indexAction()
@@ -461,10 +459,5 @@ class UserController extends BaseAbstractActionController implements LoggerAware
         if (null == $this->userRepository)
             $this->userRepository = $this->getEntityManager()->getRepository('User\Entity\User');
         return $this->userRepository;
-    }
-
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
     }
 }
