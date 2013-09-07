@@ -322,7 +322,7 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $error_code = GCFlag::GC_NoErrorCode;
 
         $size = new \Zend\Validator\File\Size(array('min'=>1000)); //minimum bytes filesize
-        $adapter = new Http();
+        $adapter = new \Zend\File\Transfer\Adapter\Http();
         $adapter->setValidators(array($size), $file['name']);
         if (!$adapter->isValid()){
             $result = GCFlag::GC_Failed;
