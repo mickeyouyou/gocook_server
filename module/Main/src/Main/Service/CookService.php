@@ -356,7 +356,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
      *************************************************************/
     public function QueryWaresFromM6($keyword, $limit, $page)
     {
-        $search_info = '{"Keyword":"'. $keyword .'","PageIndex":' . (string)$page . ',"PageRows":'. (string)$limit . '}';
+        $search_info = '{"Keyword":"'. $keyword .'","PageIndex":' . (string)($page - 1) . ',"PageRows":'. (string)$limit . '}';
         $post_array = array();
         $post_array['Cmd'] = CommonDef::SEARCH_CMD;
         $post_array['Data'] = addslashes($search_info);
@@ -391,23 +391,30 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
 
                 $data_json = json_decode($res_json['Data'], true);
 
-                $page_index = $data_json['PageIndex'];
+                $page_index = $data_json['PageIndex'] + 1;
                 $page_rows = $data_json['PageRows'];
                 $total_count = $data_json['TotalCount'];
                 $row_array = array();
-                foreach ($data_json['Rows'] as $res_row) {
-                    $row = array();
-                    $row['id'] = intval($res_row['Id']);
-                    $row['name'] = $res_row['Name'];
-                    $row['code'] = $res_row['Code'];
-                    $row['remark'] = $res_row['Remark'];
-                    $row['norm'] = $res_row['Norm'];
-                    $row['unit'] = $res_row['Unit'];
-                    $row['price'] = $res_row['Price'];
-                    $row['image_url'] = $res_row['ImageUrl'];
-                    $row['deal_method'] = $res_row['DealMethod'];
 
-                    array_push($row_array,$row);
+                //如果和传过去的page不同的话，那么返回0个
+                if ($page_index < $page) {
+                    $page_index = $page;
+                }
+                else {
+                    foreach ($data_json['Rows'] as $res_row) {
+                        $row = array();
+                        $row['id'] = intval($res_row['Id']);
+                        $row['name'] = $res_row['Name'];
+                        $row['code'] = $res_row['Code'];
+                        $row['remark'] = $res_row['Remark'];
+                        $row['norm'] = $res_row['Norm'];
+                        $row['unit'] = $res_row['Unit'];
+                        $row['price'] = $res_row['Price'];
+                        $row['image_url'] = $res_row['ImageUrl'];
+                        $row['deal_method'] = $res_row['DealMethod'];
+
+                        array_push($row_array,$row);
+                    }
                 }
 
                 $ware_array = array();
@@ -520,7 +527,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $msix_id = $authService->getIdentity()->__get('msix_id');
 
         $search_info = '{"CustId":'. (string)$msix_id .',"StartDay":"' . $start_day . '","EndDay":"' .
-            $end_day . '","PageIndex":' . (string)$page . ',"PageRows":'. (string)$limit . '}';
+            $end_day . '","PageIndex":' . (string)($page - 1) . ',"PageRows":'. (string)$limit . '}';
         $post_array = array();
         $post_array['Cmd'] = CommonDef::HIS_ORDERS_CMD;
         $post_array['Data'] = addslashes($search_info);
@@ -555,41 +562,47 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
 
                 $data_json = json_decode($res_json['Data'], true);
 
-                $page_index = $data_json['PageIndex'];
+                $page_index = $data_json['PageIndex'] + 1;
                 $page_rows = $data_json['PageRows'];
                 $total_count = $data_json['TotalCount'];
                 $row_array = array();
-                foreach ($data_json['Rows'] as $res_row) {
-                    $row = array();
-                    $row['id'] = intval($res_row['Id']);
-                    $row['cust_name'] = $res_row['CustName'];
-                    $row['code'] = $res_row['Code'];
-                    $row['delivery_type'] = $res_row['DeliveryType'];
-                    $row['delivery_time_type'] = $res_row['DeliveryTimeType'];
-                    $row['recv_mobile'] = $res_row['RecvMobile'];
-                    $row['cost'] = $res_row['Cost'];
-                    $row['create_time'] = $res_row['CreateTime'];
 
-                    $row['order_wares'] = array();
-                    foreach ($data_json['Rows']['OrderWares'] as $ware_item) {
-                        $order_ware = array();
-                        $order_ware['id'] = intval($ware_item['Id']);
-                        $order_ware['name'] = $ware_item['Name'];
-                        $order_ware['code'] = $ware_item['Code'];
-                        $order_ware['remark'] = $ware_item['Remark'];
-                        $order_ware['norm'] = $ware_item['Norm'];
-                        $order_ware['unit'] = $ware_item['Unit'];
-                        $order_ware['price'] = $ware_item['Price'];
-                        $order_ware['image_url'] = $ware_item['ImageUrl'];
-                        $order_ware['deal_method'] = $ware_item['DealMethod'];
-                        $order_ware['quantity'] = $ware_item['Quantity'];
-                        $order_ware['cost'] = $ware_item['Cost'];
-                        array_push($row['order_wares'],$order_ware);
+                //如果和传过去的page不同的话，那么返回0个
+                if ($page_index < $page) {
+                    $page_index = $page;
+                } else {
+                    foreach ($data_json['Rows'] as $res_row) {
+                        $row = array();
+                        $row['id'] = intval($res_row['Id']);
+                        $row['cust_name'] = $res_row['CustName'];
+                        $row['code'] = $res_row['Code'];
+                        $row['delivery_type'] = $res_row['DeliveryType'];
+                        $row['delivery_time_type'] = $res_row['DeliveryTimeType'];
+                        $row['recv_mobile'] = $res_row['RecvMobile'];
+                        $row['cost'] = $res_row['Cost'];
+                        $row['create_time'] = $res_row['CreateTime'];
+
+                        $row['order_wares'] = array();
+                        foreach ($data_json['Rows']['OrderWares'] as $ware_item) {
+                            $order_ware = array();
+                            $order_ware['id'] = intval($ware_item['Id']);
+                            $order_ware['name'] = $ware_item['Name'];
+                            $order_ware['code'] = $ware_item['Code'];
+                            $order_ware['remark'] = $ware_item['Remark'];
+                            $order_ware['norm'] = $ware_item['Norm'];
+                            $order_ware['unit'] = $ware_item['Unit'];
+                            $order_ware['price'] = $ware_item['Price'];
+                            $order_ware['image_url'] = $ware_item['ImageUrl'];
+                            $order_ware['deal_method'] = $ware_item['DealMethod'];
+                            $order_ware['quantity'] = $ware_item['Quantity'];
+                            $order_ware['cost'] = $ware_item['Cost'];
+                            array_push($row['order_wares'],$order_ware);
+                        }
+
+                        array_push($row_array,$row);
                     }
-
-                    array_push($row_array,$row);
                 }
-
+                
                 $ware_order_array = array();
                 $ware_order_array['page'] = $page_index;
                 $ware_order_array['total_count'] = $total_count;

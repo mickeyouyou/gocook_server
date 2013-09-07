@@ -53,11 +53,11 @@ class IndexController extends BaseAbstractActionController {
         $login_info = '{"Account":"'. $account .'","Password":"' . $token . '"}';
 
 
-        // 注册
-        $post_array = array();
-        $post_array['Cmd'] = CommonDef::REGISTER_CMD;
-        $post_array['Data'] = addslashes($login_info);
-        $post_array['Md5'] = Common::EncryptAppReqData(CommonDef::REGISTER_CMD, $login_info);
+//        // 注册
+//        $post_array = array();
+//        $post_array['Cmd'] = CommonDef::REGISTER_CMD;
+//        $post_array['Data'] = addslashes($login_info);
+//        $post_array['Md5'] = Common::EncryptAppReqData(CommonDef::REGISTER_CMD, $login_info);
 
 //        // 登陆
 //        $post_array = array();
@@ -66,12 +66,12 @@ class IndexController extends BaseAbstractActionController {
 //        $post_array['Md5'] = Common::EncryptAppReqData(Common::AUTH_CMD, $login_info);
 
 //
-//        // 搜索
-//        $search_info = '{"Keyword":"'. '牛肉' .'","PageIndex":' . (string)1 . ',"PageRows":'. (string)10 . '}';
-//        $post_array = array();
-//        $post_array['Cmd'] = Common::SEARCH_CMD;
-//        $post_array['Data'] = addslashes($search_info);
-//        $post_array['Md5'] = Common::EncryptAppReqData(Common::SEARCH_CMD, $search_info);
+        // 搜索
+        $search_info = '{"Keyword":"'. '牛肉' .'","PageIndex":' . (string)0 . ',"PageRows":'. (string)10 . '}';
+        $post_array = array();
+        $post_array['Cmd'] = CommonDef::SEARCH_CMD;
+        $post_array['Data'] = addslashes($search_info);
+        $post_array['Md5'] = Common::EncryptAppReqData(CommonDef::SEARCH_CMD, $search_info);
 //
 //        // 下单
 //        $search_info = '{"CustId":'. '17' .',"Wares":[{"WareId":6745,"Quantity":1,"Remark":"好，ok"}]}';
