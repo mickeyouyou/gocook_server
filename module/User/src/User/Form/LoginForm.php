@@ -31,7 +31,7 @@ class LoginForm
                 'type' => 'text',
             ),
             'options' => array(
-                'label' => 'Email or User Name',
+                'label' => 'Tel',
             ),
         ));
 
