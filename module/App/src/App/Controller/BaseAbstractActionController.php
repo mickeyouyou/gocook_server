@@ -4,8 +4,11 @@ namespace App\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+use Zend\Log\Logger;
+use Zend\Log\LoggerAwareInterface;
+use Zend\Log\LoggerInterface;
 
-class BaseAbstractActionController extends AbstractActionController
+class BaseAbstractActionController extends AbstractActionController implements LoggerAwareInterface
 {
     /*************Helper****************/
     public function isMobile($request)
@@ -21,5 +24,10 @@ class BaseAbstractActionController extends AbstractActionController
             }
         }
         return $isMobile;
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 }

@@ -14,12 +14,15 @@ use Main\Entity\Recipe;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use User\Entity\User;
 use Omega\Image\Zebra_Image;
+use Zend\Log\Logger;
+use Zend\Log\LoggerAwareInterface;
+use Zend\Log\LoggerInterface;
 
-class RecipeService implements ServiceManagerAwareInterface
+class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterface
 {
     protected $serviceManager;
     protected $entityManager;
-    
+    protected $logger;
 
     // 获取收藏次数最多的一个菜谱
     public function getTopCollectedRecipe()
@@ -419,6 +422,11 @@ class RecipeService implements ServiceManagerAwareInterface
     public function getEntityManager()
     {
         return $this->entityManager;      
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**************************************************************
