@@ -555,8 +555,9 @@ class CookController extends BaseAbstractActionController {
         $error_code = GCFlag::GC_NoErrorCode;
         $order_id = 0;
 
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         $request = $this->getRequest();
-        if($this->isMobile($request)) {
+        if($this->isMobile($request) && $authService->hasIdentity()) {
             if ($request->isPost()) {
                 $data = $request->getPost();
                 if($this->params()->fromPost('wares') && $this->params()->fromPost('wares') != '') {
@@ -576,9 +577,18 @@ class CookController extends BaseAbstractActionController {
                 $result = GCFlag::GC_Failed;
                 $error_code = GCFlag::GC_NoPost;
             }
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+                'collid' => -1,
+            ));
         } else {
-            $result = GCFlag::GC_Failed;
-            $error_code = GCFlag::GC_NoMobileDevice;
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+                'collid' => -1,
+            ));
         }
 
         if ($result == GCFlag::GC_Success) {
@@ -607,9 +617,10 @@ class CookController extends BaseAbstractActionController {
     {
         $result = GCFlag::GC_Success;
         $error_code = GCFlag::GC_NoErrorCode;
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         $his_orders_result = array();
         $request = $this->getRequest();
-        if($this->isMobile($request)) {
+        if($this->isMobile($request) && $authService->hasIdentity()) {
             if ($request->isPost()) {
                 $data = $request->getPost();
                 $start_day = '';
@@ -647,9 +658,18 @@ class CookController extends BaseAbstractActionController {
                 $result = GCFlag::GC_Failed;
                 $error_code = GCFlag::GC_NoPost;
             }
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+                'collid' => -1,
+            ));
         } else {
-            $result = GCFlag::GC_Failed;
-            $error_code = GCFlag::GC_NoMobileDevice;
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+                'collid' => -1,
+            ));
         }
 
         if ($result == GCFlag::GC_Success) {
