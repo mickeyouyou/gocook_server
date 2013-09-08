@@ -10,6 +10,7 @@ namespace Main\Controller;
 use App\Controller\BaseAbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\Json\Json;
+use App\Lib\GCFlag;
 
 use Main\Form\RecipeCommentForm,
     Main\Form\RecipeCommentFilter,
@@ -25,6 +26,9 @@ class RecipeController extends BaseAbstractActionController {
 
     public function indexAction() {
 
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+
         $request = $this->getRequest();
 
         if ($this->isMobile($request))
@@ -37,14 +41,14 @@ class RecipeController extends BaseAbstractActionController {
                 $recipe_id = intval($this->params()->fromQuery('id'));
                 $recipe = $repository->findOneBy(array('recipe_id' => $recipe_id));
                 //查找收藏状态
-                $collect  = 1;
+                $collect  = GCFlag::E_NotCollected;
                 if ($authService->hasIdentity())
                 {
                     $user_id = $authService->getIdentity()->__get('user_id');
                     $user_collect = $collect_repository->findOneBy(array('user_id'=>$user_id, 'recipe_id' => $recipe_id));
                     if ($user_collect)
                     {
-                        $collect = 0;
+                        $collect = GCFlag::E_IsCollected;
                     }
                 }
 
@@ -53,7 +57,8 @@ class RecipeController extends BaseAbstractActionController {
                     $steps_array = Json::decode($recipe->recipe_steps, Json::TYPE_ARRAY);
                     // var_dump($steps_array);
                     return new JsonModel(array(
-                        'result' => 0,
+                        'result' => GCFlag::GC_Success,
+                        'errorcode' => GCFlag::GC_NoErrorCode,
                         'result_recipe' => array(
                             'recipe_id' => $recipe->recipe_id,
                             'author_id' => $recipe->user->user_id,//不知道为啥user_id拿来是string，大概是doctrine的bug
@@ -70,17 +75,30 @@ class RecipeController extends BaseAbstractActionController {
                             'collect' => $collect,
                         ),
                     ));
+                } else {
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_RecipeNotExist;
                 }
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_GetParamInvalid;
             }
+        }  else {
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_NoMobileDevice;
         }
 
         return new JsonModel(array(
-            'result' => 1,
+            'result' => $result,
+            'errorcode' => $error_code,
         ));
     }
 
     public function topnewAction()
     {
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+
         $request = $this->getRequest();
         if ($this->isMobile($request))
         {
@@ -107,18 +125,26 @@ class RecipeController extends BaseAbstractActionController {
             }
 
             return new JsonModel(array(
-                'result' => 0,
+                'result' => GCFlag::GC_Success,
+                'errorcode' => GCFlag::GC_NoErrorCode,
                 'result_recipes' => $result_recipes,
             ));
+        } else {
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_NoMobileDevice;
         }
 
         return new JsonModel(array(
-            'result' => 1,
+            'result' => $result,
+            'errorcode' => $error_code,
         ));
     }
 
     public function tophotAction()
     {
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+
         $request = $this->getRequest();
         if ($this->isMobile($request))
         {
@@ -145,18 +171,27 @@ class RecipeController extends BaseAbstractActionController {
             }
 
             return new JsonModel(array(
-                'result' => 0,
+                'result' => GCFlag::GC_Success,
+                'errorcode' => GCFlag::GC_NoErrorCode,
                 'result_recipes' => $result_recipes,
             ));
+        } else {
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_NoMobileDevice;
         }
+
         return new JsonModel(array(
-            'result' => 1,
+            'result' => $result,
+            'errorcode' => $error_code,
         ));
     }
 
     // 返回所有评论
     public function commentsAction()
     {
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+
         $request = $this->getRequest();
         if ($this->isMobile($request))
         {
@@ -190,23 +225,35 @@ class RecipeController extends BaseAbstractActionController {
                     }
 
                     return new JsonModel(array(
-                        'result' => 0,
+                        'result' => GCFlag::GC_Success,
                         'result_recipe_comments' => $result_recipe_comments,
                     ));
-                }
+                } else {
+                    return new JsonModel(array(
+                        'result' => GCFlag::GC_Success,
+                        'errorcode' => GCFlag::GC_NoErrorCode,
+                        'result_recipe_comments' => array(),
+                    ));                }
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_GetParamInvalid;
             }
+        } else {
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_NoMobileDevice;
         }
 
         return new JsonModel(array(
-            'result' => 1,
+            'result' => $result,
+            'errorcode' => $error_code,
         ));
     }
 
     // 发布一个菜谱
     public function createAction()
     {
-        $result = 1;
-        $error_code = 0;
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
 
         $request = $this->getRequest();
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
@@ -226,21 +273,21 @@ class RecipeController extends BaseAbstractActionController {
                     $result = $result_array[0];
                     $error_code = $result_array[1];
                 } else {
-                    $result = 1;
-                    $error_code = 104;
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_PostInvalid;
                 }
             } else {
-                $result = 1;
-                $error_code = 103;
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoPost;
             }
-        }else {
+        } else {
             if (!$this->isMobile($request))
             {
-                $result = 1;
-                $error_code = 101;
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoMobileDevice;
             } else {
-                $result = 1;
-                $error_code = 102;
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_AuthAccountInvalid;
             }
         }
 
@@ -253,8 +300,8 @@ class RecipeController extends BaseAbstractActionController {
     // 修改菜谱
     public function editAction()
     {
-        $result = 1;
-        $error_code = 0;
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
 
         $request = $this->getRequest();
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
@@ -274,21 +321,21 @@ class RecipeController extends BaseAbstractActionController {
                     $result = $result_array[0];
                     $error_code = $result_array[1];
                 } else {
-                    $result = 1;
-                    $error_code = 104;
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_PostInvalid;
                 }
             } else {
-                $result = 1;
-                $error_code = 103;
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoPost;
             }
-        }else {
+        } else {
             if (!$this->isMobile($request))
             {
-                $result = 1;
-                $error_code = 101;
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoMobileDevice;
             } else {
-                $result = 1;
-                $error_code = 102;
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_AuthAccountInvalid;
             }
         }
 
@@ -300,8 +347,8 @@ class RecipeController extends BaseAbstractActionController {
 
     // 删除菜谱
     public function deleteAction() {
-        $result = 1;
-        $error_code = 0;
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
 
         $request = $this->getRequest();
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
@@ -327,11 +374,11 @@ class RecipeController extends BaseAbstractActionController {
         } else {
             if (!$this->isMobile($request))
             {
-                $result = 1;
-                $error_code = 101;
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoMobileDevice;
             } else {
-                $result = 1;
-                $error_code = 102;
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_AuthAccountInvalid;
             }
         }
 
@@ -346,6 +393,9 @@ class RecipeController extends BaseAbstractActionController {
     // 评论菜谱
     public function commentAction()
     {
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+
         $request = $this->getRequest();
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         if ($authService->hasIdentity()&&$this->isMobile($request))
@@ -363,24 +413,43 @@ class RecipeController extends BaseAbstractActionController {
                     if ($recipeService->commitOnRecipe($data))
                     {
                         return new JsonModel(array(
-                            'result' => 0,
+                            'result' => GCFlag::GC_Success,
+                            'errorcode' => GCFlag::GC_NoErrorCode,
                         ));
+                    } else {
+                        $result = GCFlag::GC_Failed;
+                        $error_code = GCFlag::GC_CommentOnRecipeFailed;
                     }
-
+                } else {
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_PostInvalid;
                 }
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoPost;
+            }
+        } else {
+            if (!$this->isMobile($request))
+            {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoMobileDevice;
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_AuthAccountInvalid;
             }
         }
 
         return new JsonModel(array(
-            'result' => 1,
+            'result' => $result,
+            'errorcode' => $error_code,
         ));
     }
 
     // 上传临时封面图片
     public function uploadCoverPhotoAction()
     {
-        $result = 1;
-        $errorcode = 0;
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
         $icon = '';
 
         $request = $this->getRequest();
@@ -396,21 +465,37 @@ class RecipeController extends BaseAbstractActionController {
                     $save_result = $recipeService->uploadTmpCoverPicture($File);
                     if ($save_result != "")
                     {
-                        $result = 0;
+                        $result = GCFlag::GC_Success;
+                        $error_code = GCFlag::GC_NoErrorCode;
                         $icon = $save_result;
                     }
                     else
                     {
-                        $result = 1;
-                        $errorcode = $save_result;
+                        $result = GCFlag::GC_Failed;
+                        $error_code = $save_result;
                     }
+                } else {
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_PostInvalid;
                 }
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoPost;
+            }
+        } else {
+            if (!$this->isMobile($request))
+            {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoMobileDevice;
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_AuthAccountInvalid;
             }
         }
 
         return new JsonModel(array(
             'result' => $result,
-            'errorcode' => $errorcode,
+            'errorcode' => $error_code,
             'avatar' => $icon,
         ));
     }
@@ -418,8 +503,8 @@ class RecipeController extends BaseAbstractActionController {
     // 上传临时步骤图片
     public function uploadStepPhotoAction()
     {
-        $result = 1;
-        $errorcode = 0;
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
         $icon = '';
 
         $request = $this->getRequest();
@@ -435,21 +520,37 @@ class RecipeController extends BaseAbstractActionController {
                     $save_result = $recipeService->uploadTmpStepPicture($File);
                     if ($save_result != "")
                     {
-                        $result = 0;
+                        $result = GCFlag::GC_Success;
+                        $error_code = GCFlag::GC_NoErrorCode;
                         $icon = $save_result;
                     }
                     else
                     {
-                        $result = 1;
-                        $errorcode = 1;
+                        $result = GCFlag::GC_Failed;
+                        $error_code = $save_result;
                     }
+                } else {
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_PostInvalid;
                 }
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoPost;
+            }
+        } else {
+            if (!$this->isMobile($request))
+            {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoMobileDevice;
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_AuthAccountInvalid;
             }
         }
 
         return new JsonModel(array(
             'result' => $result,
-            'errorcode' => $errorcode,
+            'errorcode' => $error_code,
             'avatar' => $icon,
         ));
     }

@@ -11,9 +11,12 @@ final class GCFlag {
     private function __construct() {}
 
     // is my watch
-    const E_IsMyWatch = 0;                     // 是我的关注
-    const E_NotMyWatch = 1;                    // 不是我的关注
+    const E_IsMyWatch = 0;                      // 是我的关注
+    const E_NotMyWatch = 1;                     // 不是我的关注
 
+    // is collected
+    const E_IsCollected = 0;                    // 已经收藏
+    const E_NotCollected = 1;                   // 未收藏
 
     // go_cook return operator code
     const GC_Success = 0;                       // 成功
@@ -52,6 +55,7 @@ final class GCFlag {
     const GC_AddRecipeCollectionError = 403;    // 加入收藏失败
     const GC_AlreadyCollectRecipe = 404;        // 已经收藏该菜谱
     const GC_NotMyCollectRecipe = 405;          // 该菜谱本人未收藏
+    const GC_CommentOnRecipeFailed = 406;       // 评论失败
 
     const GC_AlreadyWatchUser = 501;            // 已经关注过此用户
     const GC_NotMyWatchUser = 502;              // 并未关注此用户
