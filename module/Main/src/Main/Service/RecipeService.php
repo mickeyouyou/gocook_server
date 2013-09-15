@@ -271,9 +271,9 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
             else if (file_exists($coverFullPath)) {
                 $recipe->__set('cover_img', $cover_img);
             } else {
-                $result = 1;
-                $error_code = 408;
-                return array($result, $error_code);
+//                $result = 1;
+//                $error_code = 408;
+//                return array($result, $error_code);
             }
         }
         else

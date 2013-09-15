@@ -583,9 +583,6 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                         $row['create_time'] = $res_row['CreateTime'];
 
                         $row['order_wares'] = array();
-                        
-                        $this->logger->info($data_json['Rows']);
-                        
                         foreach ($res_row['OrderWares'] as $ware_item) {
                             $order_ware = array();
                             $order_ware['id'] = intval($ware_item['Id']);
