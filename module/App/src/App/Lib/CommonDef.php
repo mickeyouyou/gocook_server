@@ -25,4 +25,10 @@ final class CommonDef
 
     // m6 server
     const M6SERVER = 'http://o.m6fresh.com/ws/app.ashx';
+
+    const USER_COLLECT_COUNT = 0;
+    const USER_DISH_COUNT = 1;
+    const USER_RECIPE_COUNT = 2;
+    const USER_FOLLOWING_COUNT = 3;
+    const USER_FOLLOWED_COUNT = 4;
 }

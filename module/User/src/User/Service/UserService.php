@@ -452,11 +452,11 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
             $is_data_changed = true;
         }
 
-        if (isset($data['tel']) && $data['tel']!='')
-        {
-            $user->__set('tel', $data['tel']);
-            $is_data_changed = true;
-        }
+//        if (isset($data['tel']) && $data['tel']!='')
+//        {
+//            $user->__set('tel', $data['tel']);
+//            $is_data_changed = true;
+//        }
 
         if (isset($data['city']) && $data['city']!='')
         {
@@ -487,7 +487,83 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
         return array($result, $error_code);
     }
 
-    
+    /**************************************************************
+     *
+     * 取得用户收藏，关注，等等数量
+     * @access public
+     *
+     *************************************************************/
+    public function getUserCountInfo()
+    {
+        $result = GCFlag::GC_Failed;
+        $error_code = GCFlag::GC_NoErrorCode;
+
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user = $authService->getIdentity();
+        if ($user) {
+
+        } else {
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_AuthAccountInvalid;
+        }
+
+        if ($result == GCFlag::GC_Failed) {
+            return array($result, $error_code);
+        } else {
+
+        }
+    }
+
+    /**************************************************************
+     *
+     * 修改用户收藏，关注，等等数量
+     * @access public
+     *
+     *************************************************************/
+    public function updateUserCountInfo($count, $type)
+    {
+        $result = GCFlag::GC_Failed;
+        $error_code = GCFlag::GC_NoErrorCode;
+
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user = $authService->getIdentity();
+        if ($user) {
+            $user_info = $user->__get('user_info');
+            if ($user_info) {
+                $result = GCFlag::GC_Success;
+                $error_code = GCFlag::GC_NoErrorCode;
+                if ($type == CommonDef::USER_COLLECT_COUNT) {
+                    $user_info->__set('collect_count', $count);
+                    $this->entityManager->persist($user_info);
+                    $this->entityManager->flush();
+                } else if ($type == CommonDef::USER_RECIPE_COUNT) {
+                    $user_info->__set('recipe_count', $count);
+                    $this->entityManager->persist($user_info);
+                    $this->entityManager->flush();
+                } else if ($type == CommonDef::USER_FOLLOWING_COUNT) {
+                    $user_info->__set('following_count', $count);
+                    $this->entityManager->persist($user_info);
+                    $this->entityManager->flush();
+                } else if ($type == CommonDef::USER_FOLLOWED_COUNT) {
+                    $user_info->__set('followed_count', $count);
+                    $this->entityManager->persist($user_info);
+                    $this->entityManager->flush();
+                } else {
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_CommonError;
+                }
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_CommonError;
+            }
+        } else {
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_AuthAccountInvalid;
+        }
+
+        return array($result, $error_code);
+    }
+
     /*************Manager****************/
     public function setServiceManager(ServiceManager $serviceManager)
     {

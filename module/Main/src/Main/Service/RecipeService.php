@@ -312,16 +312,19 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
 
             $savedfilename = $user_id.date("_YmdHim").'.png';
             $savedFullPath = INDEX_ROOT_PATH."/public/images/tmp/".$savedfilename;
-            unlink($savedFullPath);
+            if (file_exists($savedFullPath))
+                unlink($savedFullPath);
             $cpresult = copy($_FILES['cover']['tmp_name'], $savedFullPath);
-            unlink($_FILES['cover']['tmp_name']);
+            if (file_exists($_FILES['cover']['tmp_name']))
+                unlink($_FILES['cover']['tmp_name']);
 
             if (!$cpresult)
                 return '';
 
             if ($curFullPath)
             {
-                unlink($curFullPath);
+                if (file_exists($savedFullPath))
+                    unlink($curFullPath);
             }
 
             return $savedfilename;
@@ -347,16 +350,19 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
 
             $savedfilename = $user_id.date("_YmdHim").'.png';
             $savedFullPath = INDEX_ROOT_PATH."/public/images/tmp/".$savedfilename;
-            unlink($savedFullPath);
+            if (file_exists($savedFullPath))
+                unlink($savedFullPath);
             $cpresult = copy($_FILES['step']['tmp_name'], $savedFullPath);
-            unlink($_FILES['step']['tmp_name']);
+            if (file_exists($_FILES['step']['tmp_name']))
+                unlink($_FILES['step']['tmp_name']);
 
             if (!$cpresult)
                 return '';
 
             if ($curFullPath)
             {
-                unlink($curFullPath);
+                if (file_exists($curFullPath))
+                    unlink($curFullPath);
             }
 
             return $savedfilename;
