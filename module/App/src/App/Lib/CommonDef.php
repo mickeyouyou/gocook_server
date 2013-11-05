@@ -22,6 +22,11 @@ final class CommonDef
     const SEARCH_CMD = 3;
     const ORDER_CMD = 4;
     const HIS_ORDERS_CMD = 5;
+    const DAY_SALES_CMD = 9;
+    const GET_COUPON_CMD = 10;
+    const DELAY_GET_COUPON_CMD = 11;
+    const GET_MY_COUPONS_CMD = 12;
+    const REG_LOGIN_CMD = 13;
 
     // m6 server
     const M6SERVER = 'http://o.m6fresh.com/ws/app.ashx';

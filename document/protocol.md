@@ -130,3 +130,15 @@ page从1开始
 	return: json {result, errorcode, orders:[id, cust_name, code, delivery_type, delivery_time_type, recv_mobile, cost, create_time, order_wares:[id, name, code, remark, norm, unit, price, image_url, deal_method, quantity, cost]]}
 	
 start_day和end_day为”yyyy-MM-dd”格式的日期
+
+######查询当天销售额
+	protocol: cook/day_sales
+	type: get
+	return: json {result, errorcode, time, sale_fee, sale_count, condition, remark}
+	
+time为"yyyy-MM-dd HH:mm:ss"格式的日期。
+sale_fee为指定日期的销售额。
+sale_count为销售笔数。
+condition为是否符合获取优惠券条件 1:符合费用; 0:不符合费用; 2:没有可用促销活动; 3:广告。remark为条件说明。
+
+

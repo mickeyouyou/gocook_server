@@ -632,7 +632,7 @@ class CookController extends BaseAbstractActionController {
                     $end_day = trim($this->params()->fromPost('start_day'));
 
                     $page = 1;
-                    if ($this->params()->fromQuery('page')&&$this->params()->fromQuery('page')!='')
+                    if ($this->params()->fromPost('page')&&$this->params()->fromPost('page')!='')
                     {
                         $page = intval($this->params()->fromQuery('page'));
                         if ($page < 1)
@@ -688,6 +688,264 @@ class CookController extends BaseAbstractActionController {
         }
     }
 
+    /**************************************************************
+     *
+     * 查询当天销售额接口
+     * url: cook/day_sales
+     * @get
+     * @access public
+     *
+     *************************************************************/
+    public function daySalesAction()
+    {
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        $day_sales_result = array();
+        $request = $this->getRequest();
+        if($this->isMobile($request) && $authService->hasIdentity()) {
+            $cookService = $this->getServiceLocator()->get('cook_service');
+            $query_result = $cookService->QueryDaySales();
+
+            $result = $query_result[0];
+            $error_code = $query_result[1];
+
+            if ($result == GCFlag::GC_Success){
+                // 取得数据
+                $day_sales_result = $query_result[2];
+            }
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+                'collid' => -1,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+                'collid' => -1,
+            ));
+        }
+
+        if ($result == GCFlag::GC_Success) {
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+                'time' => $day_sales_result['time'],
+                'sale_fee' => $day_sales_result['sale_fee'],
+                'sale_count' => $day_sales_result['sale_count'],
+                'condition' => $day_sales_result['condition'],
+                'remark' => $day_sales_result['remark'],
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+            ));
+        }
+    }
+
+    /**************************************************************
+     *
+     * 获取优惠券接口
+     * url: cook/get_coupon
+     * @get
+     * @access public
+     *
+     *************************************************************/
+    public function getCouponAction()
+    {
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        $coupon_result = array();
+        $request = $this->getRequest();
+        if($this->isMobile($request) && $authService->hasIdentity()) {
+
+            $coupon_id = 0;
+            if ($this->params()->fromQuery('coupon_id') && trim($this->params()->fromQuery('coupon_id')) != '')
+            {
+                $coupon_id = intval($this->params()->fromQuery('coupon_id'));
+            }
+
+            $cookService = $this->getServiceLocator()->get('cook_service');
+            $query_result = $cookService->GetCoupon($coupon_id);
+
+            $result = $query_result[0];
+            $error_code = $query_result[1];
+
+            if ($result == GCFlag::GC_Success){
+                // 取得数据
+                $coupon_result = $query_result[2];
+            }
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+                'collid' => -1,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+                'collid' => -1,
+            ));
+        }
+
+        if ($result == GCFlag::GC_Success) {
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+                'time' => $coupon_result['Time'],
+                'eff_day' => $coupon_result['EffDay'],
+                'exp_day' => $coupon_result['ExpDay'],
+                'coupon_id' => $coupon_result['Coupon'],
+                'coupon_remark' => $coupon_result['CouponRemark'],
+                'stores' => $coupon_result['Stores'],
+                'condition' => $coupon_result['IsMeetConditions'],
+                'remark' => $coupon_result['Remark'],
+                'is_delay' => $coupon_result['IsDelay'],
+                'supplier' => $coupon_result['supplier'],
+                'ktype' => $coupon_result['ktype'],
+                'status' => $coupon_result['status'],
+                'name' => $coupon_result['name'],
+                'url' => $coupon_result['url'],
+                'img' => $coupon_result['img'],
+                'cctime' => $coupon_result['cctime'],
+                'ctime' => $coupon_result['ctime'],
+                'val' => $coupon_result['val'],
+                'wid' => $coupon_result['wid'],
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+            ));
+        }
+    }
+
+    /**************************************************************
+     *
+     * 延期获取优惠券接口
+     * url: cook/delay_coupon
+     * @get
+     * @access public
+     *
+     *************************************************************/
+    public function delayCouponAction()
+    {
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        $delay_result = array();
+        $request = $this->getRequest();
+        if($this->isMobile($request) && $authService->hasIdentity()) {
+            $cookService = $this->getServiceLocator()->get('cook_service');
+            $query_result = $cookService->DelayCoupon();
+
+            $result = $query_result[0];
+            $error_code = $query_result[1];
+
+            if ($result == GCFlag::GC_Success){
+                // 取得数据
+                $delay_result = $query_result[2];
+            }
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+                'collid' => -1,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+                'collid' => -1,
+            ));
+        }
+
+        if ($result == GCFlag::GC_Success) {
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+                'id' => $delay_result['id'],
+                'time' => $delay_result['time'],
+                'eff_day' => $delay_result['eff_day'],
+                'exp_day' => $delay_result['exp_day'],
+                'condition' => $delay_result['condition'],
+                'remark' => $delay_result['remark'],
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+            ));
+        }
+    }
+
+
+    /**************************************************************
+     *
+     * 获取客户拥有的优惠券列表
+     * url: cook/my_coupons
+     * @get  page
+     * @access public
+     *
+     *************************************************************/
+    public function myCouponsAction()
+    {
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        $coupons_result = array();
+        $request = $this->getRequest();
+        if($this->isMobile($request) && $authService->hasIdentity()) {
+            $page = 1;
+            if ($this->params()->fromQuery('page')&&$this->params()->fromQuery('page')!='')
+            {
+                $page = intval($this->params()->fromQuery('page'));
+                if ($page < 1)
+                    $page = 1;
+            }
+
+            $cookService = $this->getServiceLocator()->get('cook_service');
+            $query_result = $cookService->GetMyConpons(10, $page);
+
+            $result = $query_result[0];
+            $error_code = $query_result[1];
+
+            if ($result == GCFlag::GC_Success){
+                // 取得数据
+                $coupons_result = $query_result[2];
+            }
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+            ));
+        }
+
+        if ($result == GCFlag::GC_Success) {
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+                'page' => $coupons_result['page'],
+                'total_count' => $coupons_result['total_count'],
+                'coupons' => $coupons_result['coupons'],
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+            ));
+        }
+    }
     /*************Others****************/
     public function setEntityManager(EntityManager $em)
     {

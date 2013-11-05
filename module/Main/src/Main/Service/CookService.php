@@ -631,6 +631,349 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         }
     }
 
+    /**************************************************************
+     *
+     * 查询当天购买记录
+     * @access public
+     *
+     *************************************************************/
+    public function QueryDaySales()
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $msix_id = $authService->getIdentity()->__get('msix_id');
+
+        $query_info = '{"CustId":'. (string)$msix_id . '}';
+        $post_array = array();
+        $post_array['Cmd'] = CommonDef::DAY_SALES_CMD;
+        $post_array['Data'] = addslashes($query_info);
+        $post_array['Md5'] = Common::EncryptAppReqData(CommonDef::DAY_SALES_CMD, $query_info);
+
+        $this->arrayRecursive($post_array, 'urlencode', false);
+        $post_str = urldecode(json_encode($post_array));//not use Json::encode because of escape
+
+        // 开始向服务器请求数据
+        $reg_request = new Request();
+        $reg_request->setUri(CommonDef::M6SERVER);
+        $reg_request->setMethod('POST');
+        $reg_request->getHeaders()->addHeaders(array('Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8'));
+        $reg_request->getPost()->set('Data', $post_str);
+
+        $reg_client = new Client();
+        $reg_client->setAdapter('Zend\Http\Client\Adapter\Curl');
+        $reg_client->setOptions(array(
+            'maxredirects' => 0,
+            'timeout'      => 30
+        ));
+
+        $reg_response = $reg_client->dispatch($reg_request);
+
+        if ($reg_response->isSuccess()) {
+            $this->logger->info($reg_response->getBody());
+            $res_content = $reg_response->getBody();
+
+            $res_json = json_decode($res_content, true); // convert into array
+
+            if (intval($res_json['Flag']) == M6Flag::M6FLAG_Success) {
+
+                $data_json = json_decode($res_json['Data'], true);
+
+                $result_array = array();
+                $result_array['time'] = $data_json['Time'];
+                $result_array['sale_fee'] = $data_json['SaleFee'];
+                $result_array['sale_count'] = $data_json['SaleCount'];
+                $result_array['condition'] = $data_json['IsMeetConditions']; // 1:qualified; 0:not
+                $result_array['remark'] = $data_json['Remark'];
+
+                //返回成功
+                $result = GCFlag::GC_Success;
+                $error_code = GCFlag::GC_NoErrorCode;
+                return array($result, $error_code, $result_array);
+
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_M6ServerError; // M6服务器返回结果
+                return array($result, $error_code);
+            }
+
+        } else {
+            // 甲方服务器4XX，5XX
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_M6ServerConnError;
+            return array($result, $error_code);
+        }
+    }
+
+
+    /**************************************************************
+     *
+     * 获取优惠券
+     * @access public
+     *
+     *************************************************************/
+    public function GetCoupon($coupon_id)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $msix_id = $authService->getIdentity()->__get('msix_id');
+
+        $query_info = '{"CustId":'. (string)$msix_id . ',"CouponId":'. (string)$coupon_id .'}';
+        $post_array = array();
+        $post_array['Cmd'] = CommonDef::GET_COUPON_CMD;
+        $post_array['Data'] = addslashes($query_info);
+        $post_array['Md5'] = Common::EncryptAppReqData(CommonDef::GET_COUPON_CMD, $query_info);
+
+        $this->arrayRecursive($post_array, 'urlencode', false);
+        $post_str = urldecode(json_encode($post_array));//not use Json::encode because of escape
+
+        // 开始向服务器请求数据
+        $reg_request = new Request();
+        $reg_request->setUri(CommonDef::M6SERVER);
+        $reg_request->setMethod('POST');
+        $reg_request->getHeaders()->addHeaders(array('Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8'));
+        $reg_request->getPost()->set('Data', $post_str);
+
+        $reg_client = new Client();
+        $reg_client->setAdapter('Zend\Http\Client\Adapter\Curl');
+        $reg_client->setOptions(array(
+            'maxredirects' => 0,
+            'timeout'      => 30
+        ));
+
+        $reg_response = $reg_client->dispatch($reg_request);
+
+        if ($reg_response->isSuccess()) {
+            $this->logger->info($reg_response->getBody());
+            $res_content = $reg_response->getBody();
+
+            $res_json = json_decode($res_content, true); // convert into array
+
+            if (intval($res_json['Flag']) == M6Flag::M6FLAG_Success) {
+
+                $data_json = json_decode($res_json['Data'], true);
+
+                $result_array = array();
+                $result_array['time'] = $data_json['Time'];
+                $result_array['eff_day'] = $data_json['EffDay'];
+                $result_array['exp_day'] = $data_json['ExpDay'];
+                $result_array['coupon_id'] = $data_json['Coupon'];
+                $result_array['coupon_remark'] = $data_json['CouponRemark'];
+                $result_array['stores'] = $data_json['Stores'];
+                $result_array['condition'] = $data_json['IsMeetConditions'];
+                $result_array['remark'] = $data_json['Remark'];
+                $result_array['is_delay'] = $data_json['IsDelay'];
+                $result_array['supplier'] = $data_json['supplier'];
+                $result_array['ktype'] = $data_json['ktype'];
+                $result_array['status'] = $data_json['status'];
+                $result_array['name'] = $data_json['name'];
+                $result_array['url'] = $data_json['url'];
+                $result_array['img'] = $data_json['img'];
+                $result_array['cctime'] = $data_json['cctime'];
+                $result_array['ctime'] = $data_json['ctime'];
+                $result_array['val'] = $data_json['val'];
+                $result_array['wid'] = $data_json['wid'];
+
+                //返回成功
+                $result = GCFlag::GC_Success;
+                $error_code = GCFlag::GC_NoErrorCode;
+                return array($result, $error_code, $result_array);
+
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_M6ServerError; // M6服务器返回结果
+                return array($result, $error_code);
+            }
+
+        } else {
+            // 甲方服务器4XX，5XX
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_M6ServerConnError;
+            return array($result, $error_code);
+        }
+    }
+
+
+    /**************************************************************
+     *
+     * 延期获取优惠券
+     * @access public
+     *
+     *************************************************************/
+    public function DelayCoupon()
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $msix_id = $authService->getIdentity()->__get('msix_id');
+
+        $query_info = '{"CustId":'. (string)$msix_id . '}';
+        $post_array = array();
+        $post_array['Cmd'] = CommonDef::DELAY_GET_COUPON_CMD;
+        $post_array['Data'] = addslashes($query_info);
+        $post_array['Md5'] = Common::EncryptAppReqData(CommonDef::DELAY_GET_COUPON_CMD, $query_info);
+
+        $this->arrayRecursive($post_array, 'urlencode', false);
+        $post_str = urldecode(json_encode($post_array));//not use Json::encode because of escape
+
+        // 开始向服务器请求数据
+        $reg_request = new Request();
+        $reg_request->setUri(CommonDef::M6SERVER);
+        $reg_request->setMethod('POST');
+        $reg_request->getHeaders()->addHeaders(array('Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8'));
+        $reg_request->getPost()->set('Data', $post_str);
+
+        $reg_client = new Client();
+        $reg_client->setAdapter('Zend\Http\Client\Adapter\Curl');
+        $reg_client->setOptions(array(
+            'maxredirects' => 0,
+            'timeout'      => 30
+        ));
+
+        $reg_response = $reg_client->dispatch($reg_request);
+
+        if ($reg_response->isSuccess()) {
+            $this->logger->info($reg_response->getBody());
+            $res_content = $reg_response->getBody();
+
+            $res_json = json_decode($res_content, true); // convert into array
+
+            if (intval($res_json['Flag']) == M6Flag::M6FLAG_Success) {
+
+                $data_json = json_decode($res_json['Data'], true);
+
+                $result_array = array();
+                $result_array['id'] = $data_json['Id'];
+                $result_array['time'] = $data_json['Time'];
+                $result_array['eff_day'] = $data_json['EffDay'];
+                $result_array['exp_day'] = $data_json['ExpDay'];
+                $result_array['condition'] = $data_json['IsMeetConditions'];
+                $result_array['remark'] = $data_json['Remark'];
+
+                //返回成功
+                $result = GCFlag::GC_Success;
+                $error_code = GCFlag::GC_NoErrorCode;
+                return array($result, $error_code, $result_array);
+
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_M6ServerError; // M6服务器返回结果
+                return array($result, $error_code);
+            }
+
+        } else {
+            // 甲方服务器4XX，5XX
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_M6ServerConnError;
+            return array($result, $error_code);
+        }
+    }
+
+
+    /**************************************************************
+     *
+     * 查询我的优惠券
+     * @access public
+     *
+     *************************************************************/
+    public function GetMyCoupons($limit, $page)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $msix_id = $authService->getIdentity()->__get('msix_id');
+
+        $search_info = '{"CustId":'. (string)$msix_id . '","PageIndex":' . (string)($page - 1) . ',"PageRows":'. (string)$limit . '}';
+        $post_array = array();
+        $post_array['Cmd'] = CommonDef::GET_MY_COUPONS_CMD;
+        $post_array['Data'] = addslashes($search_info);
+        $post_array['Md5'] = Common::EncryptAppReqData(CommonDef::GET_MY_COUPONS_CMD, $search_info);
+
+        $this->arrayRecursive($post_array, 'urlencode', false);
+        $post_str = urldecode(json_encode($post_array));//not use Json::encode because of escape
+
+        // 开始向服务器请求数据
+        $reg_request = new Request();
+        $reg_request->setUri(CommonDef::M6SERVER);
+        $reg_request->setMethod('POST');
+        $reg_request->getHeaders()->addHeaders(array('Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8'));
+        $reg_request->getPost()->set('Data', $post_str);
+
+        $reg_client = new Client();
+        $reg_client->setAdapter('Zend\Http\Client\Adapter\Curl');
+        $reg_client->setOptions(array(
+            'maxredirects' => 0,
+            'timeout'      => 30
+        ));
+
+        $reg_response = $reg_client->dispatch($reg_request);
+
+        if ($reg_response->isSuccess()) {
+            $this->logger->info($reg_response->getBody());
+            $res_content = $reg_response->getBody();
+
+            $res_json = json_decode($res_content, true); // convert into array
+
+            if (intval($res_json['Flag']) == M6Flag::M6FLAG_Success) {
+
+                $data_json = json_decode($res_json['Data'], true);
+
+                $page_index = $data_json['PageIndex'] + 1;
+                $page_rows = $data_json['PageRows'];
+                $total_count = $data_json['TotalCount'];
+                $row_array = array();
+
+                //如果和传过去的page不同的话，那么返回0个
+                if ($page_index < $page) {
+                    $page_index = $page;
+                } else {
+                    foreach ($data_json['Rows'] as $res_row) {
+                        $row = array();
+                        $row['time'] = $res_row['Time'];
+                        $row['eff_day'] = $res_row['EffDay'];
+                        $row['exp_day'] = $res_row['ExpDay'];
+                        $row['coupon_id'] = $res_row['Coupon'];
+                        $row['coupon_remark'] = $res_row['CouponRemark'];
+                        $row['stores'] = $res_row['Stores'];
+                        $row['condition'] = $res_row['IsMeetConditions'];
+                        $row['remark'] = $res_row['Remark'];
+                        $row['is_delay'] = $res_row['IsDelay'];
+                        $row['supplier'] = $res_row['supplier'];
+                        $row['ktype'] = $res_row['ktype'];
+                        $row['status'] = $res_row['status'];
+                        $row['name'] = $res_row['name'];
+                        $row['url'] = $res_row['url'];
+                        $row['img'] = $res_row['img'];
+                        $row['cctime'] = $res_row['cctime'];
+                        $row['ctime'] = $res_row['ctime'];
+                        $row['val'] = $res_row['val'];
+                        $row['wid'] = $res_row['wid'];
+
+                        array_push($row_array, $row);
+                    }
+                }
+
+                $coupon_array = array();
+                $coupon_array['page'] = $page_index;
+                $coupon_array['total_count'] = $total_count;
+                $coupon_array['coupons'] = $row_array;
+
+                //返回成功
+                $result = GCFlag::GC_Success;
+                $error_code = GCFlag::GC_NoErrorCode;
+                return array($result,$error_code,$coupon_array);
+
+            } else if (intval($res_json['Flag']) == M6Flag::M6FLAG_Product_Invalid){
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_ProductInvalid;
+                return array($result,$error_code);
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_M6ServerError; // M6服务器返回结果
+                return array($result,$error_code);
+            }
+
+        } else {
+            // 甲方服务器4XX，5XX
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_M6ServerConnError;
+            return array($result, $error_code);
+        }
+    }
+
     /*************Manager****************/
     public function setServiceManager(ServiceManager $serviceManager)
     {

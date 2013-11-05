@@ -373,6 +373,7 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
 
             if ($curFullPath != '')
             {
+                if (file_exists($curFullPath))
                 unlink($curFullPath);
             }
 
