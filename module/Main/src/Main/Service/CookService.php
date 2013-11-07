@@ -637,10 +637,14 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
      * @access public
      *
      *************************************************************/
-    public function QueryDaySales()
+    public function QueryDaySales($test_id)
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+
         $msix_id = $authService->getIdentity()->__get('msix_id');
+        if ($test_id != 0) {
+            $msix_id = $test_id;
+        }
 
         $query_info = (string)$msix_id;
         $post_array = array();
@@ -672,6 +676,8 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
             $res_content = $reg_response->getBody();
 
             $res_json = json_decode($res_content, true); // convert into array
+
+            echo $res_content;
 
             if (intval($res_json['Flag']) == M6Flag::M6FLAG_Success) {
 
@@ -710,10 +716,14 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
      * @access public
      *
      *************************************************************/
-    public function GetCoupon($coupon_id)
+    public function GetCoupon($coupon_id, $test_id)
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
         $msix_id = $authService->getIdentity()->__get('msix_id');
+
+        if ($test_id != 0) {
+            $msix_id = $test_id;
+        }
 
         $query_info = '{"CustId":'. (string)$msix_id . ',"CouponId":'. (string)$coupon_id .'}';
         $post_array = array();
@@ -797,15 +807,18 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
      * @access public
      *
      *************************************************************/
-    public function DelayCoupon()
+    public function DelayCoupon($test_id)
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
         $msix_id = $authService->getIdentity()->__get('msix_id');
 
-        $query_info = '{"CustId":'. (string)$msix_id . '}';
+        if ($test_id != 0) {
+            $msix_id = $test_id;
+        }
+        $query_info = (string)$msix_id;
         $post_array = array();
         $post_array['Cmd'] = CommonDef::DELAY_GET_COUPON_CMD;
-        $post_array['Data'] = addslashes($query_info);
+        $post_array['Data'] = $query_info;
         $post_array['Md5'] = Common::EncryptAppReqData(CommonDef::DELAY_GET_COUPON_CMD, $query_info);
 
         $this->arrayRecursive($post_array, 'urlencode', false);
@@ -871,12 +884,16 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
      * @access public
      *
      *************************************************************/
-    public function GetMyCoupons($limit, $page)
+    public function GetMyCoupons($limit, $page, $test_id)
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
         $msix_id = $authService->getIdentity()->__get('msix_id');
 
-        $search_info = '{"CustId":'. (string)$msix_id . '","PageIndex":' . (string)($page - 1) . ',"PageRows":'. (string)$limit . '}';
+        if ($test_id != 0) {
+            $msix_id = $test_id;
+        }
+
+        $search_info = '{"CustId":'. (string)$msix_id . ',"PageIndex":' . (string)($page - 1) . ',"PageRows":'. (string)$limit . '}';
         $post_array = array();
         $post_array['Cmd'] = CommonDef::GET_MY_COUPONS_CMD;
         $post_array['Data'] = addslashes($search_info);

@@ -703,9 +703,16 @@ class CookController extends BaseAbstractActionController {
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         $day_sales_result = array();
         $request = $this->getRequest();
-        if($this->isMobile($request) && $authService->hasIdentity()) {
+        if(!$this->isMobile($request) && !$authService->hasIdentity()) {
             $cookService = $this->getServiceLocator()->get('cook_service');
-            $query_result = $cookService->QueryDaySales();
+
+            $test_id = 0;
+            if ($this->params()->fromQuery('test_id') && trim($this->params()->fromQuery('test_id')) != '')
+            {
+                $test_id = intval($this->params()->fromQuery('test_id'));
+            }
+
+            $query_result = $cookService->QueryDaySales($test_id);
 
             $result = $query_result[0];
             $error_code = $query_result[1];
@@ -763,6 +770,12 @@ class CookController extends BaseAbstractActionController {
         $request = $this->getRequest();
         if($this->isMobile($request) && $authService->hasIdentity()) {
 
+            $test_id = 0;
+            if ($this->params()->fromQuery('test_id') && trim($this->params()->fromQuery('test_id')) != '')
+            {
+                $test_id = intval($this->params()->fromQuery('test_id'));
+            }
+
             $coupon_id = 0;
             if ($this->params()->fromQuery('coupon_id') && trim($this->params()->fromQuery('coupon_id')) != '')
             {
@@ -770,7 +783,7 @@ class CookController extends BaseAbstractActionController {
             }
 
             $cookService = $this->getServiceLocator()->get('cook_service');
-            $query_result = $cookService->GetCoupon($coupon_id);
+            $query_result = $cookService->GetCoupon($coupon_id, $test_id);
 
             $result = $query_result[0];
             $error_code = $query_result[1];
@@ -841,8 +854,15 @@ class CookController extends BaseAbstractActionController {
         $delay_result = array();
         $request = $this->getRequest();
         if($this->isMobile($request) && $authService->hasIdentity()) {
+
+            $test_id = 0;
+            if ($this->params()->fromQuery('test_id') && trim($this->params()->fromQuery('test_id')) != '')
+            {
+                $test_id = intval($this->params()->fromQuery('test_id'));
+            }
+
             $cookService = $this->getServiceLocator()->get('cook_service');
-            $query_result = $cookService->DelayCoupon();
+            $query_result = $cookService->DelayCoupon($test_id);
 
             $result = $query_result[0];
             $error_code = $query_result[1];
@@ -909,8 +929,14 @@ class CookController extends BaseAbstractActionController {
                     $page = 1;
             }
 
+            $test_id = 0;
+            if ($this->params()->fromQuery('test_id') && trim($this->params()->fromQuery('test_id')) != '')
+            {
+                $test_id = intval($this->params()->fromQuery('test_id'));
+            }
+
             $cookService = $this->getServiceLocator()->get('cook_service');
-            $query_result = $cookService->GetMyConpons(10, $page);
+            $query_result = $cookService->GetMyCoupons(10, $page, $test_id);
 
             $result = $query_result[0];
             $error_code = $query_result[1];
