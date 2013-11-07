@@ -136,9 +136,55 @@ start_day和end_day为”yyyy-MM-dd”格式的日期
 	type: get
 	return: json {result, errorcode, time, sale_fee, sale_count, condition, remark}
 	
-time为"yyyy-MM-dd HH:mm:ss"格式的日期。
-sale_fee为指定日期的销售额。
-sale_count为销售笔数。
-condition为是否符合获取优惠券条件 1:符合费用; 0:不符合费用; 2:没有可用促销活动; 3:广告。remark为条件说明。
+	time 		”yyyy-MM-dd HH:mm:ss”格式的服务器时间	sale_fee 	指定日期的销售额
+	sale_count	销售笔数
+	condition	是否符合获取优惠券条件 1符合费用 0不符合费用 2没有可用促销活动 3广告	remark		是否符合条件说明
+######获取优惠券
+	protocol: cook/get_coupon
+	type: get
+	param: `coupon_id`
+	return: json {result, errorcode, time, eff_day, exp_day, coupon_id, coupon_remark, stores, condition, remark, is_delay, supplier, ktype, status, name, url, img, cctime, ctime, val, wid}
+	
+    time		”yyyy-MM-dd HH:mm:ss”格式的服务器时间 
+    eff_day		”yyyy-MM-dd HH:mm:ss”格式的优惠券生效时间,如果是 延期获取记录,则为延期有效时间
+    exp_day		"yyyy-MM-dd HH:mm:ss”格式的优惠券失效时间,如果 是延期获取记录,则为延期失效时间
+    coupon_id	优惠券号,如果是延期获取记录,则为空
+    coupon_remark 优惠券描述,如果是延期获取记录,则为延期获取 的信息
+    stores 		使用门店
+    condition	是否符合获取优惠券条件 1 符合费用 0 不符合费 用 2 没有可用促销活动 3 广告
+    remark 		是否符合条件说明
+    is_delay 	是否延期获取 1 是 0 否
+    supplier 	提供商
+    ktype 		0 券 1 广告
+    status 		0 无效 1 有效
+    name 		券名称
+    url 		券信息链接
+    img			图片链接
+    cctime 		”yyyy-MM-dd HH:mm:ss”格式的客户确认金额服务器时间
+    ctime		”yyyy-MM-dd HH:mm:ss”格式的创建时间
+    val 		券价值
+    wid			对应商品编号
+    
+    
+######延期获取优惠券
+	protocol: cook/delay_coupon
+	type: get
+	return: json {result, errorcode, id, time, eff_day, exp_day, condition, remark}
+	
+    id			延期获取对应的编号,即获取优惠券接口中的 CouponId
+    time		”yyyy-MM-dd HH:mm:ss”格式的服务器时间
+    eff_day		”yyyy-MM-dd”格式的优惠券延期生效日期
+    exp_day		”yyyy-MM-dd”格式的优惠券延期失效日期
+    condition	是否符合获取优惠券条件 1 符合费用 0 不符合费用 2 没有可用促销活动 3 广告
+    remark		是否符合条件说明######获取客户拥有的优惠券列表
+	protocol: cook/my_coupons
+    type: get  
+    params: page （我们默认一页10条记录，page从1开始）
+	return: json {result, errorcode, page, total_count, coupons}
 
+	page		当前页
+    total_count	总记录数
+    coupons		具体记录，记录格式为获取优惠券协议中的单条记录（没有result, errorcode这两项）的数组
+
+	
 
