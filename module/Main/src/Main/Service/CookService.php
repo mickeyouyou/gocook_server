@@ -642,10 +642,10 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
         $msix_id = $authService->getIdentity()->__get('msix_id');
 
-        $query_info = '{"CustId":'. (string)$msix_id . '}';
+        $query_info = (string)$msix_id;
         $post_array = array();
         $post_array['Cmd'] = CommonDef::DAY_SALES_CMD;
-        $post_array['Data'] = addslashes($query_info);
+        $post_array['Data'] = $query_info;
         $post_array['Md5'] = Common::EncryptAppReqData(CommonDef::DAY_SALES_CMD, $query_info);
 
         $this->arrayRecursive($post_array, 'urlencode', false);

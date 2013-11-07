@@ -15,6 +15,7 @@ final class CommonDef
     const APP_ID = 1;
     const APP_KEY = "DAB578EC-6C01-4180-939A-37E6BE8A81AF";
     const APP_IV = "117A5C0F";
+    const SECRET_KEY = "9D74D6D0-9F86-44e4-9E3A-1B3F50F0E511";
 
     // m6 cmd
     const REGISTER_CMD = 1;
