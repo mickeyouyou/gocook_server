@@ -16,6 +16,7 @@ use Zend\Json\Json;
 use App\Lib\Common;
 use Zend\Http\Request;
 use Zend\Http\Client;
+use App\Lib\Cryptogram;
 
 class IndexController extends BaseAbstractActionController {
 
@@ -38,6 +39,18 @@ class IndexController extends BaseAbstractActionController {
   
     public function indexAction() {
 
+        $bad_json = "{ 'bar': 'baz' }";
+
+        $bad_json = '{ bar: "baz" }';
+
+        $bad_json = '{ "bar": "baz", }';
+
+        $aaa = json_decode($bad_json);
+
+        var_dump($aaa);
+
+
+
         $result = new JsonModel(array(
 	        'some_parameter' => 'some value',
             'success'=>true,
@@ -51,6 +64,23 @@ class IndexController extends BaseAbstractActionController {
         $account = '15000021035';
         $token = 'rmHSyDSm1Dk=';
         $login_info = '{"Account":"'. $account .'","Password":"' . $token . '"}';
+
+
+        $key = md5('DAB578EC-6C01-4180-939A-37E6BE8A81AF', true);
+        $real_key = $key . "\0\0\0\0\0\0\0\0";
+
+        $iv = md5('117A5C0F', true);
+        $real_iv = "\0\0\0\0\0\0\0\0";
+        for ($i = 0; $i < 8; $i++)
+        {
+            $real_iv[$i] = chr(abs(ord($iv[$i]) - ord($iv[$i+1])));
+        }
+
+        $content = base64_decode('rmHSyDSm1Dk=');
+        $aaa = Cryptogram::decryptByTDES($content, $real_key, $real_iv);
+        echo $aaa;
+
+
 
 
 //        // 注册
@@ -92,31 +122,31 @@ class IndexController extends BaseAbstractActionController {
         $post_str = urldecode(json_encode($post_array));//not use Json::encode because of escape
 
         echo $post_str . "\n\n";
-        //$request_post_data = '{' . '"Cmd":' . (string)Common::HIS_ORDERS_CMD . ',"Data":"' . '{\"CustId\":19,\"StartDay\":\"2013-03-12\",\"EndDay\":\"2013-09-11\",\"PageIndex\":1,\"PageRows\":10}' . '","Md5":"' . 'x5ybbJQmrRAuV7bTMCUHZw==' . '"}';
-
-       // echo $post_str;
-
-        $reg_request->getPost()->set('Data', $post_str);
-
-        //var_dump($reg_request->getPost());
-
-        $reg_client = new Client();
-        $reg_client->setAdapter('Zend\Http\Client\Adapter\Curl');
-
-        $reg_client->setOptions(array(
-            'maxredirects' => 0,
-            'timeout'      => 30
-        ));
-        $reg_response = $reg_client->send($reg_request);
-
-        if ($reg_response->isSuccess()) {
-            var_dump ($reg_response->getBody());
-
-            $res_content = $reg_response->getBody();
-            $res_json = json_decode($res_content);
-
-            var_dump($res_json);
-        }
+//        //$request_post_data = '{' . '"Cmd":' . (string)Common::HIS_ORDERS_CMD . ',"Data":"' . '{\"CustId\":19,\"StartDay\":\"2013-03-12\",\"EndDay\":\"2013-09-11\",\"PageIndex\":1,\"PageRows\":10}' . '","Md5":"' . 'x5ybbJQmrRAuV7bTMCUHZw==' . '"}';
+//
+//       // echo $post_str;
+//
+//        $reg_request->getPost()->set('Data', $post_str);
+//
+//        //var_dump($reg_request->getPost());
+//
+//        $reg_client = new Client();
+//        $reg_client->setAdapter('Zend\Http\Client\Adapter\Curl');
+//
+//        $reg_client->setOptions(array(
+//            'maxredirects' => 0,
+//            'timeout'      => 30
+//        ));
+//        $reg_response = $reg_client->send($reg_request);
+//
+//        if ($reg_response->isSuccess()) {
+//            var_dump ($reg_response->getBody());
+//
+//            $res_content = $reg_response->getBody();
+//            $res_json = json_decode($res_content);
+//
+//            var_dump($res_json);
+//        }
 
         return $result;
     }

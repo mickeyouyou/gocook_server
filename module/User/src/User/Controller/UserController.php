@@ -48,6 +48,75 @@ class UserController extends BaseAbstractActionController
      * @access public
      *
      *************************************************************/
+    public function loginExAction()
+    {
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+
+        $request = $this->getRequest();
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if($authService->hasIdentity()) {
+            $result = GCFlag::GC_Success;
+            $error_code = GCFlag::GC_NoErrorCode;
+        } else {
+            if ($request->isPost()) {
+                $post_content = $request->getPost();
+
+                $data = $post_content['data'];
+                $rnd = $post_content['rnd'];
+
+                if (!$data) {
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_PostInvalid;
+                } else {
+                    $userService = $this->getServiceLocator()->get('user_service');
+                    $auth_result = $userService->authenticate_ex($data, $rnd);
+
+                    $result = $auth_result[0];
+                    $error_code = $auth_result[1];
+                }
+            } else {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NoPost;
+            }
+        }
+
+        if ($result == GCFlag::GC_Success)
+        {
+            $username = $authService->getIdentity()->__get('display_name');
+            $avatar = $authService->getIdentity()->__get('portrait');
+            if (!$avatar || $avatar=='')
+                $avatar = '';
+            else
+                $avatar = 'images/avatars/'.$avatar;
+
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+                'user_id' => intval($authService->getIdentity()->__get('user_id')),
+                'username' => $username,
+                'icon' => $avatar
+            ));
+        }
+        else {
+            return new JsonModel(array(
+                'result' => $result,
+                'errorcode' => $error_code,
+                'username' => "",
+                'icon' => ''
+            ));
+        }
+    }
+
+
+    /**************************************************************
+     *
+     * 登录
+     * @post_params login password
+     * @return result errorcode username user_id icon
+     * @access public
+     *
+     *************************************************************/
     public function loginAction()
     {
         $result = GCFlag::GC_Success;
