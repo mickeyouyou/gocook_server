@@ -810,25 +810,7 @@ class CookController extends BaseAbstractActionController {
             return new JsonModel(array(
                 'result' => $result,
                 'errorcode' => $error_code,
-                'time' => $coupon_result['Time'],
-                'eff_day' => $coupon_result['EffDay'],
-                'exp_day' => $coupon_result['ExpDay'],
-                'coupon_id' => $coupon_result['Coupon'],
-                'coupon_remark' => $coupon_result['CouponRemark'],
-                'stores' => $coupon_result['Stores'],
-                'condition' => $coupon_result['IsMeetConditions'],
-                'remark' => $coupon_result['Remark'],
-                'is_delay' => $coupon_result['IsDelay'],
-                'supplier' => $coupon_result['supplier'],
-                'ktype' => $coupon_result['ktype'],
-                'status' => $coupon_result['status'],
-                'name' => $coupon_result['name'],
-                'url' => $coupon_result['url'],
-                'img' => $coupon_result['img'],
-                'cctime' => $coupon_result['cctime'],
-                'ctime' => $coupon_result['ctime'],
-                'val' => $coupon_result['val'],
-                'wid' => $coupon_result['wid'],
+                'coupons' => $coupon_result['coupons'],
             ));
         } else {
             return new JsonModel(array(

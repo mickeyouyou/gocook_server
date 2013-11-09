@@ -641,6 +641,12 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
 
+		if (!$authService->getIdentity()) {
+     	   $result = GCFlag::GC_Failed;
+           $error_code = GCFlag::GC_AuthAccountInvalid;
+     	   return array($result, $error_code);
+		}
+        
         $msix_id = $authService->getIdentity()->__get('msix_id');
         if ($test_id != 0) {
             $msix_id = $test_id;
@@ -717,6 +723,13 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
     public function GetCoupon($coupon_id, $test_id)
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+
+		if (!$authService->getIdentity()) {
+     	   $result = GCFlag::GC_Failed;
+           $error_code = GCFlag::GC_AuthAccountInvalid;
+     	   return array($result, $error_code);
+		}
+
         $msix_id = $authService->getIdentity()->__get('msix_id');
 
         if ($test_id != 0) {
@@ -756,33 +769,42 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
 
             if (intval($res_json['Flag']) == M6Flag::M6FLAG_Success) {
 
-                $data_json = json_decode($res_json['Data'], true);
+                $real_rows_string = '{"Rows":' . $res_json['Data'] .'}';
+                $data_json = json_decode($real_rows_string, true);
 
-                $result_array = array();
-                $result_array['time'] = $data_json['Time'];
-                $result_array['eff_day'] = $data_json['EffDay'];
-                $result_array['exp_day'] = $data_json['ExpDay'];
-                $result_array['coupon_id'] = $data_json['Coupon'];
-                $result_array['coupon_remark'] = $data_json['CouponRemark'];
-                $result_array['stores'] = $data_json['Stores'];
-                $result_array['condition'] = $data_json['IsMeetConditions'];
-                $result_array['remark'] = $data_json['Remark'];
-                $result_array['is_delay'] = $data_json['IsDelay'];
-                $result_array['supplier'] = $data_json['supplier'];
-                $result_array['ktype'] = $data_json['ktype'];
-                $result_array['status'] = $data_json['status'];
-                $result_array['name'] = $data_json['name'];
-                $result_array['url'] = $data_json['url'];
-                $result_array['img'] = $data_json['img'];
-                $result_array['cctime'] = $data_json['cctime'];
-                $result_array['ctime'] = $data_json['ctime'];
-                $result_array['val'] = $data_json['val'];
-                $result_array['wid'] = $data_json['wid'];
+                $row_array = array();
+                foreach ($data_json['Rows'] as $res_row) {
+                    $row = array();
+                    $row['time'] = $res_row['Time'];
+                    $row['eff_day'] = $res_row['EffDay'];
+                    $row['exp_day'] = $res_row['ExpDay'];
+                    $row['coupon_id'] = $res_row['Coupon'];
+                    $row['coupon_remark'] = $res_row['CouponRemark'];
+                    $row['stores'] = $res_row['Stores'];
+                    $row['condition'] = $res_row['IsMeetConditions'];
+                    $row['remark'] = $res_row['Remark'];
+                    $row['is_delay'] = $res_row['IsDelay'];
+                    $row['supplier'] = $res_row['supplier'];
+                    $row['ktype'] = $res_row['ktype'];
+                    $row['status'] = $res_row['status'];
+                    $row['name'] = $res_row['name'];
+                    $row['url'] = $res_row['url'];
+                    $row['img'] = $res_row['img'];
+                    $row['cctime'] = $res_row['cctime'];
+                    $row['ctime'] = $res_row['ctime'];
+                    $row['val'] = $res_row['val'];
+                    $row['wid'] = $res_row['wid'];
+
+                    array_push($row_array, $row);
+                }
+
+                $coupon_array = array();
+                $coupon_array['coupons'] = $row_array;
 
                 //返回成功
                 $result = GCFlag::GC_Success;
                 $error_code = GCFlag::GC_NoErrorCode;
-                return array($result, $error_code, $result_array);
+                return array($result, $error_code, $coupon_array);
 
             } else {
                 $result = GCFlag::GC_Failed;
@@ -808,6 +830,12 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
     public function DelayCoupon($test_id)
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+		if (!$authService->getIdentity()) {
+     	   $result = GCFlag::GC_Failed;
+           $error_code = GCFlag::GC_AuthAccountInvalid;
+     	   return array($result, $error_code);
+		}
+
         $msix_id = $authService->getIdentity()->__get('msix_id');
 
         if ($test_id != 0) {
@@ -885,6 +913,12 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
     public function GetMyCoupons($limit, $page, $test_id)
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+		if (!$authService->getIdentity()) {
+     	   $result = GCFlag::GC_Failed;
+           $error_code = GCFlag::GC_AuthAccountInvalid;
+     	   return array($result, $error_code);
+		}
+
         $msix_id = $authService->getIdentity()->__get('msix_id');
 
         if ($test_id != 0) {
