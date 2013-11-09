@@ -18,6 +18,11 @@ final class GCFlag {
     const E_IsCollected = 0;                    // 已经收藏
     const E_NotCollected = 1;                   // 未收藏
 
+    // has delay the sales                      // 是否延期成功
+    const E_IsDelayed = 0;                      // 延期成功
+    const E_NotDelayed = 1;                     // 延期未成功
+    const E_NothingDelay = 2;                   // 已经延期过
+
     // go_cook return operator code
     const GC_Success = 0;                       // 成功
     const GC_Failed = 1;                        // 失败

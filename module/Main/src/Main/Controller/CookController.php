@@ -871,6 +871,7 @@ class CookController extends BaseAbstractActionController {
             return new JsonModel(array(
                 'result' => $result,
                 'errorcode' => $error_code,
+                'delay_rst' => $delay_result['delay_rst'],
                 'id' => $delay_result['id'],
                 'time' => $delay_result['time'],
                 'eff_day' => $delay_result['eff_day'],

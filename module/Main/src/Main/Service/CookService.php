@@ -877,6 +877,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 $data_json = json_decode($res_json['Data'], true);
 
                 $result_array = array();
+                $result_array['delay_rst'] = GCFlag::E_IsDelayed;
                 $result_array['id'] = $data_json['Id'];
                 $result_array['time'] = $data_json['Time'];
                 $result_array['eff_day'] = $data_json['EffDay'];
@@ -885,6 +886,21 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 $result_array['remark'] = $data_json['Remark'];
 
                 //返回成功
+                $result = GCFlag::GC_Success;
+                $error_code = GCFlag::GC_NoErrorCode;
+                return array($result, $error_code, $result_array);
+
+            } else if (intval($res_json['Flag']) == M6Flag::M6FLAG_Fail) {
+
+                $result_array = array();
+                $result_array['delay_rst'] = GCFlag::E_NothingDelay;
+                $result_array['id'] = "";
+                $result_array['time'] = "";
+                $result_array['eff_day'] = "";
+                $result_array['exp_day'] = "";
+                $result_array['condition'] = 0;
+                $result_array['remark'] = "";
+
                 $result = GCFlag::GC_Success;
                 $error_code = GCFlag::GC_NoErrorCode;
                 return array($result, $error_code, $result_array);
