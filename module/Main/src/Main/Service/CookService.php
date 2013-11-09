@@ -677,8 +677,6 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
 
             $res_json = json_decode($res_content, true); // convert into array
 
-            echo $res_content;
-
             if (intval($res_json['Flag']) == M6Flag::M6FLAG_Success) {
 
                 $data_json = json_decode($res_json['Data'], true);
