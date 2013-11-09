@@ -55,8 +55,6 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $content = base64_decode($data);
         $json_str = Cryptogram::decryptByTDES($content, $real_key, $real_iv);
 
-        echo $json_str;
-
         $res_json = json_decode($json_str, true); // convert into array
 
         // if extract error, just return
@@ -66,105 +64,96 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
             return array($result, $error_code);
         }
 
-        if (intval($res_json['Cmd']) == CommonDef::REG_LOGIN_CMD) {
+        $msix_id = $res_json['id'];
+        $mobile = $res_json['mobile'];
+        $name = $res_json['name'];
+        $secret_id = $res_json['secretId'];
+        $rand_val = $res_json['rndVal'];
+        $error_msg = $res_json['errMsg'];
 
-            $data_json = json_decode($res_json['Data'], true);
+        if (intval($rnd) == intval($rand_val)) {
+            if ($secret_id == CommonDef::SECRET_KEY) {
+                $repository = $this->entityManager->getRepository('User\Entity\User');
+                // 到GC的数据库中查找
+                $msixid_result = $repository->findOneBy(array('msix_id' => $msix_id));
+                if ($msixid_result) {
+                    // 登录
+                    $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+                    $adapter = $authService->getAdapter();
+                    $adapter->setOptions(array(
+                        'objectManager'=>$this->getEntityManager(),
+                        'identityClass'=>'User\Entity\User',
+                        'identityProperty'=>'msix_id',
+                        'credentialProperty'=>'password',
+                        'credential_callable' => function(User $user, $password) {
+                                return $password == $user->__get('password');
+                            },
+                    ));
 
-            $msix_id = $data_json['id'];
-            $mobile = $data_json['mobile'];
-            $name = $data_json['name'];
-            $secret_id = $data_json['secretId'];
-            $rand_val = $data_json['rndVal'];
-            $error_msg = $data_json['errMsg'];
+                    $adapter->setIdentityValue($msix_id);
+                    $password = 1;
+                    $adapter->setCredentialValue($password);
+                    $authResult = $authService->authenticate();
 
-            if (intval($rnd) == intval($rand_val)) {
-                if ($secret_id == CommonDef::SECRET_KEY) {
-                    $repository = $this->entityManager->getRepository('User\Entity\User');
-                    // 到GC的数据库中查找
-                    $msixid_result = $repository->findOneBy(array('msix_id' => $msix_id));
-                    if ($msixid_result) {
-                        // 登录
-                        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
-                        $adapter = $authService->getAdapter();
-                        $adapter->setOptions(array(
-                            'objectManager'=>$this->getEntityManager(),
-                            'identityClass'=>'User\Entity\User',
-                            'identityProperty'=>'msix_id',
-                            'credentialProperty'=>'password',
-                            'credential_callable' => function(User $user, $password) {
-                                    return $password == $user->__get('password');
-                                },
-                        ));
+                    if ($authResult->isValid())
+                    {
+                        $authNamespace = new Container(Session::NAMESPACE_DEFAULT);
+                        $authNamespace->getManager()->rememberMe(60 * 60 * 24 * 7);
 
-                        $adapter->setIdentityValue($msix_id);
-                        $password = 1;
-                        $adapter->setCredentialValue($password);
-                        $authResult = $authService->authenticate();
-
-                        if ($authResult->isValid())
-                        {
-                            $authNamespace = new Container(Session::NAMESPACE_DEFAULT);
-                            $authNamespace->getManager()->rememberMe(60 * 60 * 24 * 7);
-
-                            $result = GCFlag::GC_Success;
-                            $error_code = GCFlag::GC_NoErrorCode;
-                            return array($result, $error_code);
-                        } else {
-                            $result = GCFlag::GC_Failed;
-                            $error_code = GCFlag::GC_CommonError;//理论上不应该会走到这里的
-                            return array($result, $error_code);
-                        }
-                    } else {
-                        // 注册
-                        $user = new User();
-                        $user->__set('password', '1');
-                        $user->__set('tel', $mobile);
-
-                        if ($name == '') {
-                            $name = 'u' . substr(md5(date("YmdHis")),8,16). '_' . $mobile;
-                        } else {
-                            $display_result = $repository->findOneBy(array('display_name' => $data['nickname']));
-                            if($display_result)//检查昵称重复
-                            {
-                                $name = 'u' . substr(md5(date("YmdHis")),8,16). '_' . $mobile;
-                            }
-                        }
-
-                        $user->__set('display_name', $name);
-                        $user->__set('register_time', new \DateTime());
-
-                        $user->__set('msix_id', $msix_id);
-
-                        $this->entityManager->persist($user);
-                        $this->entityManager->flush();
-
-                        $user_info = new UserInfo();
-                        $user_info->__set('collect_count', 0);
-                        $user_info->__set('dish_count', 0);
-                        $user_info->__set('recipe_count', 0);
-                        $user_info->__set('following_count', 0);
-                        $user_info->__set('followed_count', 0);
-
-                        $user->__set('user_info', $user_info);
-                        $user_info->__set('user', $user);
-
-                        $this->entityManager->persist($user_info);
-                        $this->entityManager->flush();
-
-                        // 自动登录
-                        $this->authenticate_ex($data, $rnd);
-
-                        //返回成功
                         $result = GCFlag::GC_Success;
                         $error_code = GCFlag::GC_NoErrorCode;
                         return array($result, $error_code);
+                    } else {
+                        $result = GCFlag::GC_Failed;
+                        $error_code = GCFlag::GC_CommonError;//理论上不应该会走到这里的
+                        return array($result, $error_code);
+                    }
+                } else {
+                    // 注册
+                    $user = new User();
+                    $user->__set('password', '1');
+                    $user->__set('tel', $mobile);
+
+                    if ($name == '') {
+                        $name = 'u' . substr(md5(date("YmdHis")),8,16). '_' . $mobile;
+                    } else {
+                        $display_result = $repository->findOneBy(array('display_name' => $data['nickname']));
+                        if($display_result)//检查昵称重复
+                        {
+                            $name = 'u' . substr(md5(date("YmdHis")),8,16). '_' . $mobile;
+                        }
                     }
 
-                } else {
-                    $result = GCFlag::GC_Failed;
-                    $error_code = GCFlag::GC_LoginError;
+                    $user->__set('display_name', $name);
+                    $user->__set('register_time', new \DateTime());
+
+                    $user->__set('msix_id', $msix_id);
+
+                    $this->entityManager->persist($user);
+                    $this->entityManager->flush();
+
+                    $user_info = new UserInfo();
+                    $user_info->__set('collect_count', 0);
+                    $user_info->__set('dish_count', 0);
+                    $user_info->__set('recipe_count', 0);
+                    $user_info->__set('following_count', 0);
+                    $user_info->__set('followed_count', 0);
+
+                    $user->__set('user_info', $user_info);
+                    $user_info->__set('user', $user);
+
+                    $this->entityManager->persist($user_info);
+                    $this->entityManager->flush();
+
+                    // 自动登录
+                    $this->authenticate_ex($data, $rnd);
+
+                    //返回成功
+                    $result = GCFlag::GC_Success;
+                    $error_code = GCFlag::GC_NoErrorCode;
                     return array($result, $error_code);
                 }
+
             } else {
                 $result = GCFlag::GC_Failed;
                 $error_code = GCFlag::GC_LoginError;
@@ -175,6 +164,7 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
             $error_code = GCFlag::GC_LoginError;
             return array($result, $error_code);
         }
+
     }
     /**************************************************************
      *
