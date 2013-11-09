@@ -55,6 +55,8 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $content = base64_decode($data);
         $json_str = Cryptogram::decryptByTDES($content, $real_key, $real_iv);
 
+        echo $json_str;
+
         $res_json = json_decode($json_str, true); // convert into array
 
         // if extract error, just return
