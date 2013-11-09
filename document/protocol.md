@@ -143,7 +143,8 @@ start_day和end_day为”yyyy-MM-dd”格式的日期
 	protocol: cook/get_coupon
 	type: get
 	param: `coupon_id`
-	return: json {result, errorcode, time, eff_day, exp_day, coupon_id, coupon_remark, stores, condition, remark, is_delay, supplier, ktype, status, name, url, img, cctime, ctime, val, wid}
+	return: json {result, errorcode, coupons}
+			coupons 包含 {time, eff_day, exp_day, coupon_id, coupon_remark, stores, condition, remark, is_delay, supplier, ktype, status, name, url, img, cctime, ctime, val, wid}
 	
     time		”yyyy-MM-dd HH:mm:ss”格式的服务器时间 
     eff_day		”yyyy-MM-dd HH:mm:ss”格式的优惠券生效时间,如果是 延期获取记录,则为延期有效时间
