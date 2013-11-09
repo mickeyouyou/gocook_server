@@ -186,5 +186,22 @@ start_day和end_day为”yyyy-MM-dd”格式的日期
     total_count	总记录数
     coupons		具体记录，记录格式为获取优惠券协议中的单条记录（没有result, errorcode这两项）的数组
 
+
+######登陆Ex
+	protocol: cook/login_ex
+    type: post  
+    params: `data`	M6服务器返回的数据 
+    		`rnd`	随机数
+	return: json {result, errorcode, username, icon}
+
+具体的流程为：
+	
+	1. 客户端用webview加载M6登录网址`http://o.m6fresh.com/ws/mobile_reg.aspx?sid=xxx`，并随机生成一个整数rnd，作为这个url里的get参数。打开后在网页上进行注册登录。
+	2. 登录成功后M6会重定位到`http://o.m6fresh.com/ws/appcallback.aspx`，分享厨房登录验证数据在html中`<input name="tb_data" ...>`的value里。
+	3. 取出该数据，用post的方式把之前生成的随机数rnd和分享厨房验证数据data发到分享厨房的登陆协议`cook/login_ex`，后续流程不变
+	
+	
+	
+	
 	
 
