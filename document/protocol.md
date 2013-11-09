@@ -170,8 +170,9 @@ start_day和end_day为”yyyy-MM-dd”格式的日期
 ######延期获取优惠券
 	protocol: cook/delay_coupon
 	type: get
-	return: json {result, errorcode, id, time, eff_day, exp_day, condition, remark}
+	return: json {result, errorcode, delay_rst, id, time, eff_day, exp_day, condition, remark}
 	
+    delay_rst	延期的结果 0: 延期成功 1: 延期未成功 2: 已经延期过 (1后台暂时未做判断，0和2需要处理)
     id			延期获取对应的编号,即获取优惠券接口中的 CouponId
     time		”yyyy-MM-dd HH:mm:ss”格式的服务器时间
     eff_day		”yyyy-MM-dd”格式的优惠券延期生效日期
