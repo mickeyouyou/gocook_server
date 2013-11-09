@@ -703,7 +703,7 @@ class CookController extends BaseAbstractActionController {
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         $day_sales_result = array();
         $request = $this->getRequest();
-        if(!$this->isMobile($request) && !$authService->hasIdentity()) {
+        if($this->isMobile($request) && $authService->hasIdentity()) {
             $cookService = $this->getServiceLocator()->get('cook_service');
 
             $test_id = 0;
@@ -920,7 +920,7 @@ class CookController extends BaseAbstractActionController {
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         $coupons_result = array();
         $request = $this->getRequest();
-        if(!$this->isMobile($request) && !$authService->hasIdentity()) {
+        if($this->isMobile($request) && $authService->hasIdentity()) {
             $page = 1;
             if ($this->params()->fromQuery('page')&&$this->params()->fromQuery('page')!='')
             {
