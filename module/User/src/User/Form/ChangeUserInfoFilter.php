@@ -18,7 +18,7 @@ class ChangeUserInfoFilter extends InputFilter {
             'validators' => array(
                 array(
                     'name' => 'StringLength',
-                    'options' => array( 'min' => 6 ),
+                    'options' => array( 'min' => 4 ),
                 ),
             ),
         ));
@@ -69,7 +69,7 @@ class ChangeUserInfoFilter extends InputFilter {
             'validators' => array(
                 array(
                     'name' => 'StringLength',
-                    'options' => array( 'min' => 2 ),
+                    'options' => array( 'min' => 1 ),
                 ),
             ),
         ));
@@ -84,7 +84,7 @@ class ChangeUserInfoFilter extends InputFilter {
             'validators' => array(
                 array(
                     'name' => 'StringLength',
-                    'options' => array( 'min' => 2 ),
+                    'options' => array( 'min' => 1 ),
                 ),
             ),
         ));
@@ -99,7 +99,7 @@ class ChangeUserInfoFilter extends InputFilter {
             'validators' => array(
                 array(
                     'name' => 'StringLength',
-                    'options' => array( 'min' => 4 ),
+                    'options' => array( 'min' => 1 ),
                 ),
             ),
         ));
@@ -130,7 +130,7 @@ class ChangeUserInfoFilter extends InputFilter {
             'validators' => array(
                 array(
                     'name' => 'StringLength',
-                    'options' => array( 'min' => 6 ),
+                    'options' => array( 'min' => 2 ),
                 ),
             ),
         ));
