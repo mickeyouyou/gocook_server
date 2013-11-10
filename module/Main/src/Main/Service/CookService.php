@@ -778,7 +778,8 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     $row['time'] = $res_row['Time'];
                     $row['eff_day'] = $res_row['EffDay'];
                     $row['exp_day'] = $res_row['ExpDay'];
-                    $row['coupon_id'] = $res_row['Coupon'];
+                    $row['coupon'] = $res_row['Coupon']; //优惠券编号
+                    $row['coupon_id'] = $res_row['CouponId']; //正牌的coupon id
                     $row['coupon_remark'] = $res_row['CouponRemark'];
                     $row['stores'] = $res_row['Stores'];
                     $row['condition'] = $res_row['IsMeetConditions'];
@@ -990,7 +991,8 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                         $row['time'] = $res_row['Time'];
                         $row['eff_day'] = $res_row['EffDay'];
                         $row['exp_day'] = $res_row['ExpDay'];
-                        $row['coupon_id'] = $res_row['Coupon'];
+                        $row['coupon'] = $res_row['Coupon']; //优惠券编号
+                        $row['coupon_id'] = $res_row['CouponId']; //正牌的coupon id
                         $row['coupon_remark'] = $res_row['CouponRemark'];
                         $row['stores'] = $res_row['Stores'];
                         $row['condition'] = $res_row['IsMeetConditions'];

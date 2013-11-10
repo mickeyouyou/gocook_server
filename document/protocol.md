@@ -149,7 +149,8 @@ start_day和end_day为”yyyy-MM-dd”格式的日期
     time		”yyyy-MM-dd HH:mm:ss”格式的服务器时间 
     eff_day		”yyyy-MM-dd HH:mm:ss”格式的优惠券生效时间,如果是 延期获取记录,则为延期有效时间
     exp_day		"yyyy-MM-dd HH:mm:ss”格式的优惠券失效时间,如果 是延期获取记录,则为延期失效时间
-    coupon_id	优惠券号,如果是延期获取记录,则为空
+    coupon		优惠券号,如果是延期获取记录,则为空
+    coupon_id	<em>记录id，不管是优惠券还是</em>
     coupon_remark 优惠券描述,如果是延期获取记录,则为延期获取 的信息
     stores 		使用门店
     condition	是否符合获取优惠券条件 1 符合费用 0 不符合费 用 2 没有可用促销活动 3 广告
@@ -187,6 +188,9 @@ start_day和end_day为”yyyy-MM-dd”格式的日期
 	page		当前页
     total_count	总记录数
     coupons		具体记录，记录格式为获取优惠券协议中的单条记录（没有result, errorcode这两项）的数组
+
+
+###Attention！
 
 
 ######登陆Ex
