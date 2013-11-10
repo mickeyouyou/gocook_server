@@ -65,4 +65,6 @@ final class GCFlag {
 
     const GC_AlreadyWatchUser = 501;            // 已经关注过此用户
     const GC_NotMyWatchUser = 502;              // 并未关注此用户
+
+    const GC_DelayRecordNotValid = 601;         //无该延期券
 }

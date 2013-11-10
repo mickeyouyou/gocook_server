@@ -806,6 +806,12 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 $error_code = GCFlag::GC_NoErrorCode;
                 return array($result, $error_code, $coupon_array);
 
+            } else if (intval($res_json['Flag']) == M6Flag::M6FLAG_Fail) {
+                //领取失败
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_DelayRecordNotValid;
+                return array($result, $error_code);
+
             } else {
                 $result = GCFlag::GC_Failed;
                 $error_code = GCFlag::GC_M6ServerError; // M6服务器返回结果
