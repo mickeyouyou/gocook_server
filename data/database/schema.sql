@@ -28,7 +28,7 @@ CREATE TABLE `dish` (
   `user_id` int(11) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
   `content` text,
-  `photo_id` int(11) DEFAULT NULL,
+  `photo_img` varchar(50) DEFAULT NULL,
   `favor_count` int(11) DEFAULT NULL,
   `state` smallint(1) DEFAULT NULL,
   PRIMARY KEY (`dish_id`),
@@ -87,7 +87,7 @@ CREATE TABLE `photo` (
   `image_name` varchar(100) DEFAULT NULL,
   `image_path` varchar(100) DEFAULT NULL,
   `thumb_path` varchar(100) DEFAULT NULL,
-  `description` varchar(100) DEFAULT NULL COMMENT '暂时无用',
+  `desc` varchar(100) DEFAULT NULL COMMENT '暂时无用',
   `refer_count` int(11) DEFAULT NULL COMMENT '引用数，暂时无用',
   PRIMARY KEY (`photo_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -105,7 +105,7 @@ CREATE TABLE `recipe` (
   `user_id` int(11) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
   `name` varchar(100) DEFAULT NULL,
-  `description` text,
+  `description` varchar(100) DEFAULT NULL,
   `collected_count` int(11) DEFAULT NULL,
   `dish_count` int(11) DEFAULT NULL,
   `comment_count` int(11) DEFAULT NULL,
@@ -136,8 +136,12 @@ CREATE TABLE `recipe_comment` (
   `create_time` datetime DEFAULT NULL,
   `content` text,
   `state` smallint(1) DEFAULT NULL,
-  PRIMARY KEY (`comment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`comment_id`),
+  KEY `user_id` (`user_id`),
+  KEY `recipe_id` (`recipe_id`),
+  CONSTRAINT `recipe_comment_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
+  CONSTRAINT `recipe_comment_ibfk_2` FOREIGN KEY (`recipe_id`) REFERENCES `recipe` (`recipe_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -149,31 +153,34 @@ DROP TABLE IF EXISTS `user`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(255) DEFAULT '',
+  `tel` varchar(20) DEFAULT NULL,
+  `email` varchar(40) DEFAULT NULL,
+  `username` varchar(80) DEFAULT '',
   `display_name` varchar(50) DEFAULT NULL,
   `portrait` varchar(50) DEFAULT NULL,
-  `email` varchar(255) DEFAULT '',
   `password` varchar(128) NOT NULL,
-  `qq_openid` varchar(255) DEFAULT NULL,
+  `qq_openid` varchar(50) DEFAULT NULL,
   `qq_access_token` varchar(255) DEFAULT '',
   `weibo_id` bigint(11) DEFAULT NULL,
   `weibo_access_token` varchar(255) DEFAULT NULL,
   `state` smallint(6) DEFAULT NULL,
   `gender` smallint(1) DEFAULT NULL,
   `age` smallint(6) DEFAULT NULL,
-  `career` varchar(100) DEFAULT NULL,
+  `career` varchar(50) DEFAULT NULL,
   `city` varchar(50) DEFAULT NULL,
   `province` varchar(50) DEFAULT NULL,
-  `tel` varchar(20) DEFAULT NULL,
   `user_type` smallint(1) DEFAULT NULL,
   `register_time` datetime DEFAULT NULL,
   `intro` text,
+  `msix_id` bigint(11) DEFAULT NULL,
+  `msix_access_token` varchar(22) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `qq_openid` (`qq_openid`),
   UNIQUE KEY `weibo_id` (`weibo_id`),
-  KEY `user_id` (`user_id`)
+  UNIQUE KEY `tel` (`tel`),
+  UNIQUE KEY `msix_id` (`msix_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -187,11 +194,9 @@ DROP TABLE IF EXISTS `user_collection`;
 CREATE TABLE `user_collection` (
   `user_id` int(11) NOT NULL DEFAULT '0',
   `recipe_id` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`user_id`,`recipe_id`),
+  PRIMARY KEY (`recipe_id`,`user_id`),
   KEY `user_id` (`user_id`),
-  KEY `recipe_id` (`recipe_id`),
-  CONSTRAINT `user_collection_ibfk_1` FOREIGN KEY (`recipe_id`) REFERENCES `recipe` (`recipe_id`),
-  CONSTRAINT `user_collection_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
+  KEY `recipe_id` (`recipe_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -264,7 +269,7 @@ CREATE TABLE `user_relation` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `target_id` (`target_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -276,4 +281,4 @@ CREATE TABLE `user_relation` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-04-16  1:20:27
+-- Dump completed on 2013-11-13  2:49:21
