@@ -65,7 +65,7 @@ DROP TABLE IF EXISTS `material`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `material` (
   `material_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
+  `name` varchar(80) DEFAULT NULL,
   `catgory` int(11) DEFAULT NULL,
   PRIMARY KEY (`material_id`),
   UNIQUE KEY `name` (`name`)
