@@ -105,7 +105,7 @@ CREATE TABLE `recipe` (
   `user_id` int(11) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
   `name` varchar(100) DEFAULT NULL,
-  `description` varchar(100) DEFAULT NULL,
+  `description` text,
   `collected_count` int(11) DEFAULT NULL,
   `dish_count` int(11) DEFAULT NULL,
   `comment_count` int(11) DEFAULT NULL,
