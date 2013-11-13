@@ -117,7 +117,7 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     if ($name == '') {
                         $name = 'u' . substr(md5(date("YmdHis")),8,16). '_' . $mobile;
                     } else {
-                        $display_result = $repository->findOneBy(array('display_name' => $data['nickname']));
+                        $display_result = $repository->findOneBy(array('display_name' => $name));
                         if($display_result)//检查昵称重复
                         {
                             $name = 'u' . substr(md5(date("YmdHis")),8,16). '_' . $mobile;
