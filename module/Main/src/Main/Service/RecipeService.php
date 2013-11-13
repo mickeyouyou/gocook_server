@@ -263,6 +263,10 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
                 $image->target_path = $coverFullPath_526;
                 $image->resize(526, 0, ZEBRA_IMAGE_CROP_CENTER);
 
+                $coverFullPath_300 = INDEX_ROOT_PATH."/public/images/recipe/300/".$cover_img;
+                $image->target_path = $coverFullPath_300;
+                $image->resize(526, 0, ZEBRA_IMAGE_CROP_CENTER);
+
                 unlink($tmpFullPath);
 
                 $recipe->__set('cover_img', $cover_img);
