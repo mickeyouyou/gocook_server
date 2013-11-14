@@ -250,7 +250,7 @@ class IndexController extends BaseAbstractActionController {
 	public function androidUpdateAction()
 	{
 		return new JsonModel(array(
-               'version' => 'v10b1113',
+               'version' => 1113,
                'url' => '',
         ));
 	}
