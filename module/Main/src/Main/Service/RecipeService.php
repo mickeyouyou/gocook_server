@@ -265,7 +265,7 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
 
                 $coverFullPath_300 = INDEX_ROOT_PATH."/public/images/recipe/300/".$cover_img;
                 $image->target_path = $coverFullPath_300;
-                $image->resize(526, 0, ZEBRA_IMAGE_CROP_CENTER);
+                $image->resize(300, 0, ZEBRA_IMAGE_CROP_CENTER);
 
                 unlink($tmpFullPath);
 
@@ -314,7 +314,8 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
             $user_id = intval($authService->getIdentity()->__get('user_id'));
             $curFullPath = '';
 
-            $savedfilename = $user_id.date("_YmdHim").'.png';
+            $microSenond = floor(microtime()*10000);// 取一个毫秒级数字,4位。
+            $savedfilename = $user_id.date("_YmdHis") . $microSenond . '.png';
             $savedFullPath = INDEX_ROOT_PATH."/public/images/tmp/".$savedfilename;
             if (file_exists($savedFullPath))
                 unlink($savedFullPath);
@@ -352,7 +353,8 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
 
             $curFullPath = '';
 
-            $savedfilename = $user_id.date("_YmdHim").'.png';
+            $microSenond = floor(microtime()*10000);// 取一个毫秒级数字,4位。
+            $savedfilename = $user_id.date("_YmdHis"). $microSenond . '.png';
             $savedFullPath = INDEX_ROOT_PATH."/public/images/tmp/".$savedfilename;
             if (file_exists($savedFullPath))
                 unlink($savedFullPath);
@@ -391,13 +393,13 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
         } else {
             if ($recipe->__get('user_id') == $user_id) {
 
-                $this->entityManager->remove($recipe);
-                $this->entityManager->flush();
-
                 $comments = $comment_repository->findBy(array('recipe_id' => $recipe_id));
                 foreach ($comments as $comment){
                     $this->entityManager->remove($comment);
                 }
+                $this->entityManager->flush();
+
+                $this->entityManager->remove($recipe);
                 $this->entityManager->flush();
 
                 $result = 0;

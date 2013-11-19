@@ -33,9 +33,20 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $repository = $this->entityManager->getRepository('Main\Entity\UserCollection');
         $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
 
+        $user_info = $authService->getIdentity()->__get('user_info');
+
         $result_recipes = array();
 
         $user_id_recipe_id_s = $repository->findBy(array('user_id' => $user_id), null, $limit, $offset);
+
+        if ($user_info) {
+            $tmp_count = count($user_id_recipe_id_s);
+            if ($user_info->__get('collect_count') != $tmp_count) {
+                $user_info->__set('collect_count', $tmp_count);
+                $this->entityManager->persist($user_info);
+                $this->entityManager->flush();
+            }
+        }
 
         foreach ($user_id_recipe_id_s as $user_id_recipe_id){
             $tmp_recipe_id = $user_id_recipe_id->__get('recipe_id');
@@ -86,6 +97,19 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $tmp_recipe = $recipe_repository->findOneBy(array('recipe_id' => $collid));
         if ($tmp_recipe)
         {
+            $coll_count = $tmp_recipe->__get('collected_count') + 1;
+            $tmp_recipe->__set('collected_count', $coll_count);
+            $this->entityManager->persist($tmp_recipe);
+            $this->entityManager->flush();
+
+            $user_info = $authService->getIdentity()->__get('user_info');
+            if ($user_info) {
+                $coll_count = $user_info->__get('collect_count') + 1;
+                $user_info->__set('collect_count', $coll_count);
+                $this->entityManager->persist($user_info);
+                $this->entityManager->flush();
+            }
+
             $user_collection = new UserCollection();
             $user_collection->__set('user_id', $user_id);
             $user_collection->__set('recipe_id', $collid);
@@ -105,10 +129,34 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $user_id = $authService->getIdentity()->__get('user_id');
 
         $repository = $this->entityManager->getRepository('Main\Entity\UserCollection');
+        $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
         $relation_object = $repository->findOneBy(array('recipe_id' => $collid, 'user_id' => $user_id));
 
         if ($relation_object)
         {
+            //查找是否有该菜谱
+            $tmp_recipe = $recipe_repository->findOneBy(array('recipe_id' => $collid));
+            if ($tmp_recipe) {
+                $coll_count = $tmp_recipe->__get('collected_count') - 1;
+                if ($coll_count < 0) {
+                    $coll_count = 0;
+                }
+                $tmp_recipe->__set('collected_count', $coll_count);
+                $this->entityManager->persist($tmp_recipe);
+                $this->entityManager->flush();
+
+                $user_info = $authService->getIdentity()->__get('user_info');
+                if ($user_info) {
+                    $coll_count = $user_info->__get('collect_count') - 1;
+                    if ($coll_count < 0) {
+                        $coll_count = 0;
+                    }
+                    $user_info->__set('collect_count', $coll_count);
+                    $this->entityManager->persist($user_info);
+                    $this->entityManager->flush();
+                }
+            }
+
             $this->entityManager->remove($relation_object);
             $this->entityManager->flush();
 
@@ -135,7 +183,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 'recipe_id' => $recipe->__get('recipe_id'),
                 'name' => $recipe->__get('name'),
                 'materials' => $recipe->materials,
-                'image' => 'images/recipe/140/'.$recipe->__get('cover_img'),
+                'image' => 'images/recipe/300/'.$recipe->__get('cover_img'),
                 'dish_count' => $recipe->__get('dish_count')
             );
 

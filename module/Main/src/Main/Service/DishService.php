@@ -106,7 +106,8 @@ class DishService implements ServiceManagerAwareInterface
             $recipe->__set('recipe_id', $recipe_id);
             $recipe->__set('content', $data['content']);
 
-            $saved_filename = $recipe_id.$user_id.date("_YmdHim").'.png';
+            $microSenond = floor(microtime()*10000);// 取一个毫秒级数字,4位。
+            $saved_filename = $recipe_id.$user_id.date("_YmdHis") . $microSenond . '.png';
             $saved_fullpath = INDEX_ROOT_PATH."/public/images/dish/".$saved_filename;
             @unlink($saved_fullpath);
             $cp_result = copy($_FILES['photo_img']['tmp_name'], $saved_fullpath);

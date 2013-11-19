@@ -475,7 +475,7 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 $curFullPath = INDEX_ROOT_PATH."/public/images/avatars/".$user->__get('portrait');
             }
 
-            $saved_filename = $uid.date("_YmdHim").'.png';
+            $saved_filename = $uid.date("_YmdHis").'.png';
             $savedFullPath = INDEX_ROOT_PATH."/public/images/avatars/".$saved_filename;
             if (file_exists($savedFullPath)) {
                 unlink($savedFullPath);
