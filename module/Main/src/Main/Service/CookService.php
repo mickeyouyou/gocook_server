@@ -33,20 +33,10 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $repository = $this->entityManager->getRepository('Main\Entity\UserCollection');
         $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
 
-        $user_info = $authService->getIdentity()->__get('user_info');
 
         $result_recipes = array();
 
         $user_id_recipe_id_s = $repository->findBy(array('user_id' => $user_id), null, $limit, $offset);
-
-        if ($user_info) {
-            $tmp_count = count($user_id_recipe_id_s);
-            if ($user_info->__get('collect_count') != $tmp_count) {
-                $user_info->__set('collect_count', $tmp_count);
-                $this->entityManager->persist($user_info);
-                $this->entityManager->flush();
-            }
-        }
 
         foreach ($user_id_recipe_id_s as $user_id_recipe_id){
             $tmp_recipe_id = $user_id_recipe_id->__get('recipe_id');
@@ -66,6 +56,20 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         return $result_recipes;
     }
 
+    // 每次检测user info中的collection数目
+    public function ResetUserInfoAllCollection($coll_count)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_info = $authService->getIdentity()->__get('user_info');
+        if ($user_info) {
+            if ($user_info->__get('collect_count') != $coll_count) {
+                $user_info->__set('collect_count', $coll_count);
+                $this->entityManager->persist($user_info);
+                $this->entityManager->flush();
+            }
+        }
+    }
+
     // 获取我收藏的菜谱数
     public function  getAllMyCollCount()
     {
@@ -76,7 +80,23 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $query->setParameter(1, $user_id);
         $count = $query->getSingleScalarResult();
 
+        // 检测user info
+        $this->ResetUserInfoAllCollection($count);
+
         return $count;
+    }
+
+    // 每次检测user info中的collection数目
+    public function AddUserInfoAllCollection()
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_info = $authService->getIdentity()->__get('user_info');
+        if ($user_info) {
+            $coll_count = $user_info->__get('collect_count') + 1;
+            $user_info->__set('collect_count', $coll_count);
+            $this->entityManager->persist($user_info);
+            $this->entityManager->flush();
+        }
     }
 
     // 加入收藏菜谱
@@ -102,13 +122,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
             $this->entityManager->persist($tmp_recipe);
             $this->entityManager->flush();
 
-            $user_info = $authService->getIdentity()->__get('user_info');
-            if ($user_info) {
-                $coll_count = $user_info->__get('collect_count') + 1;
-                $user_info->__set('collect_count', $coll_count);
-                $this->entityManager->persist($user_info);
-                $this->entityManager->flush();
-            }
+            $this->AddUserInfoAllCollection();
 
             $user_collection = new UserCollection();
             $user_collection->__set('user_id', $user_id);
@@ -119,6 +133,22 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
             return GCFlag::GC_NoErrorCode;
         } else {
             return GCFlag::GC_RecipeNotExist;
+        }
+    }
+
+    // 每次检测user info中的collection数目
+    public function RemoveUserInfoAllCollection()
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_info = $authService->getIdentity()->__get('user_info');
+        if ($user_info) {
+            $coll_count = $user_info->__get('collect_count') - 1;
+            if ($coll_count < 0) {
+                $coll_count = 0;
+            }
+            $user_info->__set('collect_count', $coll_count);
+            $this->entityManager->persist($user_info);
+            $this->entityManager->flush();
         }
     }
 
@@ -145,16 +175,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 $this->entityManager->persist($tmp_recipe);
                 $this->entityManager->flush();
 
-                $user_info = $authService->getIdentity()->__get('user_info');
-                if ($user_info) {
-                    $coll_count = $user_info->__get('collect_count') - 1;
-                    if ($coll_count < 0) {
-                        $coll_count = 0;
-                    }
-                    $user_info->__set('collect_count', $coll_count);
-                    $this->entityManager->persist($user_info);
-                    $this->entityManager->flush();
-                }
+                $this->RemoveUserInfoAllCollection();
             }
 
             $this->entityManager->remove($relation_object);
@@ -164,7 +185,6 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         }
         return GCFlag::GC_NotMyCollectRecipe;
     }
-
 
     // 获取我的菜谱
     public function getMyRecipes($limit, $offset=0)
@@ -192,6 +212,21 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         return $result_recipes;
     }
 
+    // 每次检测user info中的recipe数目
+    public function ResetUserInfoAllMyRecipes($recipe_count)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_info = $authService->getIdentity()->__get('user_info');
+        if ($user_info) {
+            if ($user_info->__get('recipe_count') != $recipe_count) {
+                $user_info->__set('recipe_count', $recipe_count);
+                $this->entityManager->persist($user_info);
+                $this->entityManager->flush();
+            }
+        }
+    }
+
+    // 获取我的菜谱数
     public function getAllMyRecipesCount()
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
@@ -201,17 +236,36 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $query->setParameter(1, $user_id);
         $count = $query->getSingleScalarResult();
 
+        $this->ResetUserInfoAllMyRecipes($count);
+
         return $count;
     }
 
+    // 每次检测别人的user info中的recipe数目 ** 是否有必要？
+    public function ResetUserInfoAllUserRecipes($user_id, $recipe_count)
+    {
+        $user_repository = $this->entityManager->getRepository('User\Entity\User');
+        $user = $user_repository->findOneBy(array('user_id' => $user_id));
+        if ($user) {
+            $user_info = $user->__get('user_info');
+            if ($user_info) {
+                if ($user_info->__get('recipe_count') != $recipe_count) {
+                    $user_info->__set('recipe_count', $recipe_count);
+                    $this->entityManager->persist($user_info);
+                    $this->entityManager->flush();
+                }
+            }
+        }
+    }
+
     // 获取某人的菜谱
-    public function getUserRecipes($userid, $limit, $offset=0)
+    public function getUserRecipes($user_id, $limit, $offset=0)
     {
         $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
 
         $result_recipes = array();
 
-        $recipes = $recipe_repository->findBy(array('user_id' => $userid), null, $limit, $offset);
+        $recipes = $recipe_repository->findBy(array('user_id' => $user_id), null, $limit, $offset);
 
         foreach ($recipes as $recipe){
             $result_recipe = array(
@@ -226,12 +280,14 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         }
 
         $query = $this->entityManager->createQuery('SELECT COUNT(u.user_id) FROM Main\Entity\Recipe u WHERE u.user_id=?1');
-        $query->setParameter(1, $userid);
+        $query->setParameter(1, $user_id);
         $count = $query->getSingleScalarResult();
+
+        // 检测user info
+        $this->ResetUserInfoAllUserRecipes($user_id, $count);
 
         return array($count, $result_recipes);
     }
-
 
     // 我关注的人
     public function getMyWatch($limit, $offset=0)
@@ -269,6 +325,20 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         return $result_watches;
     }
 
+    // 每次检测user info中的following数目
+    public function ResetUserInfoAllMyFollowing($follow_count)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_info = $authService->getIdentity()->__get('user_info');
+        if ($user_info) {
+            if ($user_info->__get('following_count') != $follow_count) {
+                $user_info->__set('following_count', $follow_count);
+                $this->entityManager->persist($user_info);
+                $this->entityManager->flush();
+            }
+        }
+    }
+
     // 获取我关注的人数
     public function  getAllMyWatchCount()
     {
@@ -279,11 +349,38 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $query->setParameter(1, $user_id);
         $count = $query->getSingleScalarResult();
 
+        $this->ResetUserInfoAllMyFollowing($count);
+
         return $count;
     }
 
+    // 每次检测user info中的following数目，和对方的followed的数目
+    public function AddUserInfoAllMyFollowing($other_user_id)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_info = $authService->getIdentity()->__get('user_info');
+        if ($user_info) {
+            $coll_count = $user_info->__get('following_count') + 1;
+            $user_info->__set('following_count', $coll_count);
+            $this->entityManager->persist($user_info);
+            $this->entityManager->flush();
+        }
+
+        $user_repository = $this->entityManager->getRepository('User\Entity\User');
+        $other_user = $user_repository->findOneBy(array('user_id' => $other_user_id));
+        if ($other_user) {
+            $other_user_info = $other_user->__get('user_info');
+            if ($other_user_info) {
+                $other_count = $other_user_info->__get('followed_count') + 1;
+                $other_user_info->__set('followed_count', $other_count);
+                $this->entityManager->persist($other_user_info);
+                $this->entityManager->flush();
+            }
+        }
+    }
+
     // 关注
-    public function addMyWatch($watchid)
+    public function addMyWatch($watch_id)
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
         $user_id = $authService->getIdentity()->__get('user_id');
@@ -292,19 +389,22 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $user_repository = $this->entityManager->getRepository('User\Entity\User');
 
         //查找是否有该记录
-        $tmp_record = $repository->findOneBy(array('user_id' => $user_id, 'target_id' => $watchid));
+        $tmp_record = $repository->findOneBy(array('user_id' => $user_id, 'target_id' => $watch_id));
         if ($tmp_record)
             return GCFlag::GC_AlreadyWatchUser;
 
         //查找是否有该用户
-        $tmp_user = $user_repository->findOneBy(array('user_id' => $watchid));
+        $tmp_user = $user_repository->findOneBy(array('user_id' => $watch_id));
         if ($tmp_user)
         {
             $user_relation = new UserRelation();
             $user_relation->__set('user_id', $user_id);
-            $user_relation->__set('target_id', $watchid);
+            $user_relation->__set('target_id', $watch_id);
             $this->entityManager->persist($user_relation);
             $this->entityManager->flush();
+
+            //检测
+            $this->AddUserInfoAllMyFollowing($watch_id);
 
             return GCFlag::GC_NoErrorCode;
         } else {
@@ -312,7 +412,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         }
     }
 
-    public function isMyWatch($watchid)
+    public function isMyWatch($watch_id)
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
         $user_id = $authService->getIdentity()->__get('user_id');
@@ -320,11 +420,42 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $repository = $this->entityManager->getRepository('Main\Entity\UserRelation');
 
         //查找是否有该记录
-        $tmp_record = $repository->findOneBy(array('user_id' => $user_id, 'target_id' => $watchid));
+        $tmp_record = $repository->findOneBy(array('user_id' => $user_id, 'target_id' => $watch_id));
         if ($tmp_record)
             return GCFlag::E_IsMyWatch;
 
         return GCFlag::E_NotMyWatch;
+    }
+
+    // 每次检测user info中的following数目
+    public function RemoveUserInfoAllMyFollowing($other_user_id)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_info = $authService->getIdentity()->__get('user_info');
+        if ($user_info) {
+            $follow_count = $user_info->__get('following_count') - 1;
+            if ($follow_count < 0) {
+                $follow_count = 0;
+            }
+            $user_info->__set('following_count', $follow_count);
+            $this->entityManager->persist($user_info);
+            $this->entityManager->flush();
+        }
+
+        $user_repository = $this->entityManager->getRepository('User\Entity\User');
+        $other_user = $user_repository->findOneBy(array('user_id' => $other_user_id));
+        if ($other_user) {
+            $other_user_info = $other_user->__get('user_info');
+            if ($other_user_info) {
+                $other_count = $other_user_info->__get('followed_count') - 1;
+                if ($other_count < 0) {
+                    $other_count = 0;
+                }
+                $other_user_info->__set('followed_count', $other_count);
+                $this->entityManager->persist($other_user_info);
+                $this->entityManager->flush();
+            }
+        }
     }
 
     // 取消关注
@@ -340,6 +471,9 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         {
             $this->entityManager->remove($relation_object);
             $this->entityManager->flush();
+
+            $this->RemoveUserInfoAllMyFollowing($watchid);
+
             return GCFlag::GC_NoErrorCode;
         }
 
@@ -383,6 +517,20 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         return $result_watches;
     }
 
+    // 每次检测user info中的following数目
+    public function ResetUserInfoAllMyFollowed($follow_count)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_info = $authService->getIdentity()->__get('user_info');
+        if ($user_info) {
+            if ($user_info->__get('followed_count') != $follow_count) {
+                $user_info->__set('followed_count', $follow_count);
+                $this->entityManager->persist($user_info);
+                $this->entityManager->flush();
+            }
+        }
+    }
+
     // 获取我粉丝的数目
     public function  getAllMyFansCount()
     {
@@ -392,6 +540,8 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $query = $this->entityManager->createQuery('SELECT COUNT(u.user_id) FROM Main\Entity\UserRelation u WHERE u.target_id=?1');
         $query->setParameter(1, $user_id);
         $count = $query->getSingleScalarResult();
+
+        $this->ResetUserInfoAllMyFollowed($count);
 
         return $count;
     }
@@ -430,7 +580,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $reg_response = $reg_client->dispatch($reg_request);
 
         if ($reg_response->isSuccess()) {
-            $this->logger->info($reg_response->getBody());
+            //$this->logger->info($reg_response->getBody());
             $res_content = $reg_response->getBody();
 
             $res_json = json_decode($res_content, true); // convert into array
@@ -529,7 +679,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $reg_response = $reg_client->dispatch($reg_request);
 
         if ($reg_response->isSuccess()) {
-            $this->logger->info($reg_response->getBody());
+            //$this->logger->info($reg_response->getBody());
             $res_content = $reg_response->getBody();
 
             $res_json = json_decode($res_content, true); // convert into array
@@ -601,7 +751,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $reg_response = $reg_client->dispatch($reg_request);
 
         if ($reg_response->isSuccess()) {
-            $this->logger->info($reg_response->getBody());
+            //$this->logger->info($reg_response->getBody());
             $res_content = $reg_response->getBody();
 
             $res_json = json_decode($res_content, true); // convert into array
@@ -726,7 +876,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $reg_response = $reg_client->dispatch($reg_request);
 
         if ($reg_response->isSuccess()) {
-            $this->logger->info($reg_response->getBody());
+            //$this->logger->info($reg_response->getBody());
             $res_content = $reg_response->getBody();
 
             $res_json = json_decode($res_content, true); // convert into array
@@ -810,7 +960,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $reg_response = $reg_client->dispatch($reg_request);
 
         if ($reg_response->isSuccess()) {
-            $this->logger->info($reg_response->getBody());
+            //$this->logger->info($reg_response->getBody());
             $res_content = $reg_response->getBody();
 
             $res_json = json_decode($res_content, true); // convert into array
@@ -921,7 +1071,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $reg_response = $reg_client->dispatch($reg_request);
 
         if ($reg_response->isSuccess()) {
-            $this->logger->info($reg_response->getBody());
+            //$this->logger->info($reg_response->getBody());
             $res_content = $reg_response->getBody();
 
             $res_json = json_decode($res_content, true); // convert into array
@@ -1021,7 +1171,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $reg_response = $reg_client->dispatch($reg_request);
 
         if ($reg_response->isSuccess()) {
-            $this->logger->info($reg_response->getBody());
+            //$this->logger->info($reg_response->getBody());
             $res_content = $reg_response->getBody();
 
             $res_json = json_decode($res_content, true); // convert into array

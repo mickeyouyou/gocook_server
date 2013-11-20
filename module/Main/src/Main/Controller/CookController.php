@@ -471,7 +471,70 @@ class CookController extends BaseAbstractActionController {
 
 
     //收藏，粉丝数量，关注数量
+    public function kitchenInfoAction()
+    {
+        $request = $this->getRequest();
+        if ($this->isMobile($request))
+        {
+            $user_id = -1;
+            if ($this->params()->fromQuery('userid')&&$this->params()->fromQuery('userid')!='')
+            {
+                $user_id = intval($this->params()->fromQuery('userid'));
+            }
 
+            $order_total_count = 0;
+            $end_day = date("Y-m-d");
+            //标准时间转为时间戳
+            $end_dateline = strtotime($end_day);
+            //设定规定时间
+            $days = 3600*24*30*6; //180天
+            $start_dateline = $end_dateline - $days;
+            $start_day=date('Y-m-d',$start_dateline);
+
+            $cookService = $this->getServiceLocator()->get('cook_service');
+            $query_result = $cookService->QueryHistoryOrders($start_day, $end_day, 1, 1);
+            $result = $query_result[0];
+
+
+            if ($result == GCFlag::GC_Success){
+                // 取得数据
+                $his_orders_result = $query_result[2];
+                $order_total_count = $his_orders_result['total_count'];
+            }
+
+            $user_repository = $this->getEntityManager()->getRepository('User\Entity\User');
+            $user = $user_repository->findOneBy(array('user_id' => $user_id));
+            if ($user) {
+                $user_info = $user->__get('user_info');
+                if ($user_info) {
+                    return new JsonModel(array(
+                        'result' => GCFlag::GC_Success,
+                        'errorcode' => GCFlag::GC_NoErrorCode,
+                        'recipe_count' => $user_info->__get('recipe_count'),
+                        'collect_count' => $user_info->__get('collect_count'),
+                        'following_count' => $user_info->__get('following_count'),
+                        'followed_count' => $user_info->__get('followed_count'),
+                        'order_count' => $order_total_count,
+                    ));
+                } else {
+                    return new JsonModel(array(
+                        'result' => GCFlag::GC_Failed,
+                        'errorcode' => GCFlag::GC_AccountUserInfoError,
+                    ));
+                }
+            } else {
+                return new JsonModel(array(
+                    'result' => GCFlag::GC_Failed,
+                    'errorcode' => GCFlag::GC_AccountNotExist,
+                ));
+            }
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+            ));
+        }
+    }
 
 
     /**************************************************************
@@ -629,7 +692,7 @@ class CookController extends BaseAbstractActionController {
                     && $this->params()->fromPost('end_day') && $this->params()->fromPost('end_day')){
 
                     $start_day = trim($this->params()->fromPost('start_day'));
-                    $end_day = trim($this->params()->fromPost('start_day'));
+                    $end_day = trim($this->params()->fromPost('end_day'));
 
                     $page = 1;
                     if ($this->params()->fromPost('page')&&$this->params()->fromPost('page')!='')
@@ -640,6 +703,7 @@ class CookController extends BaseAbstractActionController {
                     }
 
                     $cookService = $this->getServiceLocator()->get('cook_service');
+
                     $query_result = $cookService->QueryHistoryOrders($start_day, $end_day, 10, $page);
 
                     $result = $query_result[0];

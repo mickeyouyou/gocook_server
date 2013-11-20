@@ -51,6 +51,7 @@ final class GCFlag {
     const GC_AvatarSizeTooSmall = 210;          // 头像文件小于1k
     const GC_NoPostAvatarFile = 211;            // 上传的post中不包含avatar
     const GC_LoginError = 212;                  // 某种情况下登录失败（需要再细化）
+    const GC_AccountUserInfoError = 213;        // user info不存在，理论上是不可能会这样的
 
     const GC_ProductInvalid = 301;              // 商品不存在或无效错误
     const GC_OrderAccountInvalid = 302;         // 订购失败,客户不存在或无效
