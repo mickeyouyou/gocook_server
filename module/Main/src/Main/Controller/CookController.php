@@ -194,6 +194,8 @@ class CookController extends BaseAbstractActionController {
                 if ($authService->hasIdentity())
                     $watch = $cookService->isMyWatch($user_id);
 
+                $user_info = $user->__get('user_info');
+
                 $result_info = array(
                     'userid' => $user_id,
                     'nickname' => $nickname,
@@ -201,9 +203,12 @@ class CookController extends BaseAbstractActionController {
                     'gender' => $gender,
                     'city' => $city,
                     'intro' => $intro,
-                    'totalrecipecount' => intval($result_array[0]),
                     'recipes' => $result_array[1],
-                    'watch' => $watch
+                    'watch' => $watch,
+					'recipe_count' => $user_info->__get('recipe_count'),
+					'collect_count' => $user_info->__get('collect_count'),
+					'following_count' => $user_info->__get('following_count'),
+					'followed_count' => $user_info->__get('followed_count'),
                 );
 
                 return new JsonModel(array(
