@@ -175,6 +175,7 @@ class CookController extends BaseAbstractActionController {
             $user = $user_repository->findOneBy(array('user_id' => $user_id));
             if ($user)
             {
+
                 $user_id = $user->__get('user_id');
                 $nickname = $user->__get('display_name');
                 $portrait = $user->__get('portrait');
@@ -191,8 +192,9 @@ class CookController extends BaseAbstractActionController {
                 $result_array = $cookService->getUserRecipes($user_id,3,0);
 
                 $watch = GCFlag::E_NotMyWatch;
-                if ($authService->hasIdentity())
+                if ($authService->hasIdentity()) {
                     $watch = $cookService->isMyWatch($user_id);
+				}
 
                 $user_info = $user->__get('user_info');
 
@@ -205,10 +207,10 @@ class CookController extends BaseAbstractActionController {
                     'intro' => $intro,
                     'recipes' => $result_array[1],
                     'watch' => $watch,
-					'recipe_count' => $user_info->__get('recipe_count'),
-					'collect_count' => $user_info->__get('collect_count'),
-					'following_count' => $user_info->__get('following_count'),
-					'followed_count' => $user_info->__get('followed_count'),
+					//'recipe_count' => $user_info->__get('recipe_count'),
+					//'collect_count' => $user_info->__get('collect_count'),
+					//'following_count' => $user_info->__get('following_count'),
+					//'followed_count' => $user_info->__get('followed_count'),
                 );
 
                 return new JsonModel(array(
