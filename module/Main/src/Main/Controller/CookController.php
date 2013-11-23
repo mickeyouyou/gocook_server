@@ -465,6 +465,7 @@ class CookController extends BaseAbstractActionController {
             return new JsonModel(array(
                 'result' => GCFlag::GC_Success,
                 'errorcode' => GCFlag::GC_NoErrorCode,
+                'cur_page' => $page,
                 'totalrecipecount' => $result_recipes[0],
                 'result_recipes' => $result_recipes[1],
             ));

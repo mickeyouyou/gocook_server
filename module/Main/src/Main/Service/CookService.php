@@ -265,14 +265,14 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
 
         $result_recipes = array();
 
-        $recipes = $recipe_repository->findBy(array('user_id' => $user_id), null, $limit, $offset);
+        $recipes = $recipe_repository->findBy(array('user_id' => $user_id), array('create_time' => 'DESC'), $limit, $offset);
 
         foreach ($recipes as $recipe){
             $result_recipe = array(
                 'recipe_id' => $recipe->__get('recipe_id'),
                 'name' => $recipe->__get('name'),
                 'materials' => $recipe->materials,
-                'image' => 'images/recipe/140/'.$recipe->__get('cover_img'),
+                'image' => 'images/recipe/300/'.$recipe->__get('cover_img'),
                 'dish_count' => $recipe->__get('dish_count')
             );
 
