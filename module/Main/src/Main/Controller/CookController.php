@@ -519,8 +519,7 @@ class CookController extends BaseAbstractActionController {
     {
         $request = $this->getRequest();
 
-        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
-        if ($this->isMobile($request) && $authService->hasIdentity())
+        if ($this->isMobile($request))
         {
             $user_id = -1;
             if ($this->params()->fromQuery('userid')&&$this->params()->fromQuery('userid')!='')
