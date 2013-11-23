@@ -207,10 +207,10 @@ class CookController extends BaseAbstractActionController {
                     'intro' => $intro,
                     'recipes' => $result_array[1],
                     'watch' => $watch,
-					//'recipe_count' => $user_info->__get('recipe_count'),
-					//'collect_count' => $user_info->__get('collect_count'),
-					//'following_count' => $user_info->__get('following_count'),
-					//'followed_count' => $user_info->__get('followed_count'),
+					'recipe_count' => $user_info->__get('recipe_count'),
+					'collect_count' => $user_info->__get('collect_count'),
+					'following_count' => $user_info->__get('following_count'),
+					'followed_count' => $user_info->__get('followed_count'),
                 );
 
                 return new JsonModel(array(
@@ -476,6 +476,88 @@ class CookController extends BaseAbstractActionController {
         }
     }
 
+    //某人的关注
+    public function userWatchAction()
+    {
+        $request = $this->getRequest();
+
+        if ($this->isMobile($request))
+        {
+            $user_id = -1;
+            if ($this->params()->fromQuery('userid')&&$this->params()->fromQuery('userid')!='')
+            {
+                $user_id = intval($this->params()->fromQuery('userid'));
+            }
+
+            $page = 1;
+            if ($this->params()->fromQuery('page')&&$this->params()->fromQuery('page')!='')
+            {
+                $page = intval($this->params()->fromQuery('page'));
+            }
+
+            $cookService = $this->getServiceLocator()->get('cook_service');
+            $myWatchUsers = $cookService->getUserWatch($user_id, 10, ($page-1)*10);
+            $watch_count = intval($cookService->getUserWatchCount($user_id));
+
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Success,
+                'errorcode' => GCFlag::GC_NoErrorCode,
+                'total' => $watch_count,
+                'cur_page' => $page,
+                'result_users' => $myWatchUsers,
+            ));
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+            ));
+        }
+    }
+
+    //某人的粉丝
+    public function userFansAction()
+    {
+        $request = $this->getRequest();
+
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if ($this->isMobile($request) && $authService->hasIdentity())
+        {
+            $user_id = -1;
+            if ($this->params()->fromQuery('userid')&&$this->params()->fromQuery('userid')!='')
+            {
+                $user_id = intval($this->params()->fromQuery('userid'));
+            }
+
+            $page = 1;
+            if ($this->params()->fromQuery('page')&&$this->params()->fromQuery('page')!='')
+            {
+                $page = intval($this->params()->fromQuery('page'));
+            }
+
+            $cookService = $this->getServiceLocator()->get('cook_service');
+            $myfans = $cookService->getUserFans($user_id, 10,($page-1)*10);
+            $fans_count = intval($cookService->getUserFansCount($user_id));
+
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Success,
+                'errorcode' => GCFlag::GC_NoErrorCode,
+                'total' => $fans_count,
+                'cur_page' => $page,
+                'result_users' => $myfans,
+            ));
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+            ));
+        }
+    }
+
 
     //收藏，粉丝数量，关注数量
     public function kitchenInfoAction()
@@ -498,15 +580,19 @@ class CookController extends BaseAbstractActionController {
             $start_dateline = $end_dateline - $days;
             $start_day=date('Y-m-d',$start_dateline);
 
-            $cookService = $this->getServiceLocator()->get('cook_service');
-            $query_result = $cookService->QueryHistoryOrders($start_day, $end_day, 1, 1);
-            $result = $query_result[0];
+            //
+            $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+            if ($authService->hasIdentity()) {
 
+                $cookService = $this->getServiceLocator()->get('cook_service');
+                $query_result = $cookService->QueryHistoryOrders($start_day, $end_day, 1, 1);
+                $result = $query_result[0];
 
-            if ($result == GCFlag::GC_Success){
-                // 取得数据
-                $his_orders_result = $query_result[2];
-                $order_total_count = $his_orders_result['total_count'];
+                if ($result == GCFlag::GC_Success){
+                    // 取得数据
+                    $his_orders_result = $query_result[2];
+                    $order_total_count = $his_orders_result['total_count'];
+                }
             }
 
             $user_repository = $this->getEntityManager()->getRepository('User\Entity\User');

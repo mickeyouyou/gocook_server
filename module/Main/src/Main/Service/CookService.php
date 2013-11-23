@@ -546,6 +546,97 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         return $count;
     }
 
+    // 某人关注的人
+    public function getUserWatch($user_id, $limit, $offset=0)
+    {
+        $repository = $this->entityManager->getRepository('Main\Entity\UserRelation');
+        $user_repository = $this->entityManager->getRepository('User\Entity\User');
+
+        $result_watches = array();
+
+        $watch_id_s = $repository->findBy(array('user_id' => $user_id), array('id' => 'DESC'), $limit, $offset);
+
+        foreach ($watch_id_s as $watch_id){
+            $tmp_id = $watch_id->__get('target_id');
+            $tmp_watch = $user_repository->findOneBy(array('user_id' => $tmp_id));
+            if ($tmp_watch) {
+
+                $avatar = $tmp_watch->__get('portrait');
+                if (!$avatar || $avatar=='')
+                    $avatar = '';
+                else
+                    $avatar = 'images/avatars/'.$avatar;
+
+                $result_watch = array(
+                    'user_id' => $tmp_watch->__get('user_id'),
+                    'name' => $tmp_watch->__get('display_name'),
+                    'portrait' => $avatar,
+                );
+
+                array_push($result_watches, $result_watch);
+            }
+        }
+        return $result_watches;
+    }
+
+    // 获取某人关注的人数
+    public function  getUserWatchCount($user_id)
+    {
+        $query = $this->entityManager->createQuery('SELECT COUNT(u.user_id) FROM Main\Entity\UserRelation u WHERE u.user_id=?1');
+        $query->setParameter(1, $user_id);
+        $count = $query->getSingleScalarResult();
+
+        $this->ResetUserInfoAllMyFollowing($count);
+
+        return $count;
+    }
+
+
+    // 某人的粉丝
+    public function getUserFans($user_id, $limit, $offset=0)
+    {
+        $repository = $this->entityManager->getRepository('Main\Entity\UserRelation');
+        $user_repository = $this->entityManager->getRepository('User\Entity\User');
+
+        $result_watches = array();
+
+        $watch_id_s = $repository->findBy(array('target_id' => $user_id), array('id' => 'DESC'), $limit, $offset);
+
+        foreach ($watch_id_s as $watch_id){
+            $tmp_id = $watch_id->__get('user_id');
+            $tmp_watch = $user_repository->findOneBy(array('user_id' => $tmp_id));
+            if ($tmp_watch) {
+
+                $avatar = $tmp_watch->__get('portrait');
+                if (!$avatar || $avatar=='')
+                    $avatar = '';
+                else
+                    $avatar = 'images/avatars/'.$avatar;
+
+                $result_watch = array(
+                    'user_id' => $tmp_watch->__get('user_id'),
+                    'name' => $tmp_watch->__get('display_name'),
+                    'portrait' => $avatar,
+                );
+
+                array_push($result_watches, $result_watch);
+            }
+        }
+        return $result_watches;
+    }
+
+    // 某人粉丝的数目
+    public function  getUserFansCount($user_id)
+    {
+        $query = $this->entityManager->createQuery('SELECT COUNT(u.user_id) FROM Main\Entity\UserRelation u WHERE u.target_id=?1');
+        $query->setParameter(1, $user_id);
+        $count = $query->getSingleScalarResult();
+
+        $this->ResetUserInfoAllMyFollowed($count);
+
+        return $count;
+    }
+
     /**************************************************************
      *
      * 查询M6商品
