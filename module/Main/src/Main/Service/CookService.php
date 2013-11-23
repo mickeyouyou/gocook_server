@@ -567,16 +567,43 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 else
                     $avatar = 'images/avatars/'.$avatar;
 
+                $recipe_count = 0;
+                $followed_count = 0;
+                $user_info = $tmp_watch->__get('user_info');
+                if ($user_info) {
+                    $recipe_count = $user_info->__get('recipe_count');
+                    $followed_count = $user_info->__get('followed_count');
+                }
+
                 $result_watch = array(
                     'user_id' => $tmp_watch->__get('user_id'),
                     'name' => $tmp_watch->__get('display_name'),
                     'portrait' => $avatar,
+                    'recipe_count' => $recipe_count,
+                    'followed_count' => $followed_count,
                 );
 
                 array_push($result_watches, $result_watch);
             }
         }
         return $result_watches;
+    }
+
+    // 每次检测user info中的following数目
+    public function ResetUserInfoUserFollowing($user_id, $follow_count)
+    {
+        $user_repository = $this->entityManager->getRepository('User\Entity\User');
+        $user = $user_repository->findOneBy(array('user_id' => $user_id));
+        if ($user) {
+            $user_info = $user->__get('user_info');
+            if ($user_info) {
+                if ($user_info->__get('following_count') != $follow_count) {
+                    $user_info->__set('following_count', $follow_count);
+                    $this->entityManager->persist($user_info);
+                    $this->entityManager->flush();
+                }
+            }
+        }
     }
 
     // 获取某人关注的人数
@@ -586,11 +613,10 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $query->setParameter(1, $user_id);
         $count = $query->getSingleScalarResult();
 
-        $this->ResetUserInfoAllMyFollowing($count);
+        $this->ResetUserInfoUserFollowing($user_id, $count);
 
         return $count;
     }
-
 
     // 某人的粉丝
     public function getUserFans($user_id, $limit, $offset=0)
@@ -613,16 +639,43 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 else
                     $avatar = 'images/avatars/'.$avatar;
 
+                $recipe_count = 0;
+                $followed_count = 0;
+                $user_info = $tmp_watch->__get('user_info');
+                if ($user_info) {
+                    $recipe_count = $user_info->__get('recipe_count');
+                    $followed_count = $user_info->__get('followed_count');
+                }
+
                 $result_watch = array(
                     'user_id' => $tmp_watch->__get('user_id'),
                     'name' => $tmp_watch->__get('display_name'),
                     'portrait' => $avatar,
+                    'recipe_count' => $recipe_count,
+                    'followed_count' => $followed_count,
                 );
 
                 array_push($result_watches, $result_watch);
             }
         }
         return $result_watches;
+    }
+
+    // 每次检测user info中的following数目
+    public function ResetUserInfoUserFollowed($user_id, $follow_count)
+    {
+        $user_repository = $this->entityManager->getRepository('User\Entity\User');
+        $user = $user_repository->findOneBy(array('user_id' => $user_id));
+        if ($user) {
+            $user_info = $user->__get('user_info');
+            if ($user_info) {
+                if ($user_info->__get('followed_count') != $follow_count) {
+                    $user_info->__set('followed_count', $follow_count);
+                    $this->entityManager->persist($user_info);
+                    $this->entityManager->flush();
+                }
+            }
+        }
     }
 
     // 某人粉丝的数目
@@ -632,7 +685,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $query->setParameter(1, $user_id);
         $count = $query->getSingleScalarResult();
 
-        $this->ResetUserInfoAllMyFollowed($count);
+        $this->ResetUserInfoUserFollowed($user_id, $count);
 
         return $count;
     }
