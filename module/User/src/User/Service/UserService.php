@@ -115,12 +115,14 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     $user->__set('tel', $mobile);
 
                     if ($name == '') {
-                        $name = 'u' . substr(md5(date("YmdHis")),8,16). '_' . $mobile;
+                        $microSecond = floor(microtime()*10000);// 取一个毫秒级数字,4位。
+                        $name = 'u' . substr(md5(date("YmdHis")),8,16). '_' . $microSecond;
                     } else {
                         $display_result = $repository->findOneBy(array('display_name' => $name));
                         if($display_result)//检查昵称重复
                         {
-                            $name = 'u' . substr(md5(date("YmdHis")),8,16). '_' . $mobile;
+                            $microSecond = floor(microtime()*10000);// 取一个毫秒级数字,4位。
+                            $name = 'u' . substr(md5(date("YmdHis")),8,16). '_' . $microSecond;
                         }
                     }
 
