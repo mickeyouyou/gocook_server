@@ -73,21 +73,65 @@ ios主页协议。分别返回收总藏数最多的菜谱的图片，最新上�
 菜谱详细内容协议。返回内容如上。其中meterials需要单独在客户端解析，结构如"A|B|C||E|"这样，材料和用量成对出现，如果无用量，也要空出位置，例如C后面要空一个，E后面要空一个。
 
 
+######我的收藏
+	protocol: mycoll?page='page'
+	return: {"result":0, "errorcode":0, "total":10, "cur_page":1, "result_recipes":[{"recipe_id":1, "name":"recipeName", "materials":"materials", "image":"url", "dish_count":10},…]}
+
+我的收藏协议。其中dish_count暂时保留。
+
+######添加收藏
+	protocol: addmycoll?collid='id'
+	return: {"result":0, "errorcode":0, "collid":10}
+	
+######取消收藏
+	protocol: delmycoll?collid='id'
+	return: {"result":0, "errorcode":0, "collid":10}	
+######查询用户信息	
+	protocol: kitchen?userid='id'
+	return: {"result":0, "errorcode":0", "result_kitchen_info":{"userid":1, "nickname":"nickName", "avatar":"url", "gender":0, "city":"City", "intro":"Intro", "recipes":[],"watch":1, "recipe_count":0, "collect_count":0, "following_count":0, "followed_count":0}}
+
+其中recipes字段是android使用的，包含最多三个菜谱用来显示
+
+######我的关注 (deprecated)
+	protocol: mywatch?page='page'
+	return: {"result":0, "errorcode":0, "total":10, "cur_page":1, "result_users":[{"user_id":1, "name":"userName", "portrait":"url", "recipe_count":0, "following_count":0},…]}
+
+######添加关注
+	protocol: watch?watchid='id'
+	return: {"result":0, "errorcode":0, "watchid":10}
+	
+######取消关注
+	protocol: unwatch?watchid='id'
+	return: {"result":0, "errorcode":0, "watchid":10}
+
+######我的粉丝 (deprecated)
+	protocol: myfans?page='page'
+	return: {"result":0, "errorcode":0, "total":10, "cur_page":1, "result_users":[{"user_id":1, "name":"userName", "portrait":"url", "recipe_count":0, "followed_count":0},…]}
+
+######我的菜谱列表 (deprecated)
+	protocol: myrecipes?page='page'
+	return: {"result":0, "errorcode":0, "total":10, "cur_page":1, "result_recipes":[{"recipe_id":1, "name":"recipeName", "materials":"materials", "image":"url", "dish_count":10},…]}
+	
+######某人的菜谱列表
+	protocol: usersrecipes?userid='userid'&page='page'
+	return: {"result":0, "errorcode":0, "totalrecipecount":10, "cur_page":1, "result_recipes":[{"recipe_id":1, "name":"recipeName", "materials":"materials", "image":"url", "dish_count":10},…]}
+	
+######某人的关注
+	protocol: user_watch?userid='userid'&page='page'
+	return: {"result":0, "errorcode":0, "total":10, "cur_page":1, "result_users":[{"user_id":1, "name":"userName", "portrait":"url", "recipe_count":0, "following_count":0},…]}
+	
+######某人的粉丝
+	protocol: user_fans?userid='userid'&page='page'
+	return: {"result":0, "errorcode":0, "total":10, "cur_page":1, "result_users":[{"user_id":1, "name":"userName", "portrait":"url", "recipe_count":0, "followed_count":0},…]}
+	
+######收藏，粉丝数量，关注数量，购买数量
+	protocol: kitchen_info?userid='userid'
+	return: {"result":0, "errorcode":0, "recipe_count":10, "collect_count":1, "following_count":1, "followed_count":1, "order_count":1}
+	
+<br />
 <br />
 ###跟甲方服务器交互相关协议
 ------------
-
-
-
-
-
-
-
-
-
-
-
-
 
 ######登录
 
