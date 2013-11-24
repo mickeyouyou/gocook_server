@@ -313,10 +313,20 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 else
                     $avatar = 'images/avatars/'.$avatar;
 
+                $recipe_count = 0;
+                $following_count = 0;
+                $user_info = $tmp_watch->__get('user_info');
+                if ($user_info) {
+                    $recipe_count = $user_info->__get('recipe_count');
+                    $following_count = $user_info->__get('following_count');
+                }
+
                 $result_watch = array(
                     'user_id' => $tmp_watch->__get('user_id'),
                     'name' => $tmp_watch->__get('display_name'),
                     'portrait' => $avatar,
+                    'recipe_count' => $recipe_count,
+                    'following_count' => $following_count,
                 );
 
                 array_push($result_watches, $result_watch);
@@ -505,10 +515,20 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 else
                     $avatar = 'images/avatars/'.$avatar;
 
+                $recipe_count = 0;
+                $followed_count = 0;
+                $user_info = $tmp_watch->__get('user_info');
+                if ($user_info) {
+                    $recipe_count = $user_info->__get('recipe_count');
+                    $followed_count = $user_info->__get('followed_count');
+                }
+
                 $result_watch = array(
                     'user_id' => $tmp_watch->__get('user_id'),
                     'name' => $tmp_watch->__get('display_name'),
                     'portrait' => $avatar,
+                    'recipe_count' => $recipe_count,
+                    'followed_count' => $followed_count,
                 );
 
                 array_push($result_watches, $result_watch);
@@ -517,7 +537,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         return $result_watches;
     }
 
-    // 每次检测user info中的following数目
+    // 每次检测user info中的followed数目
     public function ResetUserInfoAllMyFollowed($follow_count)
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
@@ -568,11 +588,11 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     $avatar = 'images/avatars/'.$avatar;
 
                 $recipe_count = 0;
-                $followed_count = 0;
+                $following_count = 0;
                 $user_info = $tmp_watch->__get('user_info');
                 if ($user_info) {
                     $recipe_count = $user_info->__get('recipe_count');
-                    $followed_count = $user_info->__get('followed_count');
+                    $following_count = $user_info->__get('following_count');
                 }
 
                 $result_watch = array(
@@ -580,7 +600,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     'name' => $tmp_watch->__get('display_name'),
                     'portrait' => $avatar,
                     'recipe_count' => $recipe_count,
-                    'followed_count' => $followed_count,
+                    'following_count' => $following_count,
                 );
 
                 array_push($result_watches, $result_watch);
@@ -661,7 +681,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         return $result_watches;
     }
 
-    // 每次检测user info中的following数目
+    // 每次检测user info中的followed数目
     public function ResetUserInfoUserFollowed($user_id, $follow_count)
     {
         $user_repository = $this->entityManager->getRepository('User\Entity\User');
