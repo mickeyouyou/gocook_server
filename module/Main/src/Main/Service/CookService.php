@@ -315,10 +315,12 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
 
                 $recipe_count = 0;
                 $following_count = 0;
+                $followed_count = 0;
                 $user_info = $tmp_watch->__get('user_info');
                 if ($user_info) {
                     $recipe_count = $user_info->__get('recipe_count');
                     $following_count = $user_info->__get('following_count');
+                    $followed_count = $user_info->__get('followed_count');
                 }
 
                 $result_watch = array(
@@ -327,6 +329,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     'portrait' => $avatar,
                     'recipe_count' => $recipe_count,
                     'following_count' => $following_count,
+                    'followed_count' => $followed_count,
                 );
 
                 array_push($result_watches, $result_watch);
@@ -517,9 +520,11 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
 
                 $recipe_count = 0;
                 $followed_count = 0;
+                $following_count = 0;
                 $user_info = $tmp_watch->__get('user_info');
                 if ($user_info) {
                     $recipe_count = $user_info->__get('recipe_count');
+                    $following_count = $user_info->__get('following_count');
                     $followed_count = $user_info->__get('followed_count');
                 }
 
@@ -529,6 +534,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     'portrait' => $avatar,
                     'recipe_count' => $recipe_count,
                     'followed_count' => $followed_count,
+                    'following_count' => $following_count
                 );
 
                 array_push($result_watches, $result_watch);
@@ -589,10 +595,12 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
 
                 $recipe_count = 0;
                 $following_count = 0;
+                $followed_count = 0;
                 $user_info = $tmp_watch->__get('user_info');
                 if ($user_info) {
                     $recipe_count = $user_info->__get('recipe_count');
                     $following_count = $user_info->__get('following_count');
+                    $followed_count = $user_info->__get('followed_count');
                 }
 
                 $result_watch = array(
@@ -601,6 +609,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     'portrait' => $avatar,
                     'recipe_count' => $recipe_count,
                     'following_count' => $following_count,
+                    'followed_count' => $followed_count,
                 );
 
                 array_push($result_watches, $result_watch);
@@ -661,10 +670,12 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
 
                 $recipe_count = 0;
                 $followed_count = 0;
+                $following_count = 0;
                 $user_info = $tmp_watch->__get('user_info');
                 if ($user_info) {
                     $recipe_count = $user_info->__get('recipe_count');
                     $followed_count = $user_info->__get('followed_count');
+                    $following_count = $user_info->__get('following_count');
                 }
 
                 $result_watch = array(
@@ -673,6 +684,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     'portrait' => $avatar,
                     'recipe_count' => $recipe_count,
                     'followed_count' => $followed_count,
+                    'following_count' => $following_count,
                 );
 
                 array_push($result_watches, $result_watch);
