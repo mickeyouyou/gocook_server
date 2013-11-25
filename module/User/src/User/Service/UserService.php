@@ -114,17 +114,17 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     $user->__set('password', '1');
                     $user->__set('tel', $mobile);
 
-                    if ($name == '') {
-                        $microSecond = floor(microtime()*10000);// 取一个毫秒级数字,4位。
-                        $name = 'u' . substr(md5(date("YmdHis")),8,16). '_' . $microSecond;
-                    } else {
-                        $display_result = $repository->findOneBy(array('display_name' => $name));
-                        if($display_result)//检查昵称重复
-                        {
-                            $microSecond = floor(microtime()*10000);// 取一个毫秒级数字,4位。
-                            $name = 'u' . substr(md5(date("YmdHis")),8,16). '_' . $microSecond;
-                        }
+                    // if ($name == '') {
+                    $microSecond = floor(microtime()*10000);// 取一个毫秒级数字,4位。
+                    $name = '用户' . substr(md5(date("YmdHis")),8,16) . $microSecond;
+                    //} else {
+                    $display_result = $repository->findOneBy(array('display_name' => $name));
+                    if($display_result)//检查昵称重复
+                    {
+                         $microSecond = floor(microtime()*10000);// 取一个毫秒级数字,4位。
+                         $name = $name . '_' . $microSecond;
                     }
+                    //}
 
                     $user->__set('display_name', $name);
                     $user->__set('register_time', new \DateTime());
