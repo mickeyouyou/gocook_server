@@ -63,6 +63,8 @@ final class GCFlag {
     const GC_AlreadyCollectRecipe = 404;        // 已经收藏该菜谱
     const GC_NotMyCollectRecipe = 405;          // 该菜谱本人未收藏
     const GC_CommentOnRecipeFailed = 406;       // 评论失败
+    const GC_AlreadyLikedRecipe = 407;          // 已经赞过该菜谱
+    const GC_NotLikedRecipe = 408;              // 该菜谱本人未赞过
 
     const GC_AlreadyWatchUser = 501;            // 已经关注过此用户
     const GC_NotMyWatchUser = 502;              // 并未关注此用户

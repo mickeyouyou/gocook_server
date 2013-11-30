@@ -156,6 +156,143 @@ class CookController extends BaseAbstractActionController {
         }
     }
 
+
+    //我的赞
+    public function myLikeAction()
+    {
+        $request = $this->getRequest();
+
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if ($this->isMobile($request) && $authService->hasIdentity())
+        {
+            $page = 1;
+            if ($this->params()->fromQuery('page')&&$this->params()->fromQuery('page')!='')
+            {
+                $page = intval($this->params()->fromQuery('page'));
+                if ($page < 1)
+                    $page = 1;
+            }
+
+            $cookService = $this->getServiceLocator()->get('cook_service');
+            $collect_recipes = $cookService->getMyLike(10,($page-1)*10);
+            $collect_count = intval($cookService->getAllMyLikeCount());
+
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Success,
+                'errorcode' => GCFlag::GC_NoErrorCode,
+                'total' => $collect_count,
+                'cur_page' => $page,
+                'result_recipes' => $collect_recipes,
+            ));
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+            ));
+        }
+    }
+
+    //添加赞
+    public function likeAction()
+    {
+        $request = $this->getRequest();
+
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if ($this->isMobile($request) && $authService->hasIdentity())
+        {
+            $like_id = -1;
+            if ($this->params()->fromQuery('likeid')&&$this->params()->fromQuery('likeid')!='')
+            {
+                $like_id = intval($this->params()->fromQuery('likeid'));
+                if ($like_id < 1)
+                    $like_id = 1;
+            }
+
+            $cookService = $this->getServiceLocator()->get('cook_service');
+            $error_result = $cookService->addLike($like_id);
+
+            if ($error_result == GCFlag::GC_NoErrorCode)
+            {
+                return new JsonModel(array(
+                    'result' => GCFlag::GC_Success,
+                    'errorcode' => $error_result,
+                    'likeid' => $like_id,
+                ));
+            }
+            else
+            {
+                return new JsonModel(array(
+                    'result' => GCFlag::GC_Failed,
+                    'errorcode' => $error_result,
+                    'likeid' => -1,
+                ));
+            }
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+                'likeid' => -1,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+                'likeid' => -1,
+            ));
+        }
+    }
+
+    //取消赞
+    public function unlikeAction()
+    {
+        $request = $this->getRequest();
+
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if ($this->isMobile($request) && $authService->hasIdentity())
+        {
+            $like_id = -1;
+            if ($this->params()->fromQuery('likeid')&&$this->params()->fromQuery('likeid')!='')
+            {
+                $like_id = intval($this->params()->fromQuery('likeid'));
+                if ($like_id < 1)
+                    $like_id = 1;
+            }
+
+            $cookService = $this->getServiceLocator()->get('cook_service');
+            $code_result = $cookService->removeLike($like_id);
+            if ($code_result == GCFlag::GC_NoErrorCode) {
+                return new JsonModel(array(
+                    'result' => GCFlag::GC_Success,
+                    'errorcode' => $code_result,
+                    'collid' => $like_id,
+                ));
+            } else {
+                return new JsonModel(array(
+                    'result' => GCFlag::GC_Failed,
+                    'errorcode' => $code_result,
+                    'collid' => -1,
+                ));
+            }
+        } else if (!$this->isMobile($request)){
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_NoMobileDevice,
+                'collid' => -1,
+            ));
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_AuthAccountInvalid,
+                'collid' => -1,
+            ));
+        }
+    }
+
     //查询用户信息
     public function kitchenAction()
     {

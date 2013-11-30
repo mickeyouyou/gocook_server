@@ -6,6 +6,7 @@ use App\Lib\Common;
 use App\Lib\CommonDef;
 use App\Lib\M6Flag;
 use App\Lib\GCFlag;
+use Main\Entity\UserLike;
 use Zend\Form\Form;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\ServiceManager\ServiceManager;
@@ -185,6 +186,121 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         }
         return GCFlag::GC_NotMyCollectRecipe;
     }
+
+
+
+    // 获取赞的菜谱
+    public function getMyLike($limit, $offset=0)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_id = $authService->getIdentity()->__get('user_id');
+
+        $repository = $this->entityManager->getRepository('Main\Entity\UserLike');
+        $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
+
+
+        $result_recipes = array();
+
+        $user_id_recipe_id_s = $repository->findBy(array('user_id' => $user_id), null, $limit, $offset);
+
+        foreach ($user_id_recipe_id_s as $user_id_recipe_id){
+            $tmp_recipe_id = $user_id_recipe_id->__get('recipe_id');
+            $tmp_recipe = $recipe_repository->findOneBy(array('recipe_id' => $tmp_recipe_id));
+            if ($tmp_recipe) {
+                $result_recipe = array(
+                    'recipe_id' => $tmp_recipe->__get('recipe_id'),
+                    'name' => $tmp_recipe->__get('name'),
+                    'materials' => $tmp_recipe->materials,
+                    'image' => 'images/recipe/140/'.$tmp_recipe->__get('cover_img'),
+                    'dish_count' => $tmp_recipe->__get('dish_count')
+                );
+
+                array_push($result_recipes, $result_recipe);
+            }
+        }
+        return $result_recipes;
+    }
+
+    // 获取赞的菜谱总数
+    public function  getAllMyLikeCount()
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_id = $authService->getIdentity()->__get('user_id');
+
+        $query = $this->entityManager->createQuery('SELECT COUNT(u.user_id) FROM Main\Entity\UserLike u WHERE u.user_id=?1');
+        $query->setParameter(1, $user_id);
+        $count = $query->getSingleScalarResult();
+
+        return $count;
+    }
+
+    // 赞一个菜谱
+    public function addLike($like_id)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_id = $authService->getIdentity()->__get('user_id');
+
+        $repository = $this->entityManager->getRepository('Main\Entity\UserLike');
+        $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
+
+        //查找是否有该记录
+        $tmp_record = $repository->findOneBy(array('user_id' => $user_id, 'recipe_id' => $like_id));
+        if ($tmp_record)
+            return GCFlag::GC_AlreadyLikedRecipe;
+
+        //查找是否有该菜谱
+        $tmp_recipe = $recipe_repository->findOneBy(array('recipe_id' => $like_id));
+        if ($tmp_recipe)
+        {
+            $coll_count = $tmp_recipe->__get('like_count') + 1;
+            $tmp_recipe->__set('like_count', $coll_count);
+            $this->entityManager->persist($tmp_recipe);
+            $this->entityManager->flush();
+
+            $user_like = new UserLike();
+            $user_like->__set('user_id', $user_id);
+            $user_like->__set('recipe_id', $like_id);
+            $this->entityManager->persist($user_like);
+            $this->entityManager->flush();
+
+            return GCFlag::GC_NoErrorCode;
+        } else {
+            return GCFlag::GC_RecipeNotExist;
+        }
+    }
+
+    // 取消赞一个菜谱
+    public function removeLike($collid)
+    {
+        $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
+        $user_id = $authService->getIdentity()->__get('user_id');
+
+        $repository = $this->entityManager->getRepository('Main\Entity\UserLike');
+        $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
+        $relation_object = $repository->findOneBy(array('recipe_id' => $collid, 'user_id' => $user_id));
+
+        if ($relation_object)
+        {
+            //查找是否有该菜谱
+            $tmp_recipe = $recipe_repository->findOneBy(array('recipe_id' => $collid));
+            if ($tmp_recipe) {
+                $like_count = $tmp_recipe->__get('like_count') - 1;
+                if ($like_count < 0) {
+                    $like_count = 0;
+                }
+                $tmp_recipe->__set('like_count', $like_count);
+                $this->entityManager->persist($tmp_recipe);
+                $this->entityManager->flush();
+            }
+
+            $this->entityManager->remove($relation_object);
+            $this->entityManager->flush();
+
+            return GCFlag::GC_NoErrorCode;
+        }
+        return GCFlag::GC_NotLikedRecipe;
+    }
+
 
     // 获取我的菜谱
     public function getMyRecipes($limit, $offset=0)
