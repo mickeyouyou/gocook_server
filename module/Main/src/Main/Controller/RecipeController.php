@@ -35,6 +35,7 @@ class RecipeController extends BaseAbstractActionController {
         {
             $repository = $this->getEntityManager()->getRepository('Main\Entity\Recipe');
             $collect_repository = $this->getEntityManager()->getRepository('Main\Entity\UserCollection');
+            $like_repository = $this->getEntityManager()->getRepository('Main\Entity\UserLike');
             $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
             if ($request->isGet() && $this->params()->fromQuery('id')!='') {
 
@@ -52,6 +53,18 @@ class RecipeController extends BaseAbstractActionController {
                     }
                 }
 
+                //查找赞状态
+                $like  = GCFlag::E_UnLiked;
+                if ($authService->hasIdentity())
+                {
+                    $user_id = $authService->getIdentity()->__get('user_id');
+                    $user_like = $like_repository->findOneBy(array('user_id'=>$user_id, 'recipe_id' => $recipe_id));
+                    if ($user_like)
+                    {
+                        $like = GCFlag::E_Liked;
+                    }
+                }
+
                 if ($recipe)
                 {
                     $steps_array = Json::decode($recipe->recipe_steps, Json::TYPE_ARRAY);
@@ -66,6 +79,7 @@ class RecipeController extends BaseAbstractActionController {
                             'recipe_name' => $recipe->name,
                             'intro' => $recipe->description,
                             'collected_count' => $recipe->collected_count,
+                            'like_count' => $recipe->like_count,
                             'dish_count' => $recipe->dish_count,
                             'comment_count' => $recipe->comment_count,
                             'cover_image' => 'images/recipe/526/'.$recipe->__get('cover_img'),
@@ -73,6 +87,7 @@ class RecipeController extends BaseAbstractActionController {
                             'steps' => $steps_array['steps'],
                             'tips' => $recipe->tips,
                             'collect' => $collect,
+                            'like' => $like,
                         ),
                     ));
                 } else {

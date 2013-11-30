@@ -269,26 +269,26 @@ class CookController extends BaseAbstractActionController {
                 return new JsonModel(array(
                     'result' => GCFlag::GC_Success,
                     'errorcode' => $code_result,
-                    'collid' => $like_id,
+                    'likeid' => $like_id,
                 ));
             } else {
                 return new JsonModel(array(
                     'result' => GCFlag::GC_Failed,
                     'errorcode' => $code_result,
-                    'collid' => -1,
+                    'likeid' => -1,
                 ));
             }
         } else if (!$this->isMobile($request)){
             return new JsonModel(array(
                 'result' => GCFlag::GC_Failed,
                 'errorcode' => GCFlag::GC_NoMobileDevice,
-                'collid' => -1,
+                'likeid' => -1,
             ));
         } else {
             return new JsonModel(array(
                 'result' => GCFlag::GC_Failed,
                 'errorcode' => GCFlag::GC_AuthAccountInvalid,
-                'collid' => -1,
+                'likeid' => -1,
             ));
         }
     }

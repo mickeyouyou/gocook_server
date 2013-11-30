@@ -18,6 +18,10 @@ final class GCFlag {
     const E_IsCollected = 0;                    // 已经收藏
     const E_NotCollected = 1;                   // 未收藏
 
+    // like
+    const E_Liked = 0;                          // 赞
+    const E_UnLiked = 1;                        // 未赞
+
     // has delay the sales                      // 是否延期成功
     const E_IsDelayed = 0;                      // 延期成功
     const E_NotDelayed = 1;                     // 延期未成功

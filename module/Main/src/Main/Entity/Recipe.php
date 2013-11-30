@@ -20,6 +20,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @property string $name
  * @property text $desc
  * @property integer $collected_count
+ * @property integer $like_count
  * @property integer $dish_count
  * @property integer $comment_count
  * @property integer $browser_count
@@ -81,6 +82,11 @@ class Recipe
      * @ORM\Column(type="integer")
      */
     protected $collected_count;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    protected $like_count;
 
     /**
      * @ORM\Column(type="integer")

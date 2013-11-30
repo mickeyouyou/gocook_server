@@ -21,3 +21,25 @@ CREATE TABLE `user_like` (
 
 
 alter table recipe add like_count int(11) after collected_count;
+alter table recipe modify collected_count int(11) default 0;
+alter table recipe modify like_count int(11) default 0;
+alter table recipe modify dish_count int(11) default 0;
+alter table recipe modify comment_count int(11) default 0;
+alter table recipe modify browse_count int(11) default 0;
+
+
+alter table user_info modify collect_count int(11) default 0;
+alter table user_info modify dish_count int(11) default 0;
+alter table user_info modify recipe_count int(11) default 0;
+alter table user_info modify following_count int(11) default 0;
+alter table user_info modify followed_count int(11) default 0;
+
+alter table user_relation modify state smallint(1) default 0;
+alter table user_favor modify state smallint(1) default 0;
+alter table user_comment modify state smallint(1) default 0;
+alter table recipe_comment modify state smallint(1) default 0;
+
+alter table user modify age smallint(6) default 0;
+alter table user modify gender smallint(1) default 0;
+alter table user modify state smallint(1) default 0;
+alter table user modify user_type smallint(1) default 0;
