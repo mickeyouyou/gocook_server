@@ -68,9 +68,9 @@ ios主页协议。分别返回收总藏数最多的菜谱的图片，最新上�
 ######菜谱详细内容
 
 	protocol: recipe?id='id'
-	return: {"result":0, "result_recipe":[{"recipe_id":1, "author_id":1, "author_name":"authorName", "recipe_name":"recipeName", "intro" => "Intro", "collected_count":1, "dish_count":1, "comment_count":1, "cover_image":"image-url", "materials":"Meterials", "steps":[{"no":1,"content":"Content", "img":"img-url"}…], "tips":"Tips"}…]}
+	return: {"result":0, "result_recipe":[{"recipe_id":1, "author_id":1, "author_name":"authorName", "recipe_name":"recipeName", "intro" => "Intro", "collected_count":1, "like_count":1,"dish_count":1, "comment_count":1, "cover_image":"image-url", "materials":"Meterials", "steps":[{"no":1,"content":"Content", "img":"img-url"}…], "tips":"Tips"}…], collect, like}
 	
-菜谱详细内容协议。返回内容如上。其中meterials需要单独在客户端解析，结构如"A|B|C||E|"这样，材料和用量成对出现，如果无用量，也要空出位置，例如C后面要空一个，E后面要空一个。
+菜谱详细内容协议。返回内容如上。其中meterials需要单独在客户端解析，结构如"A|B|C||E|"这样，材料和用量成对出现，如果无用量，也要空出位置，例如C后面要空一个，E后面要空一个。collect代表是否收藏，like代表是否点赞，两个都是用0表示true，用1表示false。
 
 
 ######我的收藏
@@ -85,7 +85,24 @@ ios主页协议。分别返回收总藏数最多的菜谱的图片，最新上�
 	
 ######取消收藏
 	protocol: delmycoll?collid='id'
-	return: {"result":0, "errorcode":0, "collid":10}	
+	return: {"result":0, "errorcode":0, "collid":10}
+	
+	
+######我赞过的菜谱
+	protocol: my_like?page='page'
+	return: {"result":0, "errorcode":0, "total":10, "cur_page":1, "result_recipes":[{"recipe_id":1, "name":"recipeName", "materials":"materials", "image":"url", "dish_count":10},…]}
+
+我的赞协议。其中dish_count暂时保留。
+
+
+######菜谱添加赞
+	protocol: like?likeid='id'
+	return: {"result":0, "errorcode":0, "likeid":10}
+	
+######菜谱取消赞
+	protocol: unlike?likeid='id'
+	return: {"result":0, "errorcode":0, "likeid":10}	
+	
 ######查询用户信息	
 	protocol: kitchen?userid='id'
 	return: {"result":0, "errorcode":0", "result_kitchen_info":{"userid":1, "nickname":"nickName", "avatar":"url", "gender":0, "city":"City", "intro":"Intro", "recipes":[],"watch":1, "recipe_count":0, "collect_count":0, "following_count":0, "followed_count":0}}
