@@ -98,10 +98,13 @@ ios主页协议。分别返回收总藏数最多的菜谱的图片，最新上�
 ######菜谱添加赞
 	protocol: like?likeid='id'
 	return: {"result":0, "errorcode":0, "likeid":10}
+GC_AlreadyLikedRecipe = 407,          // 已经赞过该菜谱
 	
 ######菜谱取消赞
 	protocol: unlike?likeid='id'
-	return: {"result":0, "errorcode":0, "likeid":10}	
+	return: {"result":0, "errorcode":0, "likeid":10}
+GC_NotLikedRecipe = 408,                // 该菜谱本人未赞过
+
 	
 ######查询用户信息	
 	protocol: kitchen?userid='id'
