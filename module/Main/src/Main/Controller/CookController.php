@@ -927,7 +927,7 @@ class CookController extends BaseAbstractActionController {
                     $page = 1;
                     if ($this->params()->fromPost('page')&&$this->params()->fromPost('page')!='')
                     {
-                        $page = intval($this->params()->fromQuery('page'));
+                        $page = intval($this->params()->fromPost('page'));
                         if ($page < 1)
                             $page = 1;
                     }

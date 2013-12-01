@@ -154,19 +154,19 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
     }
 
     // 删除收藏菜谱
-    public function delMyCollection($collid)
+    public function delMyCollection($coll_id)
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
         $user_id = $authService->getIdentity()->__get('user_id');
 
         $repository = $this->entityManager->getRepository('Main\Entity\UserCollection');
         $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
-        $relation_object = $repository->findOneBy(array('recipe_id' => $collid, 'user_id' => $user_id));
+        $relation_object = $repository->findOneBy(array('recipe_id' => $coll_id, 'user_id' => $user_id));
 
         if ($relation_object)
         {
             //查找是否有该菜谱
-            $tmp_recipe = $recipe_repository->findOneBy(array('recipe_id' => $collid));
+            $tmp_recipe = $recipe_repository->findOneBy(array('recipe_id' => $coll_id));
             if ($tmp_recipe) {
                 $coll_count = $tmp_recipe->__get('collected_count') - 1;
                 if ($coll_count < 0) {
@@ -270,19 +270,19 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
     }
 
     // 取消赞一个菜谱
-    public function removeLike($collid)
+    public function removeLike($like_id)
     {
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
         $user_id = $authService->getIdentity()->__get('user_id');
 
         $repository = $this->entityManager->getRepository('Main\Entity\UserLike');
         $recipe_repository = $this->entityManager->getRepository('Main\Entity\Recipe');
-        $relation_object = $repository->findOneBy(array('recipe_id' => $collid, 'user_id' => $user_id));
+        $relation_object = $repository->findOneBy(array('recipe_id' => $like_id, 'user_id' => $user_id));
 
         if ($relation_object)
         {
             //查找是否有该菜谱
-            $tmp_recipe = $recipe_repository->findOneBy(array('recipe_id' => $collid));
+            $tmp_recipe = $recipe_repository->findOneBy(array('recipe_id' => $like_id));
             if ($tmp_recipe) {
                 $like_count = $tmp_recipe->__get('like_count') - 1;
                 if ($like_count < 0) {
