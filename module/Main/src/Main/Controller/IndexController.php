@@ -220,7 +220,7 @@ class IndexController extends BaseAbstractActionController {
                         'name' => $recipe->__get('name'),
                         'image' => 'images/recipe/140/'.$recipe->__get('cover_img'),
                         'materials' => $recipe->materials,
-                        'dish_count' => $recipe->__get('dish_count')
+                        'collected_count' => $recipe->__get('collected_count')
                     );
 
                     array_push($result_recipes, $result_recipe);

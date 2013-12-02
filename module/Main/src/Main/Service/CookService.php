@@ -48,7 +48,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     'name' => $tmp_recipe->__get('name'),
                     'materials' => $tmp_recipe->materials,
                     'image' => 'images/recipe/140/'.$tmp_recipe->__get('cover_img'),
-                    'dish_count' => $tmp_recipe->__get('dish_count')
+                    'collected_count' => $tmp_recipe->__get('collected_count')
                 );
 
                 array_push($result_recipes, $result_recipe);
@@ -212,7 +212,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     'name' => $tmp_recipe->__get('name'),
                     'materials' => $tmp_recipe->materials,
                     'image' => 'images/recipe/140/'.$tmp_recipe->__get('cover_img'),
-                    'dish_count' => $tmp_recipe->__get('dish_count')
+                    'collected_count' => $tmp_recipe->__get('collected_count')
                 );
 
                 array_push($result_recipes, $result_recipe);
@@ -320,7 +320,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 'name' => $recipe->__get('name'),
                 'materials' => $recipe->materials,
                 'image' => 'images/recipe/300/'.$recipe->__get('cover_img'),
-                'dish_count' => $recipe->__get('dish_count')
+                'collected_count' => $recipe->__get('collected_count')
             );
 
             array_push($result_recipes, $result_recipe);
@@ -389,7 +389,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                 'name' => $recipe->__get('name'),
                 'materials' => $recipe->materials,
                 'image' => 'images/recipe/300/'.$recipe->__get('cover_img'),
-                'dish_count' => $recipe->__get('dish_count')
+                'collected_count' => $recipe->__get('collected_count')
             );
 
             array_push($result_recipes, $result_recipe);
