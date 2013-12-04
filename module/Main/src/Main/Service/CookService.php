@@ -1284,6 +1284,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     $row['ctime'] = $res_row['ctime'];
                     $row['val'] = $res_row['val'];
                     $row['wid'] = $res_row['wid'];
+                    $row['isused'] = $res_row['isused'];
 
                     array_push($row_array, $row);
                 }
@@ -1503,6 +1504,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
                         $row['ctime'] = $res_row['ctime'];
                         $row['val'] = $res_row['val'];
                         $row['wid'] = $res_row['wid'];
+                        $row['isused'] = $res_row['isused'];
 
                         array_push($row_array, $row);
                     }
