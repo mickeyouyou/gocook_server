@@ -170,7 +170,7 @@ class RecipeController extends BaseAbstractActionController {
                 $page = intval($this->params()->fromQuery('page'));
             }
 
-            $recipes = $recipeService->getTopCollectedRecipes(10, ($page - 1)*10);
+            $recipes = $recipeService->getTopLikeRecipes(10, ($page - 1)*10);
 
             $result_recipes = array();
             foreach ($recipes as $recipe){

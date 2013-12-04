@@ -160,7 +160,7 @@ class IndexController extends BaseAbstractActionController {
             $topnew_img = 'images/recipe/140/265058.1.jpg';
 
             $recipeService = $this->getServiceLocator()->get('recipe_service');
-            $topRecipe = $recipeService->getTopCollectedRecipe();
+            $topRecipe = $recipeService->getTopLikeRecipe();
             $tophot_img = 'images/recipe/140/'.$topRecipe->cover_img;
 
             $recommend_items = array();

@@ -25,17 +25,17 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
     protected $logger;
 
     // 获取收藏次数最多的一个菜谱
-    public function getTopCollectedRecipe()
+    public function getTopLikeRecipe()
     {
-        $recipes = $this->entityManager->getRepository('Main\Entity\Recipe')->getRecipesByCollectedCount(1,0);
+        $recipes = $this->entityManager->getRepository('Main\Entity\Recipe')->getRecipesByLikeCount(1,0);
         $top_recipe = $recipes[0];
         return $top_recipe;
     }
 
     // 获取收藏次数最多的菜谱
-    public function getTopCollectedRecipes($limit, $offset=0)
+    public function getTopLikeRecipes($limit, $offset=0)
     {
-        $recipes = $this->entityManager->getRepository('Main\Entity\Recipe')->getRecipesByCollectedCount($limit,$offset);
+        $recipes = $this->entityManager->getRepository('Main\Entity\Recipe')->getRecipesByLikeCount($limit,$offset);
         return $recipes;
     }
 

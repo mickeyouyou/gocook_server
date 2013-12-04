@@ -20,12 +20,12 @@ class RecipeRepository extends EntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function getRecipesByCollectedCount($limit, $offset)
+    public function getRecipesByLikeCount($limit, $offset)
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('r')
             ->from('Main\Entity\Recipe', 'r')
-            ->add('orderBy', 'r.collected_count DESC')
+            ->add('orderBy', 'r.like_count DESC')
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
