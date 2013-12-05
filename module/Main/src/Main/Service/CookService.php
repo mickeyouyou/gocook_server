@@ -18,6 +18,7 @@ use Zend\Log\LoggerAwareInterface;
 use Zend\Log\LoggerInterface;
 use Zend\Http\Request;
 use Zend\Http\Client;
+use Zend\Http\Client\Adapter\Exception\RuntimeException;
 
 class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
 {
@@ -1037,83 +1038,89 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $reg_client->setAdapter('Zend\Http\Client\Adapter\Curl');
         $reg_client->setOptions(array(
             'maxredirects' => 0,
-            'timeout'      => 30
+            'timeout'      => 20,
         ));
 
-        $reg_response = $reg_client->dispatch($reg_request);
+        try {
+            $reg_response = $reg_client->dispatch($reg_request);
+            if ($reg_response->isSuccess()) {
+                //$this->logger->info($reg_response->getBody());
+                $res_content = $reg_response->getBody();
 
-        if ($reg_response->isSuccess()) {
-            //$this->logger->info($reg_response->getBody());
-            $res_content = $reg_response->getBody();
+                $res_json = json_decode($res_content, true); // convert into array
 
-            $res_json = json_decode($res_content, true); // convert into array
+                if (intval($res_json['Flag']) == M6Flag::M6FLAG_Success) {
 
-            if (intval($res_json['Flag']) == M6Flag::M6FLAG_Success) {
+                    $data_json = json_decode($res_json['Data'], true);
 
-                $data_json = json_decode($res_json['Data'], true);
+                    $page_index = $data_json['PageIndex'] + 1;
+                    $page_rows = $data_json['PageRows'];
+                    $total_count = $data_json['TotalCount'];
+                    $row_array = array();
 
-                $page_index = $data_json['PageIndex'] + 1;
-                $page_rows = $data_json['PageRows'];
-                $total_count = $data_json['TotalCount'];
-                $row_array = array();
+                    //如果和传过去的page不同的话，那么返回0个
+                    if ($page_index < $page) {
+                        $page_index = $page;
+                    } else {
+                        foreach ($data_json['Rows'] as $res_row) {
+                            $row = array();
+                            $row['id'] = intval($res_row['Id']);
+                            $row['cust_name'] = $res_row['CustName'];
+                            $row['code'] = $res_row['Code'];
+                            $row['delivery_type'] = $res_row['DeliveryType'];
+                            $row['delivery_time_type'] = $res_row['DeliveryTimeType'];
+                            $row['recv_mobile'] = $res_row['RecvMobile'];
+                            $row['cost'] = $res_row['Cost'];
+                            $row['create_time'] = $res_row['CreateTime'];
 
-                //如果和传过去的page不同的话，那么返回0个
-                if ($page_index < $page) {
-                    $page_index = $page;
-                } else {
-                    foreach ($data_json['Rows'] as $res_row) {
-                        $row = array();
-                        $row['id'] = intval($res_row['Id']);
-                        $row['cust_name'] = $res_row['CustName'];
-                        $row['code'] = $res_row['Code'];
-                        $row['delivery_type'] = $res_row['DeliveryType'];
-                        $row['delivery_time_type'] = $res_row['DeliveryTimeType'];
-                        $row['recv_mobile'] = $res_row['RecvMobile'];
-                        $row['cost'] = $res_row['Cost'];
-                        $row['create_time'] = $res_row['CreateTime'];
+                            $row['order_wares'] = array();
+                            foreach ($res_row['OrderWares'] as $ware_item) {
+                                $order_ware = array();
+                                $order_ware['id'] = intval($ware_item['Id']);
+                                $order_ware['name'] = $ware_item['Name'];
+                                $order_ware['code'] = $ware_item['Code'];
+                                $order_ware['remark'] = $ware_item['Remark'];
+                                $order_ware['norm'] = $ware_item['Norm'];
+                                $order_ware['unit'] = $ware_item['Unit'];
+                                $order_ware['price'] = $ware_item['Price'];
+                                $order_ware['image_url'] = $ware_item['ImageUrl'];
+                                $order_ware['deal_method'] = $ware_item['DealMethod'];
+                                $order_ware['quantity'] = $ware_item['Quantity'];
+                                $order_ware['cost'] = $ware_item['Cost'];
+                                array_push($row['order_wares'],$order_ware);
+                            }
 
-                        $row['order_wares'] = array();
-                        foreach ($res_row['OrderWares'] as $ware_item) {
-                            $order_ware = array();
-                            $order_ware['id'] = intval($ware_item['Id']);
-                            $order_ware['name'] = $ware_item['Name'];
-                            $order_ware['code'] = $ware_item['Code'];
-                            $order_ware['remark'] = $ware_item['Remark'];
-                            $order_ware['norm'] = $ware_item['Norm'];
-                            $order_ware['unit'] = $ware_item['Unit'];
-                            $order_ware['price'] = $ware_item['Price'];
-                            $order_ware['image_url'] = $ware_item['ImageUrl'];
-                            $order_ware['deal_method'] = $ware_item['DealMethod'];
-                            $order_ware['quantity'] = $ware_item['Quantity'];
-                            $order_ware['cost'] = $ware_item['Cost'];
-                            array_push($row['order_wares'],$order_ware);
+                            array_push($row_array,$row);
                         }
-
-                        array_push($row_array,$row);
                     }
+
+                    $ware_order_array = array();
+                    $ware_order_array['page'] = $page_index;
+                    $ware_order_array['total_count'] = $total_count;
+                    $ware_order_array['orders'] = $row_array;
+
+                    //返回成功
+                    $result = GCFlag::GC_Success;
+                    $error_code = GCFlag::GC_NoErrorCode;
+                    return array($result,$error_code,$ware_order_array);
+
+                } else if (intval($res_json['Flag']) == M6Flag::M6FLAG_Product_Invalid){
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_ProductInvalid;
+                    return array($result,$error_code);
+                } else {
+                    $result = GCFlag::GC_Failed;
+                    $error_code = GCFlag::GC_M6ServerError; // M6服务器返回结果
+                    return array($result,$error_code);
                 }
-                
-                $ware_order_array = array();
-                $ware_order_array['page'] = $page_index;
-                $ware_order_array['total_count'] = $total_count;
-                $ware_order_array['orders'] = $row_array;
 
-                //返回成功
-                $result = GCFlag::GC_Success;
-                $error_code = GCFlag::GC_NoErrorCode;
-                return array($result,$error_code,$ware_order_array);
-
-            } else if (intval($res_json['Flag']) == M6Flag::M6FLAG_Product_Invalid){
-                $result = GCFlag::GC_Failed;
-                $error_code = GCFlag::GC_ProductInvalid;
-                return array($result,$error_code);
             } else {
+                // 甲方服务器4XX，5XX
                 $result = GCFlag::GC_Failed;
-                $error_code = GCFlag::GC_M6ServerError; // M6服务器返回结果
-                return array($result,$error_code);
+                $error_code = GCFlag::GC_M6ServerConnError;
+                return array($result, $error_code);
             }
-
-        } else {
+        } catch (RuntimeException $e) {
             // 甲方服务器4XX，5XX
             $result = GCFlag::GC_Failed;
             $error_code = GCFlag::GC_M6ServerConnError;
