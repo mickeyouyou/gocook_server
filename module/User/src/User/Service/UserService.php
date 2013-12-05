@@ -559,8 +559,18 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
 
         if (isset($data['nickname']) && $data['nickname']!='')
         {
-            if ($user->__get('display_name') != $data['nickname']) {
-                $display_result = $repository->findOneBy(array('display_name' => $data['nickname']));
+            // 判断是否符合规则
+            $nickname = trim($data['nickname']);
+            $this->logger->info($nickname);
+
+            if (!preg_match('/^[0-9a-zA-Z_\x{4e00}-\x{9fa5}]{2,30}$/u', $nickname)) {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_NickNameInvalid;
+                return array($result, $error_code);
+            }
+
+            if ($user->__get('display_name') != $nickname) {
+                $display_result = $repository->findOneBy(array('display_name' => $nickname));
                 if ($display_result)
                 {
                     $result = GCFlag::GC_Failed;
@@ -568,7 +578,7 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
                     return array($result, $error_code);
                 }
 
-                $user->__set('display_name', $data['nickname']);
+                $user->__set('display_name', $nickname);
                 $is_data_changed = true;
             }
         }
@@ -581,7 +591,8 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
 
         if (isset($data['age']) && $data['age']!='')
         {
-            $user->__set('age', $data['age']);
+            $age = intval($data['age']);
+            $user->__set('age', $age);
             $is_data_changed = true;
         }
 

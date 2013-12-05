@@ -15,12 +15,12 @@ class ChangeUserInfoFilter extends InputFilter {
             'filters' => array(
                 array('name' => 'StringTrim'),
             ),
-            'validators' => array(
-                array(
-                    'name' => 'StringLength',
-                    'options' => array( 'min' => 4 ),
-                ),
-            ),
+//            'validators' => array(
+//                array(
+//                    'name' => 'StringLength',
+//                    'options' => array( 'min' => 0 ),
+//                ),
+//            ),
         ));
 
         $this->add(array(
@@ -48,15 +48,15 @@ class ChangeUserInfoFilter extends InputFilter {
             'filters' => array(
                 array('name' => 'Int'),
             ),
-            'validators' => array(
-                array(
-                    'name' => 'Between',
-                    'options' => array(
-                        'min' => 1,
-                        'max' => 100,
-                    ),
-                ),
-            ),
+//            'validators' => array(
+//                array(
+//                    'name' => 'Between',
+//                    'options' => array(
+//                        'min' => 1,
+//                        'max' => 100,
+//                    ),
+//                ),
+//            ),
         ));
 
         $this->add(array(
@@ -69,7 +69,7 @@ class ChangeUserInfoFilter extends InputFilter {
             'validators' => array(
                 array(
                     'name' => 'StringLength',
-                    'options' => array( 'min' => 1 ),
+                    'options' => array( 'min' => 0 ),
                 ),
             ),
         ));
@@ -84,7 +84,7 @@ class ChangeUserInfoFilter extends InputFilter {
             'validators' => array(
                 array(
                     'name' => 'StringLength',
-                    'options' => array( 'min' => 1 ),
+                    'options' => array( 'min' => 0 ),
                 ),
             ),
         ));
@@ -99,7 +99,7 @@ class ChangeUserInfoFilter extends InputFilter {
             'validators' => array(
                 array(
                     'name' => 'StringLength',
-                    'options' => array( 'min' => 1 ),
+                    'options' => array( 'min' => 0 ),
                 ),
             ),
         ));
@@ -111,12 +111,12 @@ class ChangeUserInfoFilter extends InputFilter {
             'filters' => array(
                 array('name' => 'StringTrim'),
             ),
-            'validators' => array(
-                array(
-                    'name' => 'StringLength',
-                    'options' => array( 'min' => 8 ),
-                ),
-            ),
+//            'validators' => array(
+//                array(
+//                    'name' => 'StringLength',
+//                    'options' => array( 'min' => 8 ),
+//                ),
+//            ),
         ));
 
 
@@ -127,12 +127,12 @@ class ChangeUserInfoFilter extends InputFilter {
             'filters' => array(
                 array('name' => 'StringTrim'),
             ),
-            'validators' => array(
-                array(
-                    'name' => 'StringLength',
-                    'options' => array( 'min' => 2 ),
-                ),
-            ),
+//            'validators' => array(
+//                array(
+//                    'name' => 'StringLength',
+//                    'options' => array( 'min' => 2 ),
+//                ),
+//            ),
         ));
     }
 
