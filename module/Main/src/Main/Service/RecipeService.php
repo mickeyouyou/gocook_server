@@ -2,6 +2,7 @@
 
 namespace Main\Service;
 
+use App\Lib\GCFlag;
 use Main\Entity\RecipeComment;
 use Zend\Authentication\AuthenticationService;
 use Zend\Form\Form;
@@ -121,20 +122,28 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
         {
             if ($recipe->__get('user_id') != $user_id)
             {
-                $result = 1;
-                $error_code = 402;
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_RecipeNotBelong2U;
                 return array($result, $error_code);
             }
         }
 
         if (isset($data['name']) && $data['name']!='')
         {
-            $recipe->__set('name', $data['name']);
+            // 判断是否符合规则,2013,2014为破折号
+            $name = trim($data['name']);
+            if (!preg_match('/^[0-9a-zA-Z_\-\x{4e00}-\x{9fa5}\x{ff01}-\x{ff5e}\x{2014}\x{2013}]{2,30}$/u', $name)) {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_RecipeNameInvalid;
+                return array($result, $error_code);
+            }
+
+            $recipe->__set('name', $name);
         }
         else if ($is_create)
         {
-            $result = 1;
-            $error_code = 404;
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_RecipeNameInvalid;
             return array($result, $error_code);
         }
 
@@ -151,20 +160,22 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
         if (isset($data['materials']) && $data['materials']!='')
         {
             //检查meterials
-            $materials = $data['materials'];
+            $materials = trim($data['materials']);
+            $materials = str_replace(' ', '', $materials);
+
             $mate_array = explode('|', $materials);
             if (count($mate_array)%2 != 0)
             {
-                $result = 1;
-                $error_code = 405;
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_RecipeMaterialInvalid;
                 return array($result, $error_code);
             }
             $recipe->__set('materials', $data['materials']);
         }
         else if ($is_create)
         {
-            $result = 1;
-            $error_code = 406;
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_RecipeMaterialInvalid;
             return array($result, $error_code);
         }
 
@@ -227,8 +238,8 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
         }
         else if ($is_create)
         {
-            $result = 1;
-            $error_code = 407;
+            $result = GCFlag::GC_Failed;
+            $error_code = GCFlag::GC_RecipeStepInvalid;
             return array($result, $error_code);
         }
 
@@ -284,8 +295,8 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
         {
             if ($is_create)//如果是新创建，并且没有图片的话，则创建失败
             {
-                $result = 1;
-                $error_code = 409;
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_RecipeCoverInvalid;
                 return array($result, $error_code);
             }
         }
@@ -388,8 +399,8 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
 
         $recipe = $recipe_repository->findOneBy(array('recipe_id' => $recipe_id));
         if ($recipe == null) {
-            $result = 1;
-            $errorcode = 401;
+            $result = GCFlag::GC_Failed;
+            $errorcode = GCFlag::GC_RecipeNotExist;
         } else {
             if ($recipe->__get('user_id') == $user_id) {
 
@@ -405,8 +416,8 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
                 $result = 0;
                 $errorcode = 0;
             } else {
-                $result = 1;
-                $errorcode = 402;
+                $result = GCFlag::GC_Failed;
+                $errorcode = GCFlag::GC_RecipeNotBelong2U;
             }
         }
 

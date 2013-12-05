@@ -71,6 +71,11 @@ final class GCFlag {
     const GC_AlreadyLikedRecipe = 407;          // 已经赞过该菜谱
     const GC_NotLikedRecipe = 408;              // 该菜谱本人未赞过
 
+    const GC_RecipeNameInvalid = 409;           // 菜谱名不合法或者为空
+    const GC_RecipeMaterialInvalid = 410;       // 菜谱材料不合法或者为空
+    const GC_RecipeStepInvalid = 410;           // 菜谱步骤不合法或者为空
+    const GC_RecipeCoverInvalid = 410;          // 菜谱封面不合法或者为空
+
     const GC_AlreadyWatchUser = 501;            // 已经关注过此用户
     const GC_NotMyWatchUser = 502;              // 并未关注此用户
 
