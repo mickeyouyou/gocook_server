@@ -301,6 +301,13 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
             }
         }
 
+        $recipe->__set('collected_count', 0);
+        $recipe->__set('like_count', 0);
+        $recipe->__set('dish_count', 0);
+        $recipe->__set('comment_count', 0);
+        $recipe->__set('browse_count', 0);
+
+
         $this->entityManager->persist($recipe);
         $this->entityManager->flush();
         $result = 0;
