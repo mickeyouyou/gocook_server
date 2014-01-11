@@ -43,7 +43,9 @@
         <div class="no">
             <span><?php echo $step['no']?></span>
         </div>
-        <img class="step_img_img" src="<?php echo $step['img']?>"/>
+        <?php if ($step['img'] == '') {?>
+        <img class="step_img_img" src="<?php echo '/images/recipe/step/' . $step['img']?>"/>
+        <?php }?>
         <div class="step_content">
             <span><?php echo $step['content']?></span>
         </div>
