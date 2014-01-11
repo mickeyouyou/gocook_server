@@ -1,0 +1,173 @@
+body {
+    background:url('../images/share/bg.png') left top repeat ;
+    position:relative;
+    width:480px;
+    margin-left:auto;
+    margin-right:auto;
+}
+#banner {
+    height:160px;
+    background-image: url('../images/share/u0.png');
+    margin-bottom: 10px;
+
+}
+#logo {
+    position:absolute;
+    left:10px;
+    top:20px;
+    width:120px;
+    height:120px;
+}
+#logo_img {
+    position:absolute;
+    width:120px;
+    height:120px;
+    border: 0;
+}
+#u4{
+    position:absolute;
+    left:277px;
+    top:38px;
+    width:193px;
+    height:62px;
+    font-family:'微软雅黑 Bold', '微软雅黑';
+    font-size:48px;
+    color: #000;
+    text-decoration: none;
+}
+
+#u6 {
+    position:absolute;
+    left:316px;
+    top:102px;
+    width:154px;
+    height:31px;
+    font-family:'微软雅黑 Bold', '微软雅黑';
+    font-weight:700;
+    font-size:24px;
+    color:#6BAE2A;
+    text-decoration: none;
+}
+
+#u8 {
+    position:absolute;
+    left:140px;
+    top:25px;
+    text-decoration: none;
+    width:133px;
+    height:110px;
+    font-family:'Arial Normal', 'Arial';
+    font-weight:400;
+    font-size:96px;
+    color:#6BAE2A;
+}
+
+#content {
+    width:480px;
+    height:auto;
+    font-family:'微软雅黑 Regular', '微软雅黑';
+    font-size:30px;
+    background-image: url('../images/share/u10.png');
+}
+.cover {
+    width:480px;
+    height:320px;
+}
+.cover_img {
+    position:absolute;
+    width:480px;
+    height:320px;
+}
+/*菜谱名称*/
+#title {
+    width:440px;
+    height:52px;
+    text-align: center;
+    font-family:'微软雅黑 Regular', '微软雅黑';
+    font-weight:400;
+    font-size:40px;
+    color:#000;
+}
+#author {
+    text-align: right;
+    width:350px;
+    height:39px;
+    font-family:'微软雅黑 Regular', '微软雅黑';
+    font-size:30px;
+    color:#949494;
+}
+
+#decription {
+    margin-left: 20px;
+    width:81px;
+    height:52px;
+    font-family:'微软雅黑 Regular', '微软雅黑';
+    font-weight:400;
+    font-size:40px;
+    color:#000000;
+}
+
+#intro {
+    margin-left: 30px;
+    margin-bottom: 10px;
+    height:auto;
+    font-family:'微软雅黑 Regular', '微软雅黑';
+    font-size:30px;
+    color:#666666;
+}
+#material {
+    margin-left:20px;
+    margin-bottom: 10px;
+    font-size: 40px;
+}
+#material p{
+    margin:0px;
+}
+#material span{
+    font-size: 30px;
+    color: #999999;
+    display: inline-block;
+    width:205px;
+    overflow: hidden;
+}
+.m_line {
+    margin:0px;
+    background-color: #999999;
+    width: 428px;
+    height: 2px;
+}
+#steps {
+    height:auto;
+    font-family:'微软雅黑 Regular', '微软雅黑';
+    font-weight:400;
+    font-size:40px;
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+.no {
+    margin-left: 20px;
+    width:28px;
+    height:57px;
+    font-family:'Arial Normal', 'Arial';
+    font-weight:400;
+    font-size:48px;
+    color:#6BAE2A;
+}
+.step_img_img {
+    margin-top: -50px;
+    margin-left: 60px;
+    width:320px;
+    height:240px;
+}
+.step_content {
+    width:440px;
+    font-size:30px;
+    color:#666666;
+    margin-bottom: 20px;
+}
+#tips{
+    font-weight: 400;
+    font-size: 40px;
+    margin-bottom: 10px;
+    margin-left: 20px;
+}
