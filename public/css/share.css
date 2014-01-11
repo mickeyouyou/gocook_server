@@ -81,7 +81,7 @@ body {
 /*菜谱名称*/
 #title {
     width:440px;
-    height:52px;
+    margin-left: 20px;
     text-align: center;
     font-family:'微软雅黑 Regular', '微软雅黑';
     font-weight:400;
@@ -100,7 +100,6 @@ body {
 #decription {
     margin-left: 20px;
     width:81px;
-    height:52px;
     font-family:'微软雅黑 Regular', '微软雅黑';
     font-weight:400;
     font-size:40px;
@@ -109,6 +108,7 @@ body {
 
 #intro {
     margin-left: 30px;
+    width: 420px;
     margin-bottom: 10px;
     height:auto;
     font-family:'微软雅黑 Regular', '微软雅黑';
@@ -170,4 +170,5 @@ body {
     font-size: 40px;
     margin-bottom: 10px;
     margin-left: 20px;
+    width: 440px;
 }
