@@ -23,7 +23,7 @@
     <div id="title" ><span><?php echo $this->result_array['recipe_name']?></span></div>
     <div id="author"><span>by <?php echo $this->result_array['author_name']?></span></div>
     <div id="decription"><span>简介</span></div>
-    <div id="intro"><span><?php echo $this->result_array['intro']?></span></div>
+    <div id="intro"><span> <?php echo str_replace("\n", "<br/>", $this->result_array['intro'])?></span></div>
     <div id="material">
         <p>用料</p>
         <?php
