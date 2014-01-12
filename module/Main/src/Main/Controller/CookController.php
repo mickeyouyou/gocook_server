@@ -1287,7 +1287,7 @@ class CookController extends BaseAbstractActionController {
             if ($res_json == null) {
                 $result = GCFlag::GC_Failed;
                 $error_code = GCFlag::GC_LoginError;
-                return new ViewModel(array($result, $error_code));
+                return new JsonModel(array($result, $error_code));
             }
 
             $res_json['rurl'] = 'http://o2o.m6fresh.com/ws/mobile_myorders.aspx';
@@ -1302,6 +1302,10 @@ class CookController extends BaseAbstractActionController {
 
             return $this->redirect()->toUrl($orders_url);
         }
+
+        $result = GCFlag::GC_Failed;
+        $error_code = GCFlag::GC_LoginError;
+        return new JsonModel(array($result, $error_code));
     }
 
     /**************************************************************
@@ -1348,7 +1352,7 @@ class CookController extends BaseAbstractActionController {
             if ($res_json == null) {
                 $result = GCFlag::GC_Failed;
                 $error_code = GCFlag::GC_LoginError;
-                return new ViewModel(array($result, $error_code));
+                return new JsonModel(array($result, $error_code));
             }
 
             $res_json['rurl'] = 'http://o2o.m6fresh.com/ws/mobile_myorder0.aspx?code=' . $order_id;
@@ -1363,6 +1367,10 @@ class CookController extends BaseAbstractActionController {
 
             return $this->redirect()->toUrl($orders_url);
         }
+
+        $result = GCFlag::GC_Failed;
+        $error_code = GCFlag::GC_LoginError;
+        return new JsonModel(array($result, $error_code));
     }
 
     /*************Others****************/
