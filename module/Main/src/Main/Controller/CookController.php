@@ -12,7 +12,9 @@ use App\Controller\BaseAbstractActionController;
 use Zend\View\Model\JsonModel;
 use App\Lib\Cryptogram;
 use App\Lib\CommonDef;
-
+use Zend\Http\Request;
+use Zend\Http\Client;
+use Zend\Http\Header\SetCookie;
 class CookController extends BaseAbstractActionController {
 
     /**
@@ -1286,7 +1288,7 @@ class CookController extends BaseAbstractActionController {
             // if extract error, just return
             if ($res_json == null) {
                 $result = GCFlag::GC_Failed;
-                $error_code = GCFlag::GC_LoginError;
+                $error_code = GCFlag::GC_M6ServerError;
                 return new JsonModel(array($result, $error_code));
             }
 
@@ -1299,7 +1301,6 @@ class CookController extends BaseAbstractActionController {
             $encrypt_str = str_replace("+", "%2B", $encrypt_str);
 
             $orders_url = 'http://o2o.m6fresh.com/ws/mobile_reg.aspx?auth=' . $encrypt_str;
-
             return $this->redirect()->toUrl($orders_url);
         }
 
@@ -1371,6 +1372,56 @@ class CookController extends BaseAbstractActionController {
         $result = GCFlag::GC_Failed;
         $error_code = GCFlag::GC_LoginError;
         return new JsonModel(array($result, $error_code));
+    }
+
+
+    /**************************************************************
+     *
+     * 拿到授权
+     * url: cook/my_auth
+     * @get  page
+     * @access public
+     *
+     *************************************************************/
+    public function myAuthAction()
+    {
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if($authService->hasIdentity()) {
+            $data = $authService->getIdentity()->__get('msix_access_token');
+            $request = new Request();
+            $request->setUri('http://o2o.m6fresh.com/ws/mobile_reg.aspx');
+            $request->setMethod('GET');
+            $request->getQuery()->set('auth', $data);
+
+            $client = new Client();
+            $client->setAdapter('Zend\Http\Client\Adapter\Curl');
+            $client->setOptions(array(
+                'maxredirects' => 1,
+                'timeout'      => 30
+            ));
+            $response = $client->dispatch($request);
+            if ($response->isSuccess()) {
+                $cookie = $client->getCookies();
+                $first = current($cookie);
+
+                return new JsonModel(array(
+                    'result' => GCFlag::GC_Success,
+                    'errorcode' => GCFlag::GC_NoErrorCode,
+                    'name' => $first->getName(),
+                    'value' => $first->getValue(),
+                ));
+            } else {
+                return new JsonModel(array(
+                    'result' => GCFlag::GC_Failed,
+                    'errorcode' => GCFlag::GC_LoginError,
+                ));
+            }
+        } else {
+            return new JsonModel(array(
+                'result' => GCFlag::GC_Failed,
+                'errorcode' => GCFlag::GC_LoginError,
+            ));
+        }
     }
 
     /*************Others****************/
