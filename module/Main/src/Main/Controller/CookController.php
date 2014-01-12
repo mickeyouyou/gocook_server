@@ -11,7 +11,7 @@ use App\Lib\GCFlag;
 use App\Controller\BaseAbstractActionController;
 use Zend\View\Model\JsonModel;
 use App\Lib\Cryptogram;
-use Zend\View\Model\ViewModel;
+use App\Lib\CommonDef;
 
 class CookController extends BaseAbstractActionController {
 
