@@ -100,6 +100,12 @@ class UserService implements ServiceManagerAwareInterface, LoggerAwareInterface
                         $authNamespace = new Container(Session::NAMESPACE_DEFAULT);
                         $authNamespace->getManager()->rememberMe(60 * 60 * 24 * 7);
 
+                        // 保存token
+                        $user = $repository->findOneBy(array('msix_id' => $msix_id));
+                        $user->__set('msix_access_token', $data);
+                        $this->entityManager->persist($user);
+                        $this->entityManager->flush();
+
                         $result = GCFlag::GC_Success;
                         $error_code = GCFlag::GC_NoErrorCode;
                         return array($result, $error_code);

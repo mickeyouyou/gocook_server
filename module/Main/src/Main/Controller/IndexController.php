@@ -39,6 +39,52 @@ class IndexController extends BaseAbstractActionController {
     }
   
     public function indexAction() {
+
+//        $data = '1TkjQGsDZ4RCbYFmDK3prXnQGYlmtbXeZHoa6inc5YUwVUfBOul0j5FWX/vG+apOv+xE7HFv5hKskCBN/9gmDnpKQnMPN9/y7ntV5bHYoZhlbH+0lFu+pJZ/U0dvb3MbXaxxj9Cax8n7USEN0eDci3BDMOKU4GGQT+kzZ3fgoL6AVA6pLVxqs9ZcIC8G5R+B';
+//
+//        echo $data;
+//
+//        echo "\n\n\n";
+//
+//        // 解析
+//        $key = md5(CommonDef::APP_KEY, true);
+//        $real_key = $key . "\0\0\0\0\0\0\0\0";
+//
+//        $iv = md5(CommonDef::APP_IV, true);
+//        $real_iv = "\0\0\0\0\0\0\0\0";
+//        for ($i = 0; $i < 8; $i++)
+//        {
+//            $real_iv[$i] = chr(abs(ord($iv[$i]) - ord($iv[$i+1])));
+//        }
+//
+//        $content = base64_decode($data);
+//        $json_str = Cryptogram::decryptByTDES($content, $real_key, $real_iv);
+//
+//        $res_json = json_decode($json_str, true); // convert into array
+//
+//        // if extract error, just return
+//        if ($res_json == null) {
+//            $result = GCFlag::GC_Failed;
+//            $error_code = GCFlag::GC_LoginError;
+//            return new ViewModel(array($result, $error_code));
+//        }
+//
+//        $order_id = '2014011200002';
+//        $res_json['rurl'] = 'http://o2o.m6fresh.com/ws/mobile_myorder0.aspx?code=' . $order_id;
+//        $res_str = json_encode($res_json);
+//
+//        // 加密
+//        $encrypt_str = Cryptogram::encryptByTDES($res_str, $real_key, $real_iv);
+//        $encrypt_str = base64_encode($encrypt_str);
+//        $encrypt_str = str_replace("+", "%2B", $encrypt_str);
+//
+//        $orders_url = 'http://o2o.m6fresh.com/ws/mobile_reg.aspx?auth=' . $encrypt_str;
+//
+//        return $this->redirect()->toUrl($orders_url);
+//
+//        echo "\n\n\n";
+
+
         $result = new JsonModel(array(
 	        'some_parameter' => 'some value',
             'success'=>true,

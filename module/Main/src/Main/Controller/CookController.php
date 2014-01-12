@@ -10,7 +10,8 @@ namespace Main\Controller;
 use App\Lib\GCFlag;
 use App\Controller\BaseAbstractActionController;
 use Zend\View\Model\JsonModel;
-
+use App\Lib\Cryptogram;
+use Zend\View\Model\ViewModel;
 
 class CookController extends BaseAbstractActionController {
 
@@ -1249,6 +1250,121 @@ class CookController extends BaseAbstractActionController {
             ));
         }
     }
+
+
+    /**************************************************************
+     *
+     * 访问所有订单
+     * url: cook/my_orders
+     * @get  page
+     * @access public
+     *
+     *************************************************************/
+    public function myOrdersAction()
+    {
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if($authService->hasIdentity()) {
+
+            $data = $authService->getIdentity()->__get('msix_access_token');
+
+            // 解析
+            $key = md5(CommonDef::APP_KEY, true);
+            $real_key = $key . "\0\0\0\0\0\0\0\0";
+
+            $iv = md5(CommonDef::APP_IV, true);
+            $real_iv = "\0\0\0\0\0\0\0\0";
+            for ($i = 0; $i < 8; $i++)
+            {
+                $real_iv[$i] = chr(abs(ord($iv[$i]) - ord($iv[$i+1])));
+            }
+
+            $content = base64_decode($data);
+            $json_str = Cryptogram::decryptByTDES($content, $real_key, $real_iv);
+
+            $res_json = json_decode($json_str, true); // convert into array
+
+            // if extract error, just return
+            if ($res_json == null) {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_LoginError;
+                return new ViewModel(array($result, $error_code));
+            }
+
+            $res_json['rurl'] = 'http://o2o.m6fresh.com/ws/mobile_myorders.aspx';
+            $res_str = json_encode($res_json);
+
+            // 加密
+            $encrypt_str = Cryptogram::encryptByTDES($res_str, $real_key, $real_iv);
+            $encrypt_str = base64_encode($encrypt_str);
+            $encrypt_str = str_replace("+", "%2B", $encrypt_str);
+
+            $orders_url = 'http://o2o.m6fresh.com/ws/mobile_reg.aspx?auth=' . $encrypt_str;
+
+            return $this->redirect()->toUrl($orders_url);
+        }
+    }
+
+    /**************************************************************
+     *
+     * 访问一个订单
+     * url: cook/my_order
+     * @get  page
+     * @access public
+     *
+     *************************************************************/
+    public function myOrderAction()
+    {
+        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
+        if($authService->hasIdentity()) {
+
+            $order_id = '0';
+            if ($this->params()->fromQuery('id')&&$this->params()->fromQuery('id')!='')
+            {
+                $order_id = $this->params()->fromQuery('order_id');
+                if (is_int($order_id)) {
+                    $order_id = strval($order_id);
+                }
+            }
+
+            $data = $authService->getIdentity()->__get('msix_access_token');
+
+            // 解析
+            $key = md5(CommonDef::APP_KEY, true);
+            $real_key = $key . "\0\0\0\0\0\0\0\0";
+
+            $iv = md5(CommonDef::APP_IV, true);
+            $real_iv = "\0\0\0\0\0\0\0\0";
+            for ($i = 0; $i < 8; $i++)
+            {
+                $real_iv[$i] = chr(abs(ord($iv[$i]) - ord($iv[$i+1])));
+            }
+
+            $content = base64_decode($data);
+            $json_str = Cryptogram::decryptByTDES($content, $real_key, $real_iv);
+
+            $res_json = json_decode($json_str, true); // convert into array
+
+            // if extract error, just return
+            if ($res_json == null) {
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_LoginError;
+                return new ViewModel(array($result, $error_code));
+            }
+
+            $res_json['rurl'] = 'http://o2o.m6fresh.com/ws/mobile_myorder0.aspx?code=' . $order_id;
+            $res_str = json_encode($res_json);
+
+            // 加密
+            $encrypt_str = Cryptogram::encryptByTDES($res_str, $real_key, $real_iv);
+            $encrypt_str = base64_encode($encrypt_str);
+            $encrypt_str = str_replace("+", "%2B", $encrypt_str);
+
+            $orders_url = 'http://o2o.m6fresh.com/ws/mobile_reg.aspx?auth=' . $encrypt_str;
+
+            return $this->redirect()->toUrl($orders_url);
+        }
+    }
+
     /*************Others****************/
     public function setEntityManager(EntityManager $em)
     {
