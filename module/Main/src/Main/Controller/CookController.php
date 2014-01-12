@@ -1320,7 +1320,7 @@ class CookController extends BaseAbstractActionController {
             $order_id = '0';
             if ($this->params()->fromQuery('id')&&$this->params()->fromQuery('id')!='')
             {
-                $order_id = $this->params()->fromQuery('order_id');
+                $order_id = $this->params()->fromQuery('id');
                 if (is_int($order_id)) {
                     $order_id = strval($order_id);
                 }

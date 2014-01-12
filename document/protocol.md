@@ -329,7 +329,17 @@ start_day和end_day为”yyyy-MM-dd”格式的日期
 	延期记录中，coupon是空的，不用处理。coupon_id是我们需要使用的，在获取优惠券中，使用这个值。
 	
 
+######我的所有订单查询
 
+	protocol: cook/my_orders
+	type: get
+
+
+######我的一张订单查询
+
+	protocol: cook/my_order
+	type: get
+	params: id
 
 	
 	
