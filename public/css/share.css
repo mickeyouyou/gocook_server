@@ -1,7 +1,7 @@
 body {
     background:url('../images/share/bg.png') left top repeat ;
     position:relative;
-    width:480px;
+    width:100%;
     margin-left:auto;
     margin-right:auto;
 }
@@ -9,19 +9,18 @@ body {
     height:160px;
     background-image: url('../images/share/u0.png');
     margin-bottom: 10px;
-
 }
 #logo {
     position:absolute;
     left:10px;
     top:20px;
-    width:120px;
-    height:120px;
+    width:90px;
+    height:90px;
 }
 #logo_img {
     position:absolute;
-    width:120px;
-    height:120px;
+    width:90px;
+    height:90px;
     border: 0;
 }
 #u4{
@@ -30,7 +29,8 @@ body {
     top:38px;
     width:193px;
     height:62px;
-    font-family:'微软雅黑 Bold', '微软雅黑';
+    font-family:SimSun, sans-serif;
+    font-weight: bold;
     font-size:48px;
     color: #000;
     text-decoration: none;
@@ -42,7 +42,7 @@ body {
     top:102px;
     width:154px;
     height:31px;
-    font-family:'微软雅黑 Bold', '微软雅黑';
+    font-family:SimSun, sans-serif;
     font-weight:700;
     font-size:24px;
     color:#6BAE2A;
@@ -56,34 +56,34 @@ body {
     text-decoration: none;
     width:133px;
     height:110px;
-    font-family:'Arial Normal', 'Arial';
+    font-family:SimSun, sans-serif;
     font-weight:400;
     font-size:96px;
     color:#6BAE2A;
 }
 
 #content {
-    width:480px;
+    width:100%;
     height:auto;
-    font-family:'微软雅黑 Regular', '微软雅黑';
+    font-family:SimSun, sans-serif;
     font-size:30px;
     background-image: url('../images/share/u10.png');
 }
 .cover {
-    width:480px;
+    width:100%;
     height:320px;
 }
 .cover_img {
     position:absolute;
-    width:480px;
+    width:100%;
     height:320px;
 }
 /*菜谱名称*/
 #title {
-    width:440px;
-    margin-left: 20px;
+    width:90%;
+    margin-left: 5%;
     text-align: center;
-    font-family:'微软雅黑 Regular', '微软雅黑';
+    font-family:SimSun, sans-serif;
     font-weight:400;
     font-size:40px;
     color:#000;
@@ -92,7 +92,7 @@ body {
     text-align: right;
     width:350px;
     height:39px;
-    font-family:'微软雅黑 Regular', '微软雅黑';
+    font-family:SimSun, sans-serif;
     font-size:30px;
     color:#949494;
 }
@@ -100,18 +100,18 @@ body {
 #decription {
     margin-left: 20px;
     width:81px;
-    font-family:'微软雅黑 Regular', '微软雅黑';
+    font-family:SimSun, sans-serif;
     font-weight:400;
     font-size:40px;
     color:#000000;
 }
 
 #intro {
-    margin-left: 30px;
-    width: 420px;
+    margin-left: 5%;
+    width: 90%;
     margin-bottom: 10px;
     height:auto;
-    font-family:'微软雅黑 Regular', '微软雅黑';
+    font-family:SimSun, sans-serif;
     font-size:30px;
     color:#666666;
 }
@@ -121,7 +121,7 @@ body {
     font-size: 40px;
 }
 #material p{
-    margin:0px;
+    margin:0;
 }
 #material span{
     font-size: 30px;
@@ -131,14 +131,14 @@ body {
     overflow: hidden;
 }
 .m_line {
-    margin:0px;
+    margin:0;
     background-color: #999999;
     width: 428px;
     height: 2px;
 }
 #steps {
     height:auto;
-    font-family:'微软雅黑 Regular', '微软雅黑';
+    font-family:SimSun, sans-serif;
     font-weight:400;
     font-size:40px;
     margin-left: 20px;
@@ -148,7 +148,7 @@ body {
     margin-left: 20px;
     width:28px;
     height:57px;
-    font-family:'Arial Normal', 'Arial';
+    font-family:SimSun, sans-serif;
     font-weight:400;
     font-size:48px;
     color:#6BAE2A;
@@ -160,7 +160,7 @@ body {
     height:240px;
 }
 .step_content {
-    width:440px;
+    width:90%;
     font-size:30px;
     color:#666666;
     margin-bottom: 20px;
@@ -170,5 +170,5 @@ body {
     font-size: 40px;
     margin-bottom: 10px;
     margin-left: 20px;
-    width: 440px;
+    width: 90%;
 }
