@@ -43,9 +43,12 @@
         <div class="no">
             <span><?php echo $step['no']?></span>
         </div>
-        <?php if ($step['img'] != '') {?>
-        <img class="step_img_img" src="<?php echo '/images/recipe/step/' . $step['img']?>"/>
-        <?php }?>
+        <?php if ($step['img'] != '') { ?>
+            <?php if (substr($step['img'],0,4) == 'http') {?>
+                <img class="step_img_img" src="<?php echo $step['img']?>"/>
+            <?php } else {?>
+                <img class="step_img_img" src="<?php echo '/images/recipe/step/' . $step['img']?>"/>
+        <?php }}?>
         <div class="step_content">
             <span><?php echo $step['content']?></span>
         </div>
