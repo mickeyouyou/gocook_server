@@ -1,9 +1,9 @@
 <?php
 /**
-* UserLike
-* 
-* Created By Panda on 30/11/13
-*/
+ * HotKeyword
+ *
+ * Created By Panda on 16/01/14
+ */
 
 namespace Main\Entity;
 
@@ -11,32 +11,32 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="user_like")
- * @property integer $user_id
- * @property integer $recipe_id
+ * @ORM\Table(name="hotkeyword")
+ * @property integer $id
+ * @property string $keyword
  */
-class UserLike
+class HotKeyword
 {
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
      */
-    protected $user_id;
-    
+    protected $id;
+
     /**
      * @ORM\Id
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      */
-    protected $recipe_id;
-    
-    
+    protected $keyword;
+
+
     /**
      * Magic getter to expose protected properties.
      *
      * @param string $property
      * @return mixed
      */
-    public function __get($property) 
+    public function __get($property)
     {
         return $this->$property;
     }
@@ -47,9 +47,9 @@ class UserLike
      * @param string $property
      * @param mixed $value
      */
-    public function __set($property, $value) 
+    public function __set($property, $value)
     {
         $this->$property = $value;
-    }  
-    
+    }
+
 }
