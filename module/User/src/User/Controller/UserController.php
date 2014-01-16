@@ -371,6 +371,7 @@ class UserController extends BaseAbstractActionController
             $province = $authService->getIdentity()->__get('province');
             $tel = $authService->getIdentity()->__get('tel');
             $intro = $authService->getIdentity()->__get('intro');
+            $credit = $authService->getIdentity()->__get('credit');
 
             $result_info = array(
                 'userid' => $user_id,
@@ -383,6 +384,7 @@ class UserController extends BaseAbstractActionController
                 'province' => $province,
                 'tel' => $tel,
                 'intro' => $intro,
+                'credit' => $credit,
             );
 
             $result = GCFlag::GC_Success;
