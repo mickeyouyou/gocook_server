@@ -310,9 +310,16 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
 
         $this->entityManager->persist($recipe);
         $this->entityManager->flush();
-        $result = 0;
-        $error_code = 0;
-        return array($result, $error_code);
+
+        $result = GCFlag::GC_Success;
+        $error_code = GCFlag::GC_NoErrorCode;
+        if ($is_create) {
+            $cookService = $this->getServiceManager()->get('cook_service');
+            $cookService->addCredit($user_id, GCFlag::Credit_Normal);
+            return array($result, $error_code, GCFlag::Credit_Normal);
+        } else {
+            return array($result, $error_code, 0);
+        }
     }
 
 
@@ -397,6 +404,7 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
 
         $result = 1;
         $errorcode = 1;
+        $credit = 0;
 
         $authService = $this->serviceManager->get('Zend\Authentication\AuthenticationService');
         $user_id = intval($authService->getIdentity()->__get('user_id'));
@@ -420,15 +428,20 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
                 $this->entityManager->remove($recipe);
                 $this->entityManager->flush();
 
-                $result = 0;
-                $errorcode = 0;
+                $result = GCFlag::GC_Success;
+                $errorcode = GCFlag::GC_NoErrorCode;
+                $credit = GCFlag::Credit_Normal;
+
+                $cookService = $this->getServiceManager()->get('cook_service');
+                $cookService->removeCredit($user_id, GCFlag::Credit_Normal);
+
             } else {
                 $result = GCFlag::GC_Failed;
                 $errorcode = GCFlag::GC_RecipeNotBelong2U;
             }
         }
 
-        return array($result, $errorcode);
+        return array($result, $errorcode, $credit);
     }
 
 

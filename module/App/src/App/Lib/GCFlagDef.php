@@ -31,6 +31,9 @@ final class GCFlag {
     const GC_Success = 0;                       // 成功
     const GC_Failed = 1;                        // 失败
 
+    // credit
+    const Credit_Normal = 10;
+
 
     // go_cook return error code
     const GC_NoErrorCode = 0;                   // 无错误码

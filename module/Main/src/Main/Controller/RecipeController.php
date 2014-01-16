@@ -269,6 +269,7 @@ class RecipeController extends BaseAbstractActionController {
     {
         $result = GCFlag::GC_Success;
         $error_code = GCFlag::GC_NoErrorCode;
+        $credit = 0;
 
         $request = $this->getRequest();
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
@@ -287,6 +288,7 @@ class RecipeController extends BaseAbstractActionController {
                     $result_array = $recipeService->saveRecipe($data);
                     $result = $result_array[0];
                     $error_code = $result_array[1];
+                    $credit = $result_array[2];
                 } else {
                     $result = GCFlag::GC_Failed;
                     $error_code = GCFlag::GC_PostInvalid;
@@ -309,6 +311,7 @@ class RecipeController extends BaseAbstractActionController {
         return new JsonModel(array(
             'result' => $result,
             'errorcode' => $error_code,
+            'credit' => $credit,
         ));
     }
 
@@ -317,6 +320,7 @@ class RecipeController extends BaseAbstractActionController {
     {
         $result = GCFlag::GC_Success;
         $error_code = GCFlag::GC_NoErrorCode;
+        $credit = 0;
 
         $request = $this->getRequest();
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
@@ -335,6 +339,7 @@ class RecipeController extends BaseAbstractActionController {
                     $result_array = $recipeService->saveRecipe($data);
                     $result = $result_array[0];
                     $error_code = $result_array[1];
+                    $credit = $result_array[2];
                 } else {
                     $result = GCFlag::GC_Failed;
                     $error_code = GCFlag::GC_PostInvalid;
@@ -357,6 +362,7 @@ class RecipeController extends BaseAbstractActionController {
         return new JsonModel(array(
             'result' => $result,
             'errorcode' => $error_code,
+            'credit' => $credit,
         ));
     }
 
@@ -364,6 +370,7 @@ class RecipeController extends BaseAbstractActionController {
     public function deleteAction() {
         $result = GCFlag::GC_Success;
         $error_code = GCFlag::GC_NoErrorCode;
+        $credit = 0;
 
         $request = $this->getRequest();
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
@@ -382,9 +389,10 @@ class RecipeController extends BaseAbstractActionController {
                 $result_array = $recipeService->delRecipe($recipe_id);
                 $result = $result_array[0];
                 $error_code = $result_array[1];
+                $credit = $result_array[2];
             } else {
-                $result = 1;
-                $error_code = 403;
+                $result = GCFlag::GC_Failed;
+                $error_code = GCFlag::GC_GetParamInvalid;
             }
         } else {
             if (!$this->isMobile($request))
@@ -400,6 +408,7 @@ class RecipeController extends BaseAbstractActionController {
         return new JsonModel(array(
             'result' => $result,
             'errorcode' => $error_code,
+            'credit' => $credit,
         ));
 
 

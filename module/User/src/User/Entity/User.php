@@ -116,7 +116,12 @@ class User
     /**
      * @ORM\Column(type="text")
      */
-    protected $intro;   
+    protected $intro;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    protected $credit;
 
     public function __construct() 
     {

@@ -119,6 +119,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $tmp_recipe = $recipe_repository->findOneBy(array('recipe_id' => $collid));
         if ($tmp_recipe)
         {
+            $this->addCredit($tmp_recipe->__get('user_id'), GCFlag::Credit_Normal);
             $coll_count = $tmp_recipe->__get('collected_count') + 1;
             $tmp_recipe->__set('collected_count', $coll_count);
             $this->entityManager->persist($tmp_recipe);
@@ -169,6 +170,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
             //查找是否有该菜谱
             $tmp_recipe = $recipe_repository->findOneBy(array('recipe_id' => $coll_id));
             if ($tmp_recipe) {
+                $this->removeCredit($tmp_recipe->__get('user_id'), GCFlag::Credit_Normal);
                 $coll_count = $tmp_recipe->__get('collected_count') - 1;
                 if ($coll_count < 0) {
                     $coll_count = 0;
@@ -253,6 +255,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $tmp_recipe = $recipe_repository->findOneBy(array('recipe_id' => $like_id));
         if ($tmp_recipe)
         {
+            $this->addCredit($tmp_recipe->__get('user_id'), GCFlag::Credit_Normal);
             $coll_count = $tmp_recipe->__get('like_count') + 1;
             $tmp_recipe->__set('like_count', $coll_count);
             $this->entityManager->persist($tmp_recipe);
@@ -285,6 +288,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
             //查找是否有该菜谱
             $tmp_recipe = $recipe_repository->findOneBy(array('recipe_id' => $like_id));
             if ($tmp_recipe) {
+                $this->removeCredit($tmp_recipe->__get('user_id'), GCFlag::Credit_Normal);
                 $like_count = $tmp_recipe->__get('like_count') - 1;
                 if ($like_count < 0) {
                     $like_count = 0;
@@ -499,6 +503,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $user_repository = $this->entityManager->getRepository('User\Entity\User');
         $other_user = $user_repository->findOneBy(array('user_id' => $other_user_id));
         if ($other_user) {
+            $this->addCredit($other_user_id, GCFlag::Credit_Normal);
             $other_user_info = $other_user->__get('user_info');
             if ($other_user_info) {
                 $other_count = $other_user_info->__get('followed_count') + 1;
@@ -575,6 +580,7 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $user_repository = $this->entityManager->getRepository('User\Entity\User');
         $other_user = $user_repository->findOneBy(array('user_id' => $other_user_id));
         if ($other_user) {
+            $this->removeCredit($other_user_id, GCFlag::Credit_Normal);
             $other_user_info = $other_user->__get('user_info');
             if ($other_user_info) {
                 $other_count = $other_user_info->__get('followed_count') - 1;
@@ -837,6 +843,47 @@ class CookService implements ServiceManagerAwareInterface, LoggerAwareInterface
         $this->ResetUserInfoUserFollowed($user_id, $count);
 
         return $count;
+    }
+
+    /**************************************************************
+     *
+     * 加积分
+     * @access public
+     *
+     *************************************************************/
+    public function addCredit($user_id, $count)
+    {
+        $user_repository = $this->entityManager->getRepository('User\Entity\User');
+        $user = $user_repository->findOneBy(array('user_id' => $user_id));
+        if ($user) {
+            $credit = $user->__get('credit');
+            $credit += $count;
+            $user->__set('credit', $credit);
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        }
+    }
+
+    /**************************************************************
+     *
+     * 减积分
+     * @access public
+     *
+     *************************************************************/
+    public function removeCredit($user_id, $count)
+    {
+        $user_repository = $this->entityManager->getRepository('User\Entity\User');
+        $user = $user_repository->findOneBy(array('user_id' => $user_id));
+        if ($user) {
+            $credit = $user->__get('credit');
+            $credit -= $count;
+            if ($credit < 0) {
+                $credit = 0;
+            }
+            $user->__set('credit', $credit);
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        }
     }
 
     /**************************************************************
