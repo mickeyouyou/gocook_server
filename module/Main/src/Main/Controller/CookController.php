@@ -345,6 +345,7 @@ class CookController extends BaseAbstractActionController {
                     'gender' => $gender,
                     'city' => $city,
                     'intro' => $intro,
+                    'credit' => $user->__get('credit'),
                     'recipes' => $result_array[1],
                     'watch' => $watch,
 					'recipe_count' => $user_info->__get('recipe_count'),
