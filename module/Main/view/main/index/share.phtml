@@ -11,20 +11,22 @@
 <body>
 <!--banner-->
 <div id="banner">
-    <a href="http://o2o.m6fresh.com/appdownload.aspx">
-        <img class="logo_img" src="/images/share/u2.png" width="70" height="70"/>
-        <span class="m6 font">M6</span>
-        <div class="share font">分享厨房</div>
-        <div class="app font">APP下载入口</div>
-    </a>
+    <div style="width: 320px; margin-left: auto; margin-right: auto; position: relative;">
+        <a href="http://o2o.m6fresh.com/appdownload.aspx">
+            <div style="position: absolute; left: 10px; top: 20px;"><img class="logo_img" src="/images/share/u2.png" width="75" height="75"/></div>
+            <div style="position: absolute; left: 90px; top: 34px;"><span class="m6 font">M6</span></div>
+            <div class="share font" style="position: absolute; left: 184px; top: 40px;">分享厨房</div>
+            <div class="app font" style="position: absolute; left: 200px; top: 78px;">APP下载入口</div>
+        </a>
+    </div>
 </div>
 
-<div id="content font">
+<div id="content font" style="margin-top: 10px;">
     <div class="cover" style="background-image:url(<?php echo $this->result_array['cover_image']?>)"></div>
     <div id="title" ><span><?php echo $this->result_array['recipe_name']?></span></div>
     <div id="author"><span>by <?php echo $this->result_array['author_name']?></span></div>
-    <div id="intro"><span> <?php echo str_replace("\n", "<br/>", $this->result_array['intro'])?></span></div>
-    <div id="material">
+    <div id="intro" style="margin-top: 20px;"><p>简介</p><span> <?php echo str_replace("\n", "<br/>", $this->result_array['intro'])?></span></div>
+    <div id="material" style="margin-top: 30px; margin-bottom: 30px;">
         <p>用料</p>
         <?php
         $m_count = count($this->materials);
@@ -43,7 +45,7 @@
     </div>
 
     <div id="steps" >
-        <span style="font-size: 28px">做法</span>
+        <div style="margin-bottom: 20px;"><span style="font-size: 20px;font-weight: bold;">做法</span></div>
         <?php foreach($steps as $step) { ?>
             <div class="no">
                 <span><?php echo $step['no']?></span>
