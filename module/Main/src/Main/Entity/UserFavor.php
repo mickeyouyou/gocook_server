@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="user_favor")
  * @property bigint $id
- * #property string $user_id
+ * @property string $user_id
  * @property integer $dish_id
  * @property smallint state
  */

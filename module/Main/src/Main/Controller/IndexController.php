@@ -105,11 +105,14 @@ class IndexController extends BaseAbstractActionController {
             $tophot_img = 'images/recipe/140/'.$topRecipe->cover_img;
 
             $recommend_items = array();
-            $recommend_keywords = array('家常菜','猪肉','快手菜','汤羹','鱼','夏日菜');
-            foreach ($recommend_keywords as $keyword){
-                $recipes = $recipeService->getRecipesByKeywordOfCatgory($keyword, 4, 0);
+
+            $repository = $this->getEntityManager()->getRepository('Main\Entity\HotKeyword');
+            $keywords = $repository->findAll();
+
+            foreach ($keywords as $keyword){
+                $recipes = $recipeService->getReicpesByAutoSearch($keyword->__get('keyword'), 4, 0);
                 $recommend_item = array();
-                $recommend_item['name'] = $keyword;
+                $recommend_item['name'] = $keyword->__get('keyword');
                 $recommend_item['images'] = array();
                 foreach ($recipes as $recipe){
                     array_push($recommend_item['images'], 'images/recipe/140/'.$recipe->__get('cover_img'));

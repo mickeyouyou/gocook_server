@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity
  * @ORM\Table(name="user_collection")
- * #property string $user_id
+ * @property integer $user_id
  * @property integer $recipe_id
  */
 class UserCollection
