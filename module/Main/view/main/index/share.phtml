@@ -6,52 +6,57 @@
     <?php echo $this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1.0') ?>
     <?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/images/share/favicon.ico'))
         ->prependStylesheet($this->basePath() . '/css/share.css') ?>
+
 </head>
 <body>
 <!--banner-->
 <div id="banner">
     <a href="http://o2o.m6fresh.com/appdownload.aspx">
-        <div id="logo"><img id="logo_img" class="img " src="/images/share/u2.png"/></div>
-        <div id="u8"><span>M6</span></div>
-        <div id="u4" ><span>分享厨房</span></div>
-        <div id="u6"><span>APP 下载入口</span></div>
+        <img class="logo_img" src="/images/share/u2.png" width="70" height="70"/>
+        <span class="m6 font">M6</span>
+        <div class="share font">分享厨房</div>
+        <div class="app font">APP下载入口</div>
     </a>
 </div>
 
-<div id="content">
+<div id="content font">
     <div class="cover"><img class="cover_img"  src="<?php echo $this->result_array['cover_image']?>"/></div>
     <div id="title" ><span><?php echo $this->result_array['recipe_name']?></span></div>
     <div id="author"><span>by <?php echo $this->result_array['author_name']?></span></div>
-    <div id="decription"><span>简介</span></div>
     <div id="intro"><span> <?php echo str_replace("\n", "<br/>", $this->result_array['intro'])?></span></div>
     <div id="material">
         <p>用料</p>
         <?php
-            for($i = 0; $i < count($this->materials); $i++) {
-                if ($i % 2 == 0) {
-                    echo '<span style="text-align: left">'. $this->materials[$i] .'</span>';
-                } else {
-                    echo '<span style="text-align: right">'. $this->materials[$i] .'</span><div class="m_line"></div>';
+        $m_count = count($this->materials);
+        for($i = 0; $i < $m_count; $i++) {
+            if ($i % 2 == 0) {
+                echo '<span style="text-align: left;color:#383838;">'. $this->materials[$i] .'</span>';
+            } else {
+                echo '<span style="">'. $this->materials[$i] .'</span>';
+                if ($i != $m_count - 1) {
+                    echo '<div class="m_line"></div>';
                 }
+                
             }
+        }
         ?>
     </div>
 
     <div id="steps" >
-        <span>做法</span>
+        <span style="font-size: 28px">做法</span>
         <?php foreach($steps as $step) { ?>
-        <div class="no">
-            <span><?php echo $step['no']?></span>
-        </div>
-        <?php if ($step['img'] != '') { ?>
-            <?php if (substr($step['img'],0,4) == 'http') {?>
-                <img class="step_img_img" src="<?php echo $step['img']?>"/>
-            <?php } else {?>
-                <img class="step_img_img" src="<?php echo '/images/recipe/step/' . $step['img']?>"/>
-        <?php }}?>
-        <div class="step_content">
-            <span><?php echo $step['content']?></span>
-        </div>
+            <div class="no">
+                <span><?php echo $step['no']?></span>
+            </div>
+            <?php if ($step['img'] != '') { ?>
+                <?php if (substr($step['img'],0,4) == 'http') {?>
+                    <img class="step_img_img" src="<?php echo $step['img']?>"/>
+                <?php } else {?>
+                    <img class="step_img_img" src="<?php echo '/images/recipe/step/' . $step['img']?>"/>
+                <?php }}?>
+            <div class="step_content">
+                <span><?php echo $step['content']?></span>
+            </div>
         <?php }?>
     </div>
 
