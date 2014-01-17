@@ -14,7 +14,7 @@
     <div style="width: 320px; margin-left: auto; margin-right: auto; position: relative;">
         <a href="http://o2o.m6fresh.com/appdownload.aspx">
             <div style="position: absolute; left: 10px; top: 20px;"><img class="logo_img" src="/images/share/u2.png" width="75" height="75"/></div>
-            <div style="position: absolute; left: 90px; top: 34px;"><span class="m6 font">M6</span></div>
+            <div class="m6 font" style="position: absolute; left: 90px; top: 34px;">M6</div>
             <div class="share font" style="position: absolute; left: 184px; top: 40px;">分享厨房</div>
             <div class="app font" style="position: absolute; left: 200px; top: 78px;">APP下载入口</div>
         </a>
@@ -62,12 +62,14 @@
         <?php }?>
     </div>
 
+    <?php if ($this->result_array['tips'] != '') { ?>
     <div id="tips">
         <span>小提示</span>
         <div class="step_content">
             <?php echo str_replace("\n", "<br/>", $this->result_array['tips'])?>
         </div>
     </div>
+    <?php } ?>
 </div>
 </body>
 </html>
