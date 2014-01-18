@@ -41,6 +41,14 @@ class RecipeService implements ServiceManagerAwareInterface, LoggerAwareInterfac
     }
 
     // 获取最新的菜谱
+    public function getTopNewRecipe()
+    {
+        $recipes = $this->entityManager->getRepository('Main\Entity\Recipe')->getRecipesByCreateDate(1,0);
+        $top_recipe = $recipes[0];
+        return $top_recipe;
+    }
+
+    // 获取最新的菜谱
     public function getTopNewRecipes($limit, $offset=0)
     {
         $recipes = $this->entityManager->getRepository('Main\Entity\Recipe')->getRecipesByCreateDate($limit,$offset);

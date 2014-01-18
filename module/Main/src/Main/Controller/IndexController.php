@@ -98,11 +98,12 @@ class IndexController extends BaseAbstractActionController {
 
         if ($this->isMobile($request))
         {
-            $topnew_img = 'images/recipe/140/265058.1.jpg';
-
             $recipeService = $this->getServiceLocator()->get('recipe_service');
             $topRecipe = $recipeService->getTopLikeRecipe();
             $tophot_img = 'images/recipe/140/'.$topRecipe->cover_img;
+
+            $topRecipe = $recipeService->getTopNewRecipe();
+            $topnew_img = 'images/recipe/140/'.$topRecipe->cover_img;
 
             $recommend_items = array();
 
