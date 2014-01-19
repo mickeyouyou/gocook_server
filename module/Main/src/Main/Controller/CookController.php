@@ -88,6 +88,7 @@ class CookController extends BaseAbstractActionController {
                     'result' => GCFlag::GC_Success,
                     'errorcode' => $error_result,
                     'collid' => $collid,
+                    'credit' => GCFlag::Credit_Normal,
                 ));
             }
             else
@@ -136,6 +137,7 @@ class CookController extends BaseAbstractActionController {
                     'result' => GCFlag::GC_Success,
                     'errorcode' => $code_result,
                     'collid' => $collid,
+                    'credit' => GCFlag::Credit_Normal,
                 ));
             } else {
                 return new JsonModel(array(
@@ -225,6 +227,7 @@ class CookController extends BaseAbstractActionController {
                     'result' => GCFlag::GC_Success,
                     'errorcode' => $error_result,
                     'likeid' => $like_id,
+                    'credit' => GCFlag::Credit_Normal,
                 ));
             }
             else
@@ -273,6 +276,7 @@ class CookController extends BaseAbstractActionController {
                     'result' => GCFlag::GC_Success,
                     'errorcode' => $code_result,
                     'likeid' => $like_id,
+                    'credit' => GCFlag::Credit_Normal,
                 ));
             } else {
                 return new JsonModel(array(
@@ -434,6 +438,7 @@ class CookController extends BaseAbstractActionController {
                     'result' => GCFlag::GC_Success,
                     'errorcode' => $result,
                     'watchid' => $watch_id,
+                    'credit' => GCFlag::Credit_Normal,
                 ));
             }
             else
@@ -481,6 +486,7 @@ class CookController extends BaseAbstractActionController {
                     'result' => GCFlag::GC_Success,
                     'errorcode' => $result,
                     'watchid' => $watchid,
+                    'credit' => GCFlag::Credit_Normal,
                 ));
             } else {
                 return new JsonModel(array(
