@@ -2,17 +2,17 @@ Return Code
 =============
 
 
-####success code
+#### success code
 
 success code: 0
 
 
-####error code
+#### error code
 
 error == 1 : authecation error
 
 
-####通用错误码
+#### 通用错误码
 101: 非移动设备
 
 102: 未授权用户
@@ -21,7 +21,7 @@ error == 1 : authecation error
 
 104: 上传post不合法
 
-####host/recipe 相关的错误码
+#### host/recipe 相关的错误码
 		
 401: 此菜谱不存在
 
@@ -41,7 +41,7 @@ error == 1 : authecation error
 
 409: 新建菜谱的封面不能为空
 
-####host/user 注册登陆相关的错误码
+#### host/user 注册登陆相关的错误码
 201: 电话号码重复
 
 202: 昵称重复
