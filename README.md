@@ -5,29 +5,29 @@ gocook_server
 
 
 
-##Introduction
+## Introduction
 ------------
 This is gocook_server code.
 
 
-##Installation
+## Installation
 ------------
 
 
-###Apache & PHP(>=5.3) & Mysql
+### Apache & PHP(>=5.3) & Mysql
 ----------------------------
-#####For linux(ubuntu):
+##### For linux(ubuntu):
 	sudo apt-get update
 	sudo apt-get install git
 	sudo apt-get install apache2
 	sudo apt-get install php5 libapache2-mod-php5 php5-mcrypt
 	sudo apt-get install mysql-server libapache2-mod-auth-mysql php5-mysql
 
-#####For MacOSX:
+##### For MacOSX:
 Just Install binary mysql
 
 
-###Virtual Host
+### Virtual Host
 ------------
 
 1. Change Document
@@ -96,7 +96,7 @@ Just Install binary mysql
 
 
 
-##Zend Framework
+## Zend Framework
 ----------------------------
 Install (It will take some time depends on your network, so just relax and have a cup of tea)
 
@@ -114,7 +114,7 @@ Then you should make some change.
 	chmod 777 my/proj/dir/gocook_server/data/cache
 	chmod 777 my/proj/dir/gocook_server/data/DoctrineORMModule
 
-###Config Project Database
+### Config Project Database
 ----------------------------
 1. if you don't have mysql, please install it. After that,
 	
@@ -136,5 +136,5 @@ Then you should make some change.
 2. copy `config/autoload/database.local.php.dist` and rename the file as `database.local.php`. Remeber to change the user and password.
 2. copy `config/autoload/zenddevelopertools.local.php.dist` and rename the file as `zenddevelopertools.local.php`.
 
-###Finish
+### Finish
 Afterwards, you should be ready to go!
