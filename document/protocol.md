@@ -2,10 +2,12 @@
 =============
 
 (客户端协议带http头"x-client-identifier" => "Mobile" 才能正常返回json)
-###用户相关
+
+### 用户相关
 ------------
-######登陆Ex
-	protocol: cook/login_ex
+###### 登陆Ex
+
+	protocol: cook/login_ex
     type: post  
     params: `data`	M6服务器返回的数据 
     		`rnd`	随机数
@@ -18,14 +20,14 @@
 	3. 取出该数据，用post的方式把之前生成的随机数rnd和分享厨房验证数据data发到分享厨房的登陆协议`cook/login_ex`，后续流程不变
 	
 
-######登录:
+###### 登录:
 	protocol: user/login 
 	post params: login password
 	return: {"result":0, "errorcode":0, "username":"user", icon:"iconurl"}
 
 带用户名（email）和密码登录，返回: result（0为成功，1为失败）, errorcode(暂时只有1)
 
-######注册:
+###### 注册:
 	protocol: user/register 
 	post params: email nickname password repassword avatar(optional)
 	return: {"result":0, "errorcode":0, "username":"user", "icon":"iconurl"}
@@ -33,7 +35,7 @@
 avatar为可选，类型为file。返回: result（0为成功，1为失败）, errorcode(1:注册失败;2:email不可用;3:nickname不可用;4:密码格式不对;5:其他)
 
 
-######ios主页:
+###### ios主页:
 
 	protocol: index/ios_main
 	return: {"result":0, "topnew_img":"image-url", "tophot_img":"image-url", "recommend_items":[{"name":"name", "images":"image-url"},…]}
@@ -41,7 +43,7 @@ avatar为可选，类型为file。返回: result（0为成功，1为失败）, e
 ios主页协议。分别返回收总藏数最多的菜谱的图片，最新上传的图片，以及热门搜索的图片。android如果不能用，需要再实现一个。
 
 
-######搜索:
+###### 搜索:
 
 	protocol: index/search?keyword='keyword'&page='page' 
 	return: {"result":0, "result_recipes":[{"recipe_id":1, "name":"recipeName", "image":"image-url", "dish_count":123}...]}
@@ -49,7 +51,7 @@ ios主页协议。分别返回收总藏数最多的菜谱的图片，最新上�
 搜索协议。从菜谱名，用料，分类中查找有关的菜谱，并返回菜谱id，名字，图片url和收藏数。每次返回10个。
 
 
-######最新菜谱
+###### 最新菜谱
 
 	protocol: recipe/topnew?page='page'
 	return: {"result":0, "result_recipes":[{"recipe_id":1, "name":"recipeName", "image":"image-url", "dish_count":123}…]}
@@ -57,7 +59,7 @@ ios主页协议。分别返回收总藏数最多的菜谱的图片，最新上�
 最新菜谱协议。返回内容和搜索一样，每次也是返回10个。
 
 
-######收藏最多菜谱
+###### 收藏最多菜谱
 
 	protocol: recipe/topnew?page='page'
 	return: {"result":0, "result_recipes":[{"recipe_id":1, "name":"recipeName", "image":"image-url", "dish_count":123}...]}
@@ -65,7 +67,7 @@ ios主页协议。分别返回收总藏数最多的菜谱的图片，最新上�
 收藏最多菜谱协议。返回内容和搜索一样，每次也是返回10个。
 
 
-######菜谱详细内容
+###### 菜谱详细内容
 
 	protocol: recipe?id='id'
 	return: {"result":0, "result_recipe":[{"recipe_id":1, "author_id":1, "author_name":"authorName", "recipe_name":"recipeName", "intro" => "Intro", "collected_count":1, "like_count":1,"dish_count":1, "comment_count":1, "cover_image":"image-url", "materials":"Meterials", "steps":[{"no":1,"content":"Content", "img":"img-url"}…], "tips":"Tips"}…], collect, like}
@@ -73,87 +75,87 @@ ios主页协议。分别返回收总藏数最多的菜谱的图片，最新上�
 菜谱详细内容协议。返回内容如上。其中meterials需要单独在客户端解析，结构如"A|B|C||E|"这样，材料和用量成对出现，如果无用量，也要空出位置，例如C后面要空一个，E后面要空一个。collect代表是否收藏，like代表是否点赞，两个都是用0表示true，用1表示false。
 
 
-######我的收藏
+###### 我的收藏
 	protocol: mycoll?page='page'
 	return: {"result":0, "errorcode":0, "total":10, "cur_page":1, "result_recipes":[{"recipe_id":1, "name":"recipeName", "materials":"materials", "image":"url", "dish_count":10},…]}
 
 我的收藏协议。其中dish_count暂时保留。
 
-######添加收藏
+###### 添加收藏
 	protocol: addmycoll?collid='id'
 	return: {"result":0, "errorcode":0, "collid":10}
 	
-######取消收藏
+###### 取消收藏
 	protocol: delmycoll?collid='id'
 	return: {"result":0, "errorcode":0, "collid":10}
 	
 	
-######我赞过的菜谱
+###### 赞过的菜谱
 	protocol: my_like?page='page'
 	return: {"result":0, "errorcode":0, "total":10, "cur_page":1, "result_recipes":[{"recipe_id":1, "name":"recipeName", "materials":"materials", "image":"url", "dish_count":10},…]}
 
 我的赞协议。其中dish_count暂时保留。
 
 
-######菜谱添加赞
+###### 菜谱添加赞
 	protocol: like?likeid='id'
 	return: {"result":0, "errorcode":0, "likeid":10}
 GC_AlreadyLikedRecipe = 407,          // 已经赞过该菜谱
 	
-######菜谱取消赞
+###### 菜谱取消赞
 	protocol: unlike?likeid='id'
 	return: {"result":0, "errorcode":0, "likeid":10}
 GC_NotLikedRecipe = 408,                // 该菜谱本人未赞过
 
 	
-######查询用户信息	
+###### 查询用户信息	
 	protocol: kitchen?userid='id'
 	return: {"result":0, "errorcode":0", "result_kitchen_info":{"userid":1, "nickname":"nickName", "avatar":"url", "gender":0, "city":"City", "intro":"Intro", "recipes":[],"watch":1, "recipe_count":0, "collect_count":0, "following_count":0, "followed_count":0}}
 
 其中recipes字段是android使用的，包含最多三个菜谱用来显示
 
-######我的关注 (deprecated)
+###### 我的关注 (deprecated)
 	protocol: mywatch?page='page'
 	return: {"result":0, "errorcode":0, "total":10, "cur_page":1, "result_users":[{"user_id":1, "name":"userName", "portrait":"url", "recipe_count":0, "following_count":0},…]}
 
-######添加关注
+###### 添加关注
 	protocol: watch?watchid='id'
 	return: {"result":0, "errorcode":0, "watchid":10}
 	
-######取消关注
+###### 取消关注
 	protocol: unwatch?watchid='id'
 	return: {"result":0, "errorcode":0, "watchid":10}
 
-######我的粉丝 (deprecated)
+###### 我的粉丝 (deprecated)
 	protocol: myfans?page='page'
 	return: {"result":0, "errorcode":0, "total":10, "cur_page":1, "result_users":[{"user_id":1, "name":"userName", "portrait":"url", "recipe_count":0, "followed_count":0},…]}
 
-######我的菜谱列表 (deprecated)
+###### 我的菜谱列表 (deprecated)
 	protocol: myrecipes?page='page'
 	return: {"result":0, "errorcode":0, "total":10, "cur_page":1, "result_recipes":[{"recipe_id":1, "name":"recipeName", "materials":"materials", "image":"url", "dish_count":10},…]}
 	
-######某人的菜谱列表
+###### 某人的菜谱列表
 	protocol: usersrecipes?userid='userid'&page='page'
 	return: {"result":0, "errorcode":0, "totalrecipecount":10, "cur_page":1, "result_recipes":[{"recipe_id":1, "name":"recipeName", "materials":"materials", "image":"url", "dish_count":10},…]}
 	
-######某人的关注
+###### 某人的关注
 	protocol: user_watch?userid='userid'&page='page'
 	return: {"result":0, "errorcode":0, "total":10, "cur_page":1, "result_users":[{"user_id":1, "name":"userName", "portrait":"url", "recipe_count":0, "following_count":0},…]}
 	
-######某人的粉丝
+###### 某人的粉丝
 	protocol: user_fans?userid='userid'&page='page'
 	return: {"result":0, "errorcode":0, "total":10, "cur_page":1, "result_users":[{"user_id":1, "name":"userName", "portrait":"url", "recipe_count":0, "followed_count":0},…]}
 	
-######收藏，粉丝数量，关注数量，购买数量
+###### 收藏，粉丝数量，关注数量，购买数量
 	protocol: kitchen_info?userid='userid'
 	return: {"result":0, "errorcode":0, "recipe_count":10, "collect_count":1, "following_count":1, "followed_count":1, "order_count":1}
 	
 <br />
 <br />
-###跟甲方服务器交互相关协议
+### 跟甲方服务器交互相关协议
 ------------
 
-######登录
+###### 登录
 
 	protocol: user/login
 	type: post
@@ -163,7 +165,7 @@ GC_NotLikedRecipe = 408,                // 该菜谱本人未赞过
 	
 password为3des加密后的字符串。
 
-######注册
+###### 注册
 
 	protocol: user/register
 	type: post
@@ -177,7 +179,7 @@ password为3des加密后的字符串。
 	
 avatar为可选，类型为file；email为可选；password和repassword为3des加密后的字符串。
 
-######商品查询
+###### 商品查询
 
 	protocol: cook/search_wares
 	type: get
@@ -187,7 +189,7 @@ avatar为可选，类型为file；email为可选；password和repassword为3des�
 	
 page从1开始
 	
-######订购M6商品
+###### 订购M6商品
 
 	protocol: cook/order
 	type: post
@@ -197,7 +199,7 @@ page从1开始
 发送的wares字段格式为`"Wares":[{"WareId":6745,"Quantity":1,"Remark":"切块洗洗"}]`
 
 	
-######历史订单查询
+###### 历史订单查询
 
 	protocol: cook/his_orders
 	type: post
@@ -208,15 +210,19 @@ page从1开始
 	
 start_day和end_day为”yyyy-MM-dd”格式的日期
 
-######查询当天销售额
+###### 查询当天销售额
 	protocol: cook/day_sales
 	type: get
 	return: json {result, errorcode, time, sale_fee, sale_count, condition, remark}
 	
-	time 		”yyyy-MM-dd HH:mm:ss”格式的服务器时间	sale_fee 	指定日期的销售额
+	time 		”yyyy-MM-dd HH:mm:ss”格式的服务器时间
+	sale_fee 	指定日期的销售额
 	sale_count	销售笔数
-	condition	是否符合获取优惠券条件 1符合费用 0不符合费用 2没有可用促销活动 3广告	remark		是否符合条件说明
-######获取优惠券
+	condition	是否符合获取优惠券条件 1符合费用 0不符合费用 2没有可用促销活动 3广告
+	remark		是否符合条件说明
+
+
+###### 获取优惠券
 	protocol: cook/get_coupon
 	type: get
 	param: `coupon_id`
@@ -245,7 +251,7 @@ start_day和end_day为”yyyy-MM-dd”格式的日期
     wid			对应商品编号
     
     
-######延期获取优惠券
+###### 延期获取优惠券
 	protocol: cook/delay_coupon
 	type: get
 	return: json {result, errorcode, delay_rst, id, time, eff_day, exp_day, condition, remark}
@@ -256,8 +262,13 @@ start_day和end_day为”yyyy-MM-dd”格式的日期
     eff_day		”yyyy-MM-dd”格式的优惠券延期生效日期
     exp_day		”yyyy-MM-dd”格式的优惠券延期失效日期
     condition	是否符合获取优惠券条件 1 符合费用 0 不符合费用 2 没有可用促销活动 3 广告
-    remark		是否符合条件说明######获取客户拥有的优惠券列表
-	protocol: cook/my_coupons
+    remark		是否符合条件说明
+
+
+
+###### 获取客户拥有的优惠券列表
+
+	protocol: cook/my_coupons
     type: get  
     params: page （我们默认一页10条记录，page从1开始）
 	return: json {result, errorcode, page, total_count, coupons}
@@ -329,8 +340,9 @@ start_day和end_day为”yyyy-MM-dd”格式的日期
 	延期记录中，coupon是空的，不用处理。coupon_id是我们需要使用的，在获取优惠券中，使用这个值。
 	
 
-######拉取甲方授权
-	protocol: cook/my_auth
+###### 拉取甲方授权
+
+	protocol: cook/my_auth
     type: get  
 	return: json {result, errorcode, name, value}
 
